@@ -1,0 +1,34 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 10.00
+# Visual Studio 2008
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "nv_cuda", "nv_cuda.vcproj", "{B1E88BE4-AF16-4059-9635-8A3E13034059}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "debug", "debug.vcproj", "{64C3F77C-1B3B-47E1-B304-FBF5522A3D79}"
+	ProjectSection(ProjectDependencies) = postProject
+		{B1E88BE4-AF16-4059-9635-8A3E13034059} = {B1E88BE4-AF16-4059-9635-8A3E13034059}
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug_EMU|Win32 = Debug_EMU|Win32
+		Debug|Win32 = Debug|Win32
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{B1E88BE4-AF16-4059-9635-8A3E13034059}.Debug_EMU|Win32.ActiveCfg = Debug_EMU|Win32
+		{B1E88BE4-AF16-4059-9635-8A3E13034059}.Debug_EMU|Win32.Build.0 = Debug_EMU|Win32
+		{B1E88BE4-AF16-4059-9635-8A3E13034059}.Debug|Win32.ActiveCfg = Debug|Win32
+		{B1E88BE4-AF16-4059-9635-8A3E13034059}.Debug|Win32.Build.0 = Debug|Win32
+		{B1E88BE4-AF16-4059-9635-8A3E13034059}.Release|Win32.ActiveCfg = Release|Win32
+		{B1E88BE4-AF16-4059-9635-8A3E13034059}.Release|Win32.Build.0 = Release|Win32
+		{64C3F77C-1B3B-47E1-B304-FBF5522A3D79}.Debug_EMU|Win32.ActiveCfg = Debug_EMU|Win32
+		{64C3F77C-1B3B-47E1-B304-FBF5522A3D79}.Debug_EMU|Win32.Build.0 = Debug_EMU|Win32
+		{64C3F77C-1B3B-47E1-B304-FBF5522A3D79}.Debug|Win32.ActiveCfg = Debug|Win32
+		{64C3F77C-1B3B-47E1-B304-FBF5522A3D79}.Debug|Win32.Build.0 = Debug|Win32
+		{64C3F77C-1B3B-47E1-B304-FBF5522A3D79}.Release|Win32.ActiveCfg = Release|Win32
+		{64C3F77C-1B3B-47E1-B304-FBF5522A3D79}.Release|Win32.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

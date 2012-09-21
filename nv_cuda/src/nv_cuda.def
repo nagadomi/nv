@@ -1,0 +1,7 @@
+LIBRARY	nv_cuda.dll
+
+EXPORTS
+	nv_cuda_init
+	nv_cuda_available
+	nv_cuda_keypoint
+	
