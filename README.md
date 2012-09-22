@@ -179,4 +179,4 @@ mat1のj1番目のベクトルとmat2のj2番目のベクトルの内積(ドッ�
 
 ### 他
 
-[src/tests](src/tests)の下に一部の大きめの処理のテストがあります。テストですが、使用サンプルみたいなものです。
+[src/tests](https://github.com/nagadomi/nv/tree/master/src/tests)の下に一部の大きめの処理のテストがあります。テストですが、使用サンプルみたいなものです。
