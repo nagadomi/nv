@@ -1,5 +1,5 @@
 ACLOCAL_AMFLAGS = -I m4
-EXTRA_DIST = README.md autogen.sh ChangeLog COPYING m4
+EXTRA_DIST = README.md autogen.sh ChangeLog COPYING m4 .gitignore 
 SUBDIRS    = src nv_cuda src/tests vcproj
 
 valgrind:
