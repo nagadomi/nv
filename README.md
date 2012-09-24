@@ -103,9 +103,9 @@ nv_cudaには一部関数のCUDA実装がありますが、今はちょっとメ
     for (j = 0; j < vec_array->m; ++j) {
         // ベクトルの各要素について
         for (i = 0; i < vec_array->n; ++i) {
-	    // 0-1.0の一様乱数を設定
-	    NV_MAT_V(vec_array, j, i) = nv_rand(); 
-	}
+            // 0-1.0の一様乱数を設定
+            NV_MAT_V(vec_array, j, i) = nv_rand(); 
+        }
     }
     
 とアクセスできます。`NV_MAT_V`は参照と代入どちらもできます。
@@ -122,10 +122,10 @@ nv_cudaには一部関数のCUDA実装がありますが、今はちょっとメ
         for (j = 0; j < vec_array->cols; ++j) {
             // ベクトルの各要素について
             for (i = 0; i < vec_array->n; ++i) {
-	        // 0-1.0の一様乱数を設定
-	        NV_MAT3D_V(vec_array, l, j, i) = nv_rand(); 
-	    }
-	}
+                // 0-1.0の一様乱数を設定
+                NV_MAT3D_V(vec_array, l, j, i) = nv_rand(); 
+            }
+        }
     }
 
 となります。このとき`m = rows * cols`となっているので、1次元の場合と同じように
@@ -133,9 +133,9 @@ nv_cudaには一部関数のCUDA実装がありますが、今はちょっとメ
     for (j = 0; j < vec_array->m; ++j) {
         // ベクトルの各要素について
         for (i = 0; i < vec_array->n; ++i) {
-	    // 0-1.0の一様乱数を設定
-	    NV_MAT_V(vec_array, j, i) = nv_rand(); 
-	}
+            // 0-1.0の一様乱数を設定
+            NV_MAT_V(vec_array, j, i) = nv_rand(); 
+        }
     }
 
 ともアクセスできます。
