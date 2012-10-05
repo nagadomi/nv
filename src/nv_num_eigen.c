@@ -168,7 +168,7 @@ nv_eigen_sym(nv_matrix_t *eigen_vec,
 
 	//if (converge) 
 	{
-		/* 固有値で昇順ソート. 固有ベクトルを転置. */
+		/* 固有値で降順ソート. 固有ベクトルを転置. */
 		nv_matrix_t *eigen = nv_matrix_alloc(eigen_vec->n + 1, eigen_vec->m);
 		for (i = 0; i < eigen_vec->m; ++i) {
 			int j;
