@@ -167,7 +167,7 @@ mat2のj2番目のベクトルをmat1のj1番目のベクトルにコピーし�
 
     nv_vector_normalize_L2(mat, j);
 
-j番目のベクトルを破壊的にL2正規化します。
+j番目のベクトルを破壊的にL2正則化します。
 
     float norm = nv_vector_norm(mat, j);
 
