@@ -79,7 +79,6 @@ void nv_cov(nv_matrix_t *cov,
 {
 	int m, n;
 	int alloc_u = 0;
-	int alloc_s = 0;
 	float factor = 1.0f / data->m;
 	int procs = nv_omp_procs();
 	nv_matrix_t *ut = nv_matrix_alloc(u->n, procs);
