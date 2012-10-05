@@ -29,8 +29,16 @@ int main(void)
 	
 	nv_test_keypoint();
 	
+	nv_test_lr();
+	nv_test_arow();
+	nv_test_pa();	
+	nv_test_mlp();
+	nv_test_nb();
+	nv_test_knn2();
+	
+	nv_test_knn();
 	nv_test_munkres();
-
+	
 	nv_test_kmeans();
 	nv_test_lbgu();	
 	nv_test_klr();
@@ -38,14 +46,9 @@ int main(void)
 
 	nv_test_kmeans_tree();
 	nv_test_klr_tree();
-	nv_test_lr();
-	nv_test_arow();
-	nv_test_pa();	
-	nv_test_mlp();
-	nv_test_nb();
 	
 	//nv_test_plsi();
 
-	nv_test_knn();
+	
 	return 0;
 }

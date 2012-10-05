@@ -43,5 +43,6 @@ void nv_test_knb(void);
 void nv_test_plsi(void);
 void nv_test_io(void);
 void nv_test_munkres(void);
+void nv_test_knn2(void);
 
 #endif

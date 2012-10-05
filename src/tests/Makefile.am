@@ -19,7 +19,8 @@ nv_test_lbgu.c \
 nv_test_knn.c \
 nv_test_io.c \
 nv_test_munkres.c \
-nv_test_sha1.c
+nv_test_sha1.c \
+nv_test_knn2.c
 
 nv_test_CFLAGS= -Wall \
 -I$(srcdir)/../ -I$(srcdir)/../3rd_party/sha1 -I$(srcdir)/../3rd_party/mt -I$(srcdir)/../3rd_party/avxintrin_emu \
