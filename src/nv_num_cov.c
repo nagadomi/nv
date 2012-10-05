@@ -79,10 +79,10 @@ void nv_cov(nv_matrix_t *cov,
 {
 	int m, n;
 	int alloc_u = 0;
-	float factor = 1.0f / data->m;
 	int procs = nv_omp_procs();
 	nv_matrix_t *ut = nv_matrix_alloc(u->n, procs);
-
+	const float factor = 1.0f / (float)data->m;
+	
 	if (u == NULL) {
 		u = nv_matrix_alloc(cov->n, 1);
 		alloc_u =1;
@@ -94,7 +94,7 @@ void nv_cov(nv_matrix_t *cov,
 	nv_matrix_zero(u);
 	nv_matrix_zero(ut);
 #ifdef _OPENMP
-#pragma omp parallel for
+#pragma omp parallel for num_threads(procs)
 #endif
 	for (m = 0; m < data->m; ++m) {
 		int idx = nv_omp_thread_id();
@@ -103,13 +103,13 @@ void nv_cov(nv_matrix_t *cov,
 	for (m = 0; m < procs; ++m) {
 		nv_vector_add(u, 0, u, 0, ut, m);
 	}
-	nv_vector_muls(u, 0, u, 0, 1.0f / (float)data->m);
+	nv_vector_muls(u, 0, u, 0, factor);
 
 	/* 分散共分散行列 */
 	nv_matrix_zero(cov);
 
 #ifdef _OPENMP
-#pragma omp parallel for
+#pragma omp parallel for num_threads(procs)	
 #endif
 	for (m = 0; m < cov->m; ++m) {
 		nv_matrix_t *dum = nv_matrix_alloc(data->m, 1);
