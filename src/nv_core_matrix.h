@@ -53,6 +53,9 @@ float *nv_mat_v(const nv_matrix_t *mat, int m, int n);
 float *nv_mat3d_list_v(const nv_matrix_t *mat, int list, int row, int col, int n);
 float *nv_mat_list_v(const nv_matrix_t *mat, int list, int m, int n);
 
+#define NV_MAT_VI(mat, m, n) ((int)NV_MAT_V(mat, m, n))
+#define NV_MAT3D_VI(mat, row, col, n) ((int)NV_MAT3D_V(mat, row, col, n))
+
 #if NV_ENABLE_STRICT
 #  define NV_VEC_SIZE(mat) nv_vec_size(mat)
 #  define NV_MAT_SIZE(mat) nv_mat_size(mat)
