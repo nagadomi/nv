@@ -80,7 +80,7 @@ nv_pa_train_at(nv_pa_t *pa,
 		long t = nv_clock();
 		for (j = 0; j < data->m; ++j) {
 			int rand_i = nv_rand_index(data->m);
-			float y = posi_label == (int)NV_MAT_V(labels, rand_i, 0) ? 1.0f : -1.0f;
+			float y = posi_label == NV_MAT_VI(labels, rand_i, 0) ? 1.0f : -1.0f;
 			float score = nv_vector_dot(pa->w, posi_label, data, rand_i);
 			float l = 1.0f - score * y;
 			if (l > 0.0) {

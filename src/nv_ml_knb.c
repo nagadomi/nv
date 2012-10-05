@@ -79,10 +79,10 @@ nv_knb_init(nv_nb_t *nb,         // k
 #endif
 	for (k = 0; k < nb->k; ++k) {
 		int c, m;// local
-		nv_matrix_t *train_data = nv_matrix_alloc(nb->n, (int)NV_MAT_V(count, k, 0));
+		nv_matrix_t *train_data = nv_matrix_alloc(nb->n, NV_MAT_VI(count, k, 0));
 
 		for (c = m = 0; m < data->m; ++m) {
-			if ((int)NV_MAT_V(labels, m, 0) == k) {
+			if (NV_MAT_VI(labels, m, 0) == k) {
 				nv_vector_copy(train_data, c++, data, m);
 			}
 		}
@@ -168,10 +168,10 @@ nv_knb_em(nv_nb_t *nb,         // k
 			for (i = 0; i < nb->k; ++i) {
 				int m, c; // local
 				if (NV_MAT_V(count, i, 0) > 0.0f) {
-					nv_matrix_t *train_data = nv_matrix_alloc(nb->n, (int)NV_MAT_V(count, i, 0));
+					nv_matrix_t *train_data = nv_matrix_alloc(nb->n, NV_MAT_VI(count, i, 0));
 
 					for (c = m = 0; m < data->m; ++m) {
-						if ((int)NV_MAT_V(labels, m, 0) == i) {
+						if (NV_MAT_VI(labels, m, 0) == i) {
 							nv_vector_copy(train_data, c++, data, m);
 						}
 					}

@@ -393,7 +393,7 @@ nv_munkres(nv_matrix_t *task, const nv_matrix_t *cost_matrix)
 	memset(assign, 0, sizeof(int) * cost_matrix->m);
 	cost = 0.0f;
 	for (i = 0; i < task->n; ++i) {
-		j = (int)NV_MAT_V(task, 0, i);
+		j = NV_MAT_VI(task, 0, i);
 		if (assign[j] == 0 &&
 			!(NV_MAT_V(cost_matrix, j, i) > NV_MAT_V(min_cost, 0, j)))
 		{

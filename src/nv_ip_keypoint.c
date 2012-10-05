@@ -400,7 +400,7 @@ nv_keypoint_select(const nv_keypoint_ctx_t *ctx,
 			int col_idx = col / 2;
 
 			for (s = 1; s < el; ++s) {
-				int key = (int)NV_MAT_V(outer_r, 0, s);
+				int key = NV_MAT_VI(outer_r, 0, s);
 				nv_matrix_t *memobuf = nv_imap_find(memo, key);
 				int nn, sy, sx, ey, ex;
 				float response = NV_MAT3D_V(grid_response, s, row_idx, col_idx);
@@ -435,7 +435,7 @@ nv_keypoint_select(const nv_keypoint_ctx_t *ctx,
 					sy /= 2;
 					ey /= 2;
 					for (y = sy; y < ey; ++y) {
-						int cx = (int)NV_MAT_V(circle_x, s, abs(row - y * 2));
+						int cx = NV_MAT_VI(circle_x, s, abs(row - y * 2));
 						sx = (col - cx) / 2;
 						ex = (col + cx + 1) / 2;
 						for (x = sx; x < ex; ++x) {
@@ -455,7 +455,7 @@ nv_keypoint_select(const nv_keypoint_ctx_t *ctx,
 					sy /= 2;
 					ey /= 2;
 					for (y = sy; y < ey; ++y) {
-						int cx = (int)NV_MAT_V(circle_x, s, abs(row - y * 2));
+						int cx = NV_MAT_VI(circle_x, s, abs(row - y * 2));
 						sx = (col - cx) / 2;
 						ex = (col + cx + 1) / 2;
 						

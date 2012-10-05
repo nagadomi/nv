@@ -89,7 +89,7 @@ nv_arow_train_at(nv_arow_t *arow,
 		for (j = 0; j < data->m; ++j) {
 			int i;
 			int rand_j = nv_rand_index(data->m);
-			int y = (int)NV_MAT_V(labels, rand_j, 0) == posi_label ? 1:-1;
+			int y = NV_MAT_VI(labels, rand_j, 0) == posi_label ? 1:-1;
 			float xu = nv_vector_dot(arow->w, posi_label, data, rand_j);
 			float alpha = 1.0f - y * xu;
 			float var;

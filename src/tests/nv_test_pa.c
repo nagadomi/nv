@@ -54,7 +54,7 @@ nv_test_pa(void)
 				train_data, train_labels, 0.1, 20);
 	ok = 0;
 	for (i = 0; i < test_data->m; ++i) {
-		if (nv_pa_predict_label(pa, test_data, i) == (int)NV_MAT_V(test_labels, i, 0)) {
+		if (nv_pa_predict_label(pa, test_data, i) == NV_MAT_VI(test_labels, i, 0)) {
 			++ok;
 		}
 	}

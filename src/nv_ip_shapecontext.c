@@ -378,8 +378,8 @@ float nv_shapecontext_distance(const nv_shapecontext_t *sctx1,
 			NV_MAT_V(sctx2->coodinate, n, 0));
 
 		fprintf(fd, "%f %f\n", 
-			NV_MAT_V(sctx1->coodinate,(int)NV_MAT_V(mincost, 0, n), 1),
-			NV_MAT_V(sctx1->coodinate,(int)NV_MAT_V(mincost, 0, n), 0));
+			NV_MAT_V(sctx1->coodinate, NV_MAT_VI(mincost, 0, n), 1),
+			NV_MAT_V(sctx1->coodinate, NV_MAT_VI(mincost, 0, n), 0));
 		fprintf(fd, "\n\n");
 	}
 	fclose(f1);

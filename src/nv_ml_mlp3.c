@@ -289,7 +289,7 @@ float nv_mlp3_train_lex(nv_mlp3_t *mlp,
 			data_e += e;
 			mp = -FLT_MAX;
 			l = -1; // nega
-			label_ok = (int)NV_MAT_V(label, dm, 0);
+			label_ok = NV_MAT_VI(label, dm, 0);
 
 			if (output_y->n == 1) {
 				if (NV_MAT_V(output_y, 0, 0) > 0.5f) {

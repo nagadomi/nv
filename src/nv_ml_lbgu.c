@@ -87,7 +87,7 @@ nv_lbgu_e(nv_matrix_t *e,
 	nv_matrix_zero(e);
 
 	for (m = 0; m < data->m; ++m) {
-		int i = (int)NV_MAT_V(labels, m, 0);
+		int i = NV_MAT_VI(labels, m, 0);
 		float dist = nv_euclidean2(means, i, data, m);
 
 		{
@@ -121,7 +121,7 @@ nv_lbgu_u(nv_matrix_t *u,
 	for (m = 0; m < data->m; ++m) {
 		int k;
 		float diff, min_error = FLT_MAX;
-		int i = (int)NV_MAT_V(labels, m, 0);
+		int i = NV_MAT_VI(labels, m, 0);
 
 		for (k = 0; k < means->m; ++k) {
 			float dist;
@@ -161,7 +161,7 @@ nv_lbgu_update(nv_matrix_t *means,
 	 */
 
 	int m, j;
-	int c = (int)NV_MAT_V(count, max_error_class, 0);
+	int c = NV_MAT_VI(count, max_error_class, 0);
 	nv_matrix_t *data_tmp = nv_matrix_alloc(means->n, c);
 	nv_matrix_t *means_tmp = nv_matrix_alloc(means->n, 2);
 	nv_matrix_t *labels_tmp = nv_matrix_alloc(1, c);
@@ -170,7 +170,7 @@ nv_lbgu_update(nv_matrix_t *means,
 	nv_matrix_zero(data_tmp);
 
 	for (m = j = 0; m < data->m; ++m) {
-		if (max_error_class == (int)NV_MAT_V(labels, m, 0)) {
+		if (max_error_class == NV_MAT_VI(labels, m, 0)) {
 			nv_vector_copy(data_tmp, j++, data, m);
 		}
 	}
