@@ -18,11 +18,12 @@
  */
 
 #include "nv_core.h"
+#include "nv_num_vector.h"
 #include "nv_num_cov.h"
 #include "nv_num_matrix.h"
 #include "nv_num_eigen.h"
 
-#define NV_COV_JACOBI_EPOCH 100
+#define NV_COV_JACOBI_EPOCH 20
 
 /* 分散共分散 */
 
@@ -32,7 +33,6 @@ nv_cov_t *nv_cov_alloc(int n)
 
 	cov->n = n;
 	cov->u = nv_matrix_alloc(n, 1);
-	cov->s = nv_matrix_alloc(n, 1);
 	cov->cov = nv_matrix_alloc(n, n);
 	cov->eigen_val = nv_matrix_alloc(1, n);
 	cov->eigen_vec = nv_matrix_alloc(n, n);
@@ -47,7 +47,6 @@ void nv_cov_free(nv_cov_t **cov)
 		nv_matrix_free(&(*cov)->cov);
 		nv_matrix_free(&(*cov)->eigen_val);
 		nv_matrix_free(&(*cov)->eigen_vec);
-		nv_matrix_free(&(*cov)->s);
 		nv_matrix_free(&(*cov)->u);
 
 		nv_free(*cov);
@@ -59,16 +58,20 @@ void
 nv_cov_eigen_ex(nv_cov_t *cov, const nv_matrix_t *data,
 				int max_epoch)
 {
-	nv_cov(cov->cov, cov->u, cov->s, data);
+	long t = nv_clock();
+	nv_cov(cov->cov, cov->u, data);
+	printf("cov %ldms\n", nv_clock() -t );
+	t = nv_clock();
 	nv_eigen_sym(cov->eigen_vec, cov->eigen_val,
 				 cov->cov, max_epoch);
+	printf("eigen %ldms\n", nv_clock() -t );
 	cov->data_m = data->m;
 }
 
 void
 nv_cov_eigen(nv_cov_t *cov, const nv_matrix_t *data)
 {
-	nv_cov(cov->cov, cov->u, cov->s, data);
+	nv_cov(cov->cov, cov->u, data);
 	nv_eigen_sym(cov->eigen_vec, cov->eigen_val,
 						cov->cov, NV_COV_JACOBI_EPOCH);
 	cov->data_m = data->m;
@@ -76,48 +79,53 @@ nv_cov_eigen(nv_cov_t *cov, const nv_matrix_t *data)
 
 void nv_cov(nv_matrix_t *cov,
 			nv_matrix_t *u,
-			nv_matrix_t *s,
 			const nv_matrix_t *data)
 {
 	int m, n;
 	int alloc_u = 0;
 	int alloc_s = 0;
 	float factor = 1.0f / data->m;
+	int procs = nv_omp_procs();
+	nv_matrix_t *ut = nv_matrix_alloc(u->n, procs);
 
 	if (u == NULL) {
 		u = nv_matrix_alloc(cov->n, 1);
 		alloc_u =1;
 	}
-	if (s == NULL) {
-		s = nv_matrix_alloc(cov->n, 1);
-		alloc_s =1;
-	}
 	NV_ASSERT(cov->n == data->n && cov->n == cov->m
-		&& u->n == cov->n
-		&& s->n == cov->n);
+			  && u->n == cov->n);
 
 	/* 平均 */
 	nv_matrix_zero(u);
+	nv_matrix_zero(ut);
+#ifdef _OPENMP
+#pragma omp parallel for
+#endif
 	for (m = 0; m < data->m; ++m) {
-		for (n = 0; n < data->n; ++n) {
-			NV_MAT_V(u, 0, n) += NV_MAT_V(data, m, n) * factor;
-		}
+		int idx = nv_omp_thread_id();
+		nv_vector_add(ut, idx, ut, idx, data, m);
 	}
+	for (m = 0; m < procs; ++m) {
+		nv_vector_add(u, 0, u, 0, ut, m);
+	}
+	nv_vector_muls(u, 0, u, 0, 1.0f / (float)data->m);
 
 	/* 分散共分散行列 */
 	nv_matrix_zero(cov);
-	nv_matrix_zero(s);
 
+#ifdef _OPENMP
+#pragma omp parallel for
+#endif
 	for (m = 0; m < cov->m; ++m) {
 		nv_matrix_t *dum = nv_matrix_alloc(data->m, 1);
 		int i;
-		float um = NV_MAT_V(u, 0, m);
+		const float um = NV_MAT_V(u, 0, m);
 		for (i = 0; i < data->m; ++i) {
 			NV_MAT_V(dum, 0, i) = (NV_MAT_V(data, i, m) - um) * factor;
 		}
 		for (n = m; n < cov->n; ++n) {
 			float v = 0.0f;
-			float un = NV_MAT_V(u, 0, n);
+			const float un = NV_MAT_V(u, 0, n);
 			for (i = 0; i < data->m; ++i) {
 				v += (NV_MAT_V(data, i, n) - un) * NV_MAT_V(dum, 0, i);
 			}
@@ -125,11 +133,8 @@ void nv_cov(nv_matrix_t *cov,
 		}
 		nv_matrix_free(&dum);
 	}
-
 	if (alloc_u) {
 		nv_matrix_free(&u);
 	}
-	if (alloc_s) {
-		nv_matrix_free(&s);
-	}
+	nv_matrix_free(&ut);
 }

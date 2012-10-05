@@ -27,11 +27,13 @@ sort_eigen(const void *p1, const void *p2)
 	float *f1 = (float *)p1;
 	float *f2 = (float *)p2;
 
-	if (f1[0] == f2[0]) {
-		return 0;
+	if (f1[0] > f2[0]) {
+		return -1;
+	} else if (f1[0] < f2[0]) {
+		return 1;
 	}
 
-	return f1[0] > f2[0] ? 1:-1;
+	return 0;
 }
 
 
@@ -44,8 +46,7 @@ nv_eigen_sym(nv_matrix_t *eigen_vec,
 			const nv_matrix_t *smat,
 			int max_epoch)
 {
-	int j, iq, ip, i, nrot, converge;
-	float tresh, theta, tau, t, sm, s, c, g, h;
+	int i, nrot, converge;
 	const int n = smat->n;
 	nv_matrix_t *b, *z;
 	nv_matrix_t *v = eigen_vec;
@@ -68,20 +69,24 @@ nv_eigen_sym(nv_matrix_t *eigen_vec,
 	nv_matrix_zero(v);
 
 	/* 単位行列に初期化 */
-	for (ip = 0; ip < n; ++ip) {
-		NV_MAT_V(v, ip, ip) = 1.0f;
+	for (i = 0; i < n; ++i) {
+		NV_MAT_V(v, i, i) = 1.0f;
 	}
 	/* d, bをaの対角成分で初期化 */
-	for (ip = 0; ip < n; ++ip) {
-		NV_MAT_V(b, ip, 0) = NV_MAT_V(d, ip, 0) = NV_MAT_V(a, ip, ip);
+	for (i = 0; i < n; ++i) {
+		NV_MAT_V(b, i, 0) = NV_MAT_V(d, i, 0) = NV_MAT_V(a, i, i);
 	}
 
 	nrot = 0;
 	converge = 0;
 	for (i = 0; i < max_epoch; ++i) {
 		/* 収束判定 */
-		sm = 0.0f;
+		float sm = 0.0f;
+		float tresh;
+		int ip;
+		
 		for (ip = 0; ip < n - 1; ++ip) {
+			int iq;
 			for (iq = ip + 1; iq < n; ++iq) {
 				sm += fabsf(NV_MAT_V(a, ip, iq));
 			}
@@ -94,11 +99,15 @@ nv_eigen_sym(nv_matrix_t *eigen_vec,
 
 		/* 上三角成分(対角成分含まず)が0になるように回転していく */
 		for (ip = 0; ip < n - 1; ++ip) {
+			int iq;
 			for (iq = ip + 1; iq < n; ++iq) {
-				g = 100.0f * fabsf(NV_MAT_V(a, ip, iq));
+				float g = 100.0f * fabsf(NV_MAT_V(a, ip, iq));
 				if (i > 3 && g <= FLT_EPSILON) {
 					NV_MAT_V(a, ip, iq) = 0.0f;
 				} else if (fabs(NV_MAT_V(a, ip, iq)) > tresh) {
+					float t, h, theta, c, s, tau;
+					int j;
+					
 					h = NV_MAT_V(d, iq, 0) - NV_MAT_V(d, ip, 0);
 					if (g <= FLT_EPSILON) {
 						t = NV_MAT_V(a, ip, iq) / h;
@@ -161,20 +170,22 @@ nv_eigen_sym(nv_matrix_t *eigen_vec,
 	{
 		/* 固有値で昇順ソート. 固有ベクトルを転置. */
 		nv_matrix_t *eigen = nv_matrix_alloc(eigen_vec->n + 1, eigen_vec->m);
-		for (j = 0; j < eigen_vec->m; ++j) {
+		for (i = 0; i < eigen_vec->m; ++i) {
+			int j;
 			/* 0:固有値 */
-			NV_MAT_V(eigen, j, 0) = NV_MAT_V(d, j, 0); 
+			NV_MAT_V(eigen, i, 0) = NV_MAT_V(d, i, 0); 
 			/* 1-:固有ベクトル */
-			for (i = 0; i < eigen_vec->n; ++i) {
-				NV_MAT_V(eigen, j, 1 + i) = NV_MAT_V(v, i, j);
+			for (j = 0; j < eigen_vec->n; ++j) {
+				NV_MAT_V(eigen, i, 1 + j) = NV_MAT_V(v, j, i);
 			}
 		}
 		qsort(eigen->v, eigen->m, NV_VEC_SIZE(eigen), sort_eigen);
 
-		for (j = 0; j < eigen_vec->m; ++j) {
-			NV_MAT_V(eigen_val, j, 0) = NV_MAT_V(eigen, j, 0);
-			for (i = 0; i < eigen_vec->n; ++i) {
-				NV_MAT_V(eigen_vec, j, i) = NV_MAT_V(eigen, j, 1 + i);
+		for (i = 0; i < eigen_vec->m; ++i) {
+			int j;
+			NV_MAT_V(eigen_val, i, 0) = NV_MAT_V(eigen, i, 0);
+			for (j = 0; j < eigen_vec->n; ++j) {
+				NV_MAT_V(eigen_vec, i, j) = NV_MAT_V(eigen, i, 1 + j);
 			}
 		}
 		nv_matrix_free(&eigen);

@@ -108,7 +108,6 @@ nv_nb_predict_label(const nv_nb_t *nb,
 	static const float LOG_PI_0_5_NEGA = -0.5723649f;
 	nv_matrix_t *y = nv_matrix_alloc(x->n, nb->k);
 	int k, label = -1;
-	int en;
 	float p_init;
 	const int nb_k = nb->k;
 	const int x_n = x->n;
@@ -117,7 +116,6 @@ nv_nb_predict_label(const nv_nb_t *nb,
 	if (npca == 0) {
 		npca = (int)(x_n * 0.4f);
 	}
-	en = (x_n - npca);
 	p_init = -LOG_PI_0_5_NEGA * npca;
 
 #ifdef _OPENMP
@@ -131,12 +129,11 @@ nv_nb_predict_label(const nv_nb_t *nb,
 		NV_ASSERT(NV_MAT_V(nb->pk, k, 0) != FLT_MAX);
 
 		nv_vector_sub(y, k, x, xm, nb->kcov[k]->u, 0);
-		for (n = en; n < x_n; ++n) {
+		for (n = 0; n < npca; ++n) {
 			float xv = nv_vector_dot(cov->eigen_vec, n, y, k);
 			float ev = NV_MAT_V(cov->eigen_val, n, 0) * 2.0f;
 			p += -(0.5f * logf(ev)) - (xv * xv) / (ev);
 		}
-
 #ifdef _OPENMP
 #pragma omp critical (nv_nb_predict_label)
 #endif
@@ -151,48 +148,6 @@ nv_nb_predict_label(const nv_nb_t *nb,
 
 	return label;
 }
-
-
-int 
-nv_nb_predict_label_fast(const nv_nb_t *nb, const nv_matrix_t *x, int xm,
-						 int npca, int second_k)
-{
-	nv_matrix_t *predicts = nv_matrix_alloc(2, nb->k);
-	int k,label = -1, i;
-
-	NV_ASSERT(second_k < nb->k);
-	NV_ASSERT(second_k > 0);
-
-	if (npca == 0) {
-		npca = (int)(x->n * 0.4f);
-	}
-
-#ifdef _OPENMP
-#pragma omp parallel for
-#endif
-	for (k = 0; k < nb->k; ++k) {
-		NV_MAT_V(predicts, k, 0) = NV_MAT_V(nb->pk, k, 0) 
-			+ nv_gaussian_log_predict_range(
-			nb->n - (int)(npca * 0.5f), nb->n, nb->kcov[k], x, xm);
-		NV_MAT_V(predicts, k, 1) = (float)k;
-	}
-	nv_matrix_sort(predicts, 0, NV_SORT_DIR_DESC);
-	nv_matrix_m(predicts, second_k);
-
-	for (i = 0; i < predicts->m; ++ i) {
-		k = (int)NV_MAT_V(predicts, i, 1);
-		NV_MAT_V(predicts, i, 0) += nv_gaussian_log_predict_range(
-			nb->n - npca,nb->n - (int)(npca * 0.5f),
-			nb->kcov[k], x, xm);
-	}
-	nv_matrix_sort(predicts, 0, NV_SORT_DIR_DESC);
-
-	label = (int)NV_MAT_V(predicts, 0, 1);
-	nv_matrix_free(&predicts);
-
-	return label;
-}
-
 
 float 
 nv_nb_predict(const nv_nb_t *nb,

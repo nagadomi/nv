@@ -26,7 +26,6 @@ nv_save_cov_fp(FILE *fp, const nv_cov_t *cov)
 {
 	fprintf(fp, "%d %d\n", cov->n, cov->data_m);
 	nv_save_matrix_fp(fp, cov->u);
-	nv_save_matrix_fp(fp, cov->s);
 	nv_save_matrix_fp(fp, cov->cov);
 	nv_save_matrix_fp(fp, cov->eigen_vec);
 	nv_save_matrix_fp(fp, cov->eigen_val);
@@ -47,15 +46,12 @@ nv_load_cov_fp(FILE *fp)
 	cov->n = n;
 	cov->data_m = data_m;
 	cov->u = nv_load_matrix_fp(fp);
-	cov->s = nv_load_matrix_fp(fp);
 	cov->cov = nv_load_matrix_fp(fp);
 	cov->eigen_vec = nv_load_matrix_fp(fp);
 	cov->eigen_val = nv_load_matrix_fp(fp);
 
 	NV_ASSERT(cov->u->n == n);
 	NV_ASSERT(cov->u->m == 1);
-	NV_ASSERT(cov->s->n == n);
-	NV_ASSERT(cov->s->m == 1);
 	NV_ASSERT(cov->cov->n == n);
 	NV_ASSERT(cov->cov->m == n);
 	NV_ASSERT(cov->eigen_vec->n == n);

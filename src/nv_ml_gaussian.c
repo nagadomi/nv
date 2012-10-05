@@ -37,9 +37,7 @@ nv_gaussian_predict(const nv_cov_t *cov, const nv_matrix_t *x, int xm)
 	float delta2 = 0.0f;
 	float lambda = 1.0f;
 
-	for (n = 0; n < y->n; ++n) {
-		NV_MAT_V(y, 0, n) = NV_MAT_V(x, xm, n) - NV_MAT_V(cov->u, 0, n);
-	}
+	nv_vector_sub(y, 0, x, xm, cov->u, 0);
 	nv_gemv(y, 1, NV_MAT_TR, cov->eigen_vec, y, 0);
 	for (n = 0; n < x->n; ++n) {
 		float ev = NV_MAT_V(cov->eigen_val, n, 0);
@@ -61,20 +59,18 @@ nv_gaussian_log_predict(int npca, const nv_cov_t *cov, const nv_matrix_t *x, int
 {
 	static const float LOG_PI_0_5_NEGA = -0.5723649f;
 	nv_matrix_t *y = nv_matrix_alloc(x->n, 1);
-	int n, en;
-	const int x_n = x->n;
+	int n;
 	float p;
 
 	NV_ASSERT(npca <= x->n);
 
 	if (npca == 0) {
-		npca = (int)(x_n * 0.4f);
+		npca = (int)(x->n * 0.4f);
 	}
-	en = (x_n - npca);
 	p = LOG_PI_0_5_NEGA * npca;
 
 	nv_vector_sub(y, 0, x, xm, cov->u, 0);
-	for (n = en; n < x_n; ++n) {
+	for (n = 0; n < npca; ++n) {
 		float xv = nv_vector_dot(cov->eigen_vec, n, y, 0);
 		float ev = NV_MAT_V(cov->eigen_val, n, 0) * 2.0f;
 		p += -(0.5f * logf(ev)) - (xv * xv) / (ev);

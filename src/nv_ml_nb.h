@@ -46,10 +46,6 @@ void nv_nb_train_finish(nv_nb_t *nb);
 int nv_nb_predict_label(const nv_nb_t *nb, const nv_matrix_t *x, int xm, int npca);
 float nv_nb_predict(const nv_nb_t *nb, const nv_matrix_t *x, int xm, int pca, int k);
 
-int 
-nv_nb_predict_label_fast(const nv_nb_t *nb, const nv_matrix_t *x, int xm, int npca, int second_k);
-
-
 void nv_nb_free(nv_nb_t **nb);
 
 
