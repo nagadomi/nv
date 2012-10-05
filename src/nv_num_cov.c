@@ -58,13 +58,9 @@ void
 nv_cov_eigen_ex(nv_cov_t *cov, const nv_matrix_t *data,
 				int max_epoch)
 {
-	long t = nv_clock();
 	nv_cov(cov->cov, cov->u, data);
-	printf("cov %ldms\n", nv_clock() -t );
-	t = nv_clock();
 	nv_eigen_sym(cov->eigen_vec, cov->eigen_val,
 				 cov->cov, max_epoch);
-	printf("eigen %ldms\n", nv_clock() -t );
 	cov->data_m = data->m;
 }
 

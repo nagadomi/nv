@@ -29,12 +29,13 @@ int main(void)
 	
 	nv_test_keypoint();
 	
+	nv_test_knn_pca();
+	nv_test_knn2();
 	nv_test_lr();
 	nv_test_arow();
 	nv_test_pa();	
 	nv_test_mlp();
 	nv_test_nb();
-	nv_test_knn2();
 	
 	nv_test_knn();
 	nv_test_munkres();
