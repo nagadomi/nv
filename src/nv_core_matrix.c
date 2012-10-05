@@ -193,6 +193,21 @@ nv_matrix_free(nv_matrix_t **matrix)
 }
 
 void
+nv_vector_print(FILE *out, const nv_matrix_t *mat, int j)
+{
+	int n;
+
+	fprintf(out, "\t[ ");
+	for (n = 0; n < mat->n; ++n) {
+		if (n != 0) {
+			fprintf(out, ", ");
+		}
+		fprintf(out, "%10E", NV_MAT_V(mat, j, n));
+	}
+	fprintf(out, "]\n");
+}
+
+void
 nv_matrix_print(FILE *out, const nv_matrix_t *mat)
 {
 	int m, n;

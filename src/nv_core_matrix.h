@@ -122,6 +122,7 @@ void nv_matrix_scale(nv_matrix_t *mat, float factor);
 void nv_matrix_split(nv_matrix_t *mat1, int dest_n, const nv_matrix_t *mat2, int src_n);
 
 void nv_matrix_print(FILE *out, const nv_matrix_t *mat);
+void nv_vector_print(FILE *out, const nv_matrix_t *mat, int j);
 void nv_matrix3d_print(FILE *out, const nv_matrix_t *mat, int channel);
 
 void nv_matrix_dump_c(FILE *out, const nv_matrix_t *mat, const char *name, int static_variable);
