@@ -77,7 +77,7 @@ void nv_cov(nv_matrix_t *cov,
 			nv_matrix_t *u,
 			const nv_matrix_t *data)
 {
-	int m, n;
+	int m;
 	int alloc_u = 0;
 	int procs = nv_omp_procs();
 	nv_matrix_t *ut = nv_matrix_alloc(u->n, procs);
@@ -113,7 +113,7 @@ void nv_cov(nv_matrix_t *cov,
 #endif
 	for (m = 0; m < cov->m; ++m) {
 		nv_matrix_t *dum = nv_matrix_alloc(data->m, 1);
-		int i;
+		int i, n;
 		const float um = NV_MAT_V(u, 0, m);
 		for (i = 0; i < data->m; ++i) {
 			NV_MAT_V(dum, 0, i) = (NV_MAT_V(data, i, m) - um) * factor;
