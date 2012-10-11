@@ -26,7 +26,7 @@
 #define RESIZE 512.0f
 #define KEYPOINT_MAX 2000
 
-int
+static int
 nv_test_keypoint_extract(nv_matrix_t *key_vec,
 						 nv_matrix_t *desc_vec,
 						 const nv_matrix_t *image,
