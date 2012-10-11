@@ -1,6 +1,0 @@
-- 2012-10
-  - otamaでLMCA(Large Margin Component Analysis)を使いたいので入れる
-    + 初期値にPCAを使うのでPCA関係を整理する
-    - とりあえず実装
-    - LMCA kNN classifierのテストを書く
-    - 計算オーダーが(データ数^3 * 次元^2)とやばいけどわりと削れそうなのでできるだけ高速化する
