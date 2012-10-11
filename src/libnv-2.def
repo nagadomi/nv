@@ -132,6 +132,8 @@ nv_klr_tree_predict_vector
 nv_klr_tree_progress
 nv_klr_tree_train
 nv_klr_tree_train_at
+nv_lmca
+nv_lmca_projection
 nv_kmeans
 nv_kmeans_em
 nv_kmeans_init_pp
@@ -215,6 +217,7 @@ nv_matrix_list_get
 nv_matrix_m
 nv_matrix_normalize_maxmin
 nv_matrix_print
+nv_vector_print
 nv_matrix_realloc
 nv_matrix_scale
 nv_matrix_sort
@@ -258,7 +261,6 @@ nv_nb_alloc
 nv_nb_free
 nv_nb_predict
 nv_nb_predict_label
-nv_nb_predict_label_fast
 nv_nb_train
 nv_nb_train_all
 nv_nb_train_finish
