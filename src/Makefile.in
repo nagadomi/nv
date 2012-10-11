@@ -105,10 +105,11 @@ am_libnv_la_OBJECTS = libnv_la-nv_portable.lo \
 	libnv_la-nv_ml_gaussian.lo libnv_la-nv_ml_klr.lo \
 	libnv_la-nv_ml_knb.lo libnv_la-nv_ml_mlp.lo \
 	libnv_la-nv_ml_som.lo libnv_la-nv_ml_kmeans_tree.lo \
-	libnv_la-nv_ml_klr_tree.lo libnv_la-nv_ip_gaussian.lo \
-	libnv_la-nv_ip_gray.lo libnv_la-nv_ip_integral.lo \
-	libnv_la-nv_ip_star_integral.lo libnv_la-nv_ip_keypoint.lo \
-	libnv_la-nv_ip_laplacian.lo libnv_la-nv_ip_resize.lo \
+	libnv_la-nv_ml_klr_tree.lo libnv_la-nv_ml_lmca.lo \
+	libnv_la-nv_ip_gaussian.lo libnv_la-nv_ip_gray.lo \
+	libnv_la-nv_ip_integral.lo libnv_la-nv_ip_star_integral.lo \
+	libnv_la-nv_ip_keypoint.lo libnv_la-nv_ip_laplacian.lo \
+	libnv_la-nv_ip_resize.lo \
 	libnv_la-nv_ip_star_integral_static.lo \
 	libnv_la-nv_ip_shapecontext.lo libnv_la-nv_ip_flip.lo \
 	libnv_la-nv_ip_euclidean_color.lo libnv_la-nv_ip_hsv.lo \
@@ -380,6 +381,7 @@ nv_ml_mlp.c \
 nv_ml_som.c \
 nv_ml_kmeans_tree.c \
 nv_ml_klr_tree.c \
+nv_ml_lmca.c \
 nv_ip_gaussian.c \
 nv_ip_gray.c \
 nv_ip_integral.c \
@@ -458,6 +460,7 @@ nv_ml_mlp.h \
 nv_ml_som.h \
 nv_ml_kmeans_tree.h \
 nv_ml_klr_tree.h \
+nv_ml_lmca.h \
 nv_ml.h \
 nv_ip_gaussian.h \
 nv_ip_gray.h \
@@ -702,6 +705,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libnv_la-nv_ml_kmeans_tree.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libnv_la-nv_ml_knb.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libnv_la-nv_ml_lbgu.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libnv_la-nv_ml_lmca.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libnv_la-nv_ml_lr.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libnv_la-nv_ml_mlp.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libnv_la-nv_ml_mlp3.Plo@am__quote@
@@ -1000,6 +1004,13 @@ libnv_la-nv_ml_klr_tree.lo: nv_ml_klr_tree.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='nv_ml_klr_tree.c' object='libnv_la-nv_ml_klr_tree.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libnv_la_CPPFLAGS) $(CPPFLAGS) $(libnv_la_CFLAGS) $(CFLAGS) -c -o libnv_la-nv_ml_klr_tree.lo `test -f 'nv_ml_klr_tree.c' || echo '$(srcdir)/'`nv_ml_klr_tree.c
+
+libnv_la-nv_ml_lmca.lo: nv_ml_lmca.c
+@am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libnv_la_CPPFLAGS) $(CPPFLAGS) $(libnv_la_CFLAGS) $(CFLAGS) -MT libnv_la-nv_ml_lmca.lo -MD -MP -MF $(DEPDIR)/libnv_la-nv_ml_lmca.Tpo -c -o libnv_la-nv_ml_lmca.lo `test -f 'nv_ml_lmca.c' || echo '$(srcdir)/'`nv_ml_lmca.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/libnv_la-nv_ml_lmca.Tpo $(DEPDIR)/libnv_la-nv_ml_lmca.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='nv_ml_lmca.c' object='libnv_la-nv_ml_lmca.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libnv_la_CPPFLAGS) $(CPPFLAGS) $(libnv_la_CFLAGS) $(CFLAGS) -c -o libnv_la-nv_ml_lmca.lo `test -f 'nv_ml_lmca.c' || echo '$(srcdir)/'`nv_ml_lmca.c
 
 libnv_la-nv_ip_gaussian.lo: nv_ip_gaussian.c
 @am__fastdepCC_TRUE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libnv_la_CPPFLAGS) $(CPPFLAGS) $(libnv_la_CFLAGS) $(CFLAGS) -MT libnv_la-nv_ip_gaussian.lo -MD -MP -MF $(DEPDIR)/libnv_la-nv_ip_gaussian.Tpo -c -o libnv_la-nv_ip_gaussian.lo `test -f 'nv_ip_gaussian.c' || echo '$(srcdir)/'`nv_ip_gaussian.c

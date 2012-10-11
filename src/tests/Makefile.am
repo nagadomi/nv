@@ -21,7 +21,8 @@ nv_test_io.c \
 nv_test_munkres.c \
 nv_test_sha1.c \
 nv_test_knn2.c \
-nv_test_knn_pca.c 
+nv_test_knn_pca.c \
+nv_test_knn_lmca.c 
 
 nv_test_CFLAGS= -Wall \
 -I$(srcdir)/../ -I$(srcdir)/../3rd_party/sha1 -I$(srcdir)/../3rd_party/mt -I$(srcdir)/../3rd_party/avxintrin_emu \
@@ -32,6 +33,7 @@ nv_test_CFLAGS= -Wall \
 -DNV_TEST_DATA=\"$(srcdir)/data/mnist_test_14x14.vec\" \
 -DNV_TEST_LABEL=\"$(srcdir)/data/mnist_test_labels.vec\" \
 -DNV_TEST_DATA_K=10
+
 nv_test_CXXFLAGS = $(nv_test_CFLAGS)
 nv_test_CPPFLAGS = $(nv_test_CFLAGS)
 nv_test_LDADD = $(builddir)/../libnv.la

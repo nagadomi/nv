@@ -16,36 +16,18 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+#ifndef NV_ML_LMCA_H
+#define NV_ML_LMCA_H
 
-#ifndef NV_ML_H
-#define NV_ML_H
+void nv_lmca_progress(int onoff);
+void nv_lmca(nv_matrix_t *ldm,
+			 const nv_matrix_t *data,
+			 const nv_matrix_t *labels,
+			 int nk, int mk, float margin, float pull_ratio, float delta,
+			 int max_epoch);
 
-#include "nv_core.h"
-#include "nv_ml_util.h"
-#include "nv_ml_lr.h"
-#include "nv_ml_arow.h"
-#include "nv_ml_pa.h"
-#include "nv_ml_gaussian.h"
-#include "nv_ml_nb.h"
-#include "nv_ml_mlp.h"
-#include "nv_ml_mlp3.h"
-#include "nv_ml_som.h"
-#include "nv_ml_kmeans.h"
-#include "nv_ml_xmeans.h"
-#include "nv_ml_plsi.h"
-#include "nv_ml_lbgu.h"
-#include "nv_ml_knb.h"
-#include "nv_ml_klr.h"
-#include "nv_ml_lmca.h"
-#include "nv_ml_kmeans_tree.h"
-#include "nv_ml_klr_tree.h"
-
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-#ifdef __cplusplus
-}
-#endif
+void nv_lmca_projection(nv_matrix_t *v1, int v1_j,
+						const nv_matrix_t *ldm,
+						const nv_matrix_t *v2, int v2_j);
 
 #endif

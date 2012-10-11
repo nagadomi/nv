@@ -60,6 +60,7 @@ nv_ml_mlp.c \
 nv_ml_som.c \
 nv_ml_kmeans_tree.c \
 nv_ml_klr_tree.c \
+nv_ml_lmca.c \
 nv_ip_gaussian.c \
 nv_ip_gray.c \
 nv_ip_integral.c \
@@ -138,6 +139,7 @@ nv_ml_mlp.h \
 nv_ml_som.h \
 nv_ml_kmeans_tree.h \
 nv_ml_klr_tree.h \
+nv_ml_lmca.h \
 nv_ml.h \
 nv_ip_gaussian.h \
 nv_ip_gray.h \

@@ -61,7 +61,7 @@ AC_CHECK_HEADERS([execinfo.h], [AC_CHECK_FUNCS(backtrace backtrace_symbols_fd,[n
 AX_ARG_ENABLE(debug,
         AS_HELP_STRING([--enable-debug],[enable assert -g and boundary check.]), [no],
 	[nv_strict=1
-	CFLAGS=" $CFLAGS -g0 -D_GLIBCXX_DEBUG -DGLIBCXX_FORCE_NEW "
+	CFLAGS=" $CFLAGS -g -D_GLIBCXX_DEBUG -DGLIBCXX_FORCE_NEW "
     ],
     [nv_strict=0
 	CFLAGS="$CFLAGS -DNDEBUG -O3 -funroll-loops -ffast-math -g "])

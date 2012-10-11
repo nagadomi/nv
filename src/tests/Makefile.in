@@ -61,7 +61,8 @@ am_nv_test_OBJECTS = nv_test-nv_test.$(OBJEXT) \
 	nv_test-nv_test_lbgu.$(OBJEXT) nv_test-nv_test_knn.$(OBJEXT) \
 	nv_test-nv_test_io.$(OBJEXT) nv_test-nv_test_munkres.$(OBJEXT) \
 	nv_test-nv_test_sha1.$(OBJEXT) nv_test-nv_test_knn2.$(OBJEXT) \
-	nv_test-nv_test_knn_pca.$(OBJEXT)
+	nv_test-nv_test_knn_pca.$(OBJEXT) \
+	nv_test-nv_test_knn_lmca.$(OBJEXT)
 nv_test_OBJECTS = $(am_nv_test_OBJECTS)
 nv_test_DEPENDENCIES = $(builddir)/../libnv.la
 nv_test_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
@@ -239,7 +240,8 @@ nv_test_io.c \
 nv_test_munkres.c \
 nv_test_sha1.c \
 nv_test_knn2.c \
-nv_test_knn_pca.c 
+nv_test_knn_pca.c \
+nv_test_knn_lmca.c 
 
 nv_test_CFLAGS = -Wall \
 -I$(srcdir)/../ -I$(srcdir)/../3rd_party/sha1 -I$(srcdir)/../3rd_party/mt -I$(srcdir)/../3rd_party/avxintrin_emu \
@@ -319,6 +321,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/nv_test-nv_test_knb.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/nv_test-nv_test_knn.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/nv_test-nv_test_knn2.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/nv_test-nv_test_knn_lmca.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/nv_test-nv_test_knn_pca.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/nv_test-nv_test_lbgu.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/nv_test-nv_test_lr.Po@am__quote@
@@ -644,6 +647,20 @@ nv_test-nv_test_knn_pca.obj: nv_test_knn_pca.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='nv_test_knn_pca.c' object='nv_test-nv_test_knn_pca.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(nv_test_CPPFLAGS) $(CPPFLAGS) $(nv_test_CFLAGS) $(CFLAGS) -c -o nv_test-nv_test_knn_pca.obj `if test -f 'nv_test_knn_pca.c'; then $(CYGPATH_W) 'nv_test_knn_pca.c'; else $(CYGPATH_W) '$(srcdir)/nv_test_knn_pca.c'; fi`
+
+nv_test-nv_test_knn_lmca.o: nv_test_knn_lmca.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(nv_test_CPPFLAGS) $(CPPFLAGS) $(nv_test_CFLAGS) $(CFLAGS) -MT nv_test-nv_test_knn_lmca.o -MD -MP -MF $(DEPDIR)/nv_test-nv_test_knn_lmca.Tpo -c -o nv_test-nv_test_knn_lmca.o `test -f 'nv_test_knn_lmca.c' || echo '$(srcdir)/'`nv_test_knn_lmca.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/nv_test-nv_test_knn_lmca.Tpo $(DEPDIR)/nv_test-nv_test_knn_lmca.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='nv_test_knn_lmca.c' object='nv_test-nv_test_knn_lmca.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(nv_test_CPPFLAGS) $(CPPFLAGS) $(nv_test_CFLAGS) $(CFLAGS) -c -o nv_test-nv_test_knn_lmca.o `test -f 'nv_test_knn_lmca.c' || echo '$(srcdir)/'`nv_test_knn_lmca.c
+
+nv_test-nv_test_knn_lmca.obj: nv_test_knn_lmca.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(nv_test_CPPFLAGS) $(CPPFLAGS) $(nv_test_CFLAGS) $(CFLAGS) -MT nv_test-nv_test_knn_lmca.obj -MD -MP -MF $(DEPDIR)/nv_test-nv_test_knn_lmca.Tpo -c -o nv_test-nv_test_knn_lmca.obj `if test -f 'nv_test_knn_lmca.c'; then $(CYGPATH_W) 'nv_test_knn_lmca.c'; else $(CYGPATH_W) '$(srcdir)/nv_test_knn_lmca.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/nv_test-nv_test_knn_lmca.Tpo $(DEPDIR)/nv_test-nv_test_knn_lmca.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='nv_test_knn_lmca.c' object='nv_test-nv_test_knn_lmca.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(nv_test_CPPFLAGS) $(CPPFLAGS) $(nv_test_CFLAGS) $(CFLAGS) -c -o nv_test-nv_test_knn_lmca.obj `if test -f 'nv_test_knn_lmca.c'; then $(CYGPATH_W) 'nv_test_knn_lmca.c'; else $(CYGPATH_W) '$(srcdir)/nv_test_knn_lmca.c'; fi`
 
 mostlyclean-libtool:
 	-rm -f *.lo

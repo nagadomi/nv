@@ -15892,7 +15892,7 @@ if test "${enable_debug+set}" = set; then :
   enableval=$enable_debug; case  "${enableval}" in
   yes)
     nv_strict=1
-	CFLAGS=" $CFLAGS -g0 -D_GLIBCXX_DEBUG -DGLIBCXX_FORCE_NEW "
+	CFLAGS=" $CFLAGS -g -D_GLIBCXX_DEBUG -DGLIBCXX_FORCE_NEW "
 
     ;;
   no)
@@ -15908,7 +15908,7 @@ else
   case  "no" in
   yes)
     nv_strict=1
-	CFLAGS=" $CFLAGS -g0 -D_GLIBCXX_DEBUG -DGLIBCXX_FORCE_NEW "
+	CFLAGS=" $CFLAGS -g -D_GLIBCXX_DEBUG -DGLIBCXX_FORCE_NEW "
 
     ;;
   no)

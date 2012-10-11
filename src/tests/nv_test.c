@@ -23,6 +23,7 @@
 int main(void)
 {
 	NV_BACKTRACE;
+	
 	nv_test_sha1();
 	nv_test_io();
 	nv_test_serialize();
@@ -31,6 +32,7 @@ int main(void)
 	
 	nv_test_knn_pca();
 	nv_test_knn2();
+	nv_test_knn_lmca();
 	nv_test_lr();
 	nv_test_arow();
 	nv_test_pa();	
@@ -49,7 +51,6 @@ int main(void)
 	nv_test_klr_tree();
 	
 	//nv_test_plsi();
-
 	
 	return 0;
 }
