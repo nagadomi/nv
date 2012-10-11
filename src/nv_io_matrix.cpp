@@ -262,7 +262,7 @@ nv_load_matrix_bin_fp(FILE *fp)
 	while ((n = fread(mat->v + len, sizeof(float), (size_t)mat->list_step * mat->list - len, fp)) > 0) {
 		len += n;
 	}
-	if (len != mat->list_step * mat->list) {
+	if (len != (size_t)mat->list_step * mat->list) {
 		nv_matrix_free(&mat);
 		return NULL;
 	}
