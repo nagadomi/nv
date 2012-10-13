@@ -90,8 +90,6 @@ nv_nn_dist(const nv_matrix_t *mat,
 		   const nv_matrix_t *vec, int vec_j)
 {
 	int i;
-	int min_index = -1;
-	float min_dist = FLT_MAX;
 	nv_int_float_t min_v;
 	
 	min_v.i = -1;
