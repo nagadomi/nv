@@ -109,7 +109,7 @@ void nv_cov(nv_matrix_t *cov,
 	nv_matrix_zero(cov);
 
 #ifdef _OPENMP
-#pragma omp parallel for num_threads(procs)	
+#pragma omp parallel for num_threads(procs)	schedule(dynamic, 1)
 #endif
 	for (m = 0; m < cov->m; ++m) {
 		nv_matrix_t *dum = nv_matrix_alloc(data->m, 1);
