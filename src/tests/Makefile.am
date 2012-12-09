@@ -13,6 +13,7 @@ nv_test_kmeans.c \
 nv_test_klr.c \
 nv_test_klr_tree.c \
 nv_test_kmeans_tree.c \
+nv_test_pca_kmeans_tree.c \
 nv_test_knb.c \
 nv_test_plsi.c \
 nv_test_lbgu.c \
@@ -37,6 +38,11 @@ nv_test_CFLAGS= -Wall \
 nv_test_CXXFLAGS = $(nv_test_CFLAGS)
 nv_test_CPPFLAGS = $(nv_test_CFLAGS)
 nv_test_LDADD = $(builddir)/../libnv.la
+
+
+#-DNV_TEST_DATA=\"$(srcdir)/data/mnist_test_0-5.vec\" \
+#-DNV_TEST_LABEL=\"$(srcdir)/data/mnist_test_0-5_labels.vec\" \
+#
 
 TESTS = nv_test
 CLEANFILES = test.mat test.matb

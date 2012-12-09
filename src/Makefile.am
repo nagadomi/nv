@@ -59,6 +59,7 @@ nv_ml_knb.c \
 nv_ml_mlp.c \
 nv_ml_som.c \
 nv_ml_kmeans_tree.c \
+nv_ml_pca_kmeans_tree.c \
 nv_ml_klr_tree.c \
 nv_ml_lmca.c \
 nv_ip_gaussian.c \
@@ -138,6 +139,7 @@ nv_ml_knb.h \
 nv_ml_mlp.h \
 nv_ml_som.h \
 nv_ml_kmeans_tree.h \
+nv_ml_pca_kmeans_tree.h \
 nv_ml_klr_tree.h \
 nv_ml_lmca.h \
 nv_ml.h \
