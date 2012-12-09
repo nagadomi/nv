@@ -27,6 +27,7 @@ typedef struct
 	nv_matrix_t *w;
 } nv_pa_t;
 
+void nv_pa_progress(int onoff);
 nv_pa_t *nv_pa_alloc(int n, int k);
 void nv_pa_free(nv_pa_t **pa);
 	
