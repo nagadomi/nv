@@ -38,6 +38,7 @@
 #include "nv_ml_klr.h"
 #include "nv_ml_lmca.h"
 #include "nv_ml_kmeans_tree.h"
+#include "nv_ml_pca_kmeans_tree.h"
 #include "nv_ml_klr_tree.h"
 
 #ifdef __cplusplus
