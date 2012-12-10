@@ -782,7 +782,7 @@ nv_keypoint_orientation(const nv_keypoint_ctx_t *ctx,
 			i2 = nv_vector_max_n(hist, thread_idx);
 			v2 = NV_MAT_V(hist, thread_idx, i2);
 			
-			if (v2 / v1 > 0.8f) {
+			if (v1 > 0.0f && v2 / v1 > 0.8f) {
 				if (i1 > i2) {
 					if (i1 == NV_KEYPOINT_ORIENTATION_HIST - 1) {
 						if (!(i2 == 0 || i2 == NV_KEYPOINT_ORIENTATION_HIST - 2)) {
@@ -1265,7 +1265,7 @@ nv_keypoint_dense_ex(const nv_keypoint_ctx_t *ctx,
 		float sy, ey, sx, ex;
 		float xstep, ystep;
 		
-		for (j = 0; j < ctx->param.level; ++j) {
+		for (j = 1; j < ctx->param.level - 1; ++j) {
 			float dist = (NV_MAT_V(ctx->outer_r, 0, j) - dense[i].r) *
 				(NV_MAT_V(ctx->outer_r, 0, j) - dense[i].r);
 			if (min_dist > dist) {
@@ -1274,8 +1274,8 @@ nv_keypoint_dense_ex(const nv_keypoint_ctx_t *ctx,
 			}
 		}
 		sx = sy = NV_MAT_V(ctx->outer_r, 0, level) * NV_KEYPOINT_DESC_SCALE;
-		ex = (img->cols) - sx;
-		ey = (img->rows) - sy;
+		ex = (img->cols - 1) - sx;
+		ey = (img->rows - 1) - sy;
 		xstep = (ex - sx) / dense[i].cols;
 		ystep = (ey - sy) / dense[i].rows;
 		xstep += xstep / dense[i].cols;
@@ -1285,18 +1285,19 @@ nv_keypoint_dense_ex(const nv_keypoint_ctx_t *ctx,
 			for (x = 0; x < dense[i].cols; ++x) {
 				float ky = sy + y * ystep;
 				float kx = sx + x * xstep;
-				
-				NV_MAT_V(keypoints, km, NV_KEYPOINT_RESPONSE_IDX) =
-					nv_keypoint_scale_diff(
-						integral, integral_tilted,
-						NV_FLOOR_INT(ky),
-						NV_FLOOR_INT(kx),
-						NV_MAT_V(ctx->outer_r, 0, level),
-						NV_MAT_V(ctx->inner_r, 0, level));
-				NV_MAT_V(keypoints, km, NV_KEYPOINT_Y_IDX) = ky;
-				NV_MAT_V(keypoints, km, NV_KEYPOINT_X_IDX) = kx;
-				NV_MAT_V(keypoints, km, NV_KEYPOINT_RADIUS_IDX) = NV_MAT_V(outer_r, 0, level);
-				++km;
+				float response = nv_keypoint_scale_diff(
+					integral, integral_tilted,
+					NV_FLOOR_INT(ky),
+					NV_FLOOR_INT(kx),
+					NV_MAT_V(ctx->outer_r, 0, level),
+					NV_MAT_V(ctx->inner_r, 0, level));
+				if (response != 0.0f) {
+					NV_MAT_V(keypoints, km, NV_KEYPOINT_RESPONSE_IDX) =
+						NV_MAT_V(keypoints, km, NV_KEYPOINT_Y_IDX) = ky;
+					NV_MAT_V(keypoints, km, NV_KEYPOINT_X_IDX) = kx;
+					NV_MAT_V(keypoints, km, NV_KEYPOINT_RADIUS_IDX) = NV_MAT_V(outer_r, 0, level);
+					++km;
+				}
 			}
 		}
 	}
