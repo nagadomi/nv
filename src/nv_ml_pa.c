@@ -124,7 +124,7 @@ nv_pa_train(nv_pa_t *pa,
 
 int
 nv_pa_predict_label(const nv_pa_t *pa,
-					nv_matrix_t *vec, int j)
+					const nv_matrix_t *vec, int j)
 {
 	if (pa->n == 2) {
 		return nv_vector_dot(pa->w, 0, vec, j) >= 0.0f ? 0 : 1;

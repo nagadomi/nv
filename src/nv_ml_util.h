@@ -33,8 +33,8 @@ void nv_dataset(nv_matrix_t *data,
 
 float nv_purity(int cluster_k,
 				int correct_k,
-				nv_matrix_t *clustering_labels,
-				nv_matrix_t *correct_labels);
+				const nv_matrix_t *clustering_labels,
+				const nv_matrix_t *correct_labels);
 
 
 #ifdef __cplusplus
