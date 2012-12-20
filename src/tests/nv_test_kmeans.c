@@ -25,10 +25,8 @@
 
 #define K 31
 
-void nv_test_kmeans(void)
+void nv_test_kmeans(const nv_matrix_t *data, const nv_matrix_t *labels, int k)
 {
-	nv_matrix_t *data = nv_load_matrix(NV_TEST_DATA);
-	nv_matrix_t *labels = nv_load_matrix(NV_TEST_LABEL);
 	nv_matrix_t *cluster_labels = nv_matrix_alloc(1, data->m);
 	nv_matrix_t *centroids = nv_matrix_alloc(data->n, K);
 	nv_matrix_t *count = nv_matrix_alloc(1, K);
@@ -36,16 +34,13 @@ void nv_test_kmeans(void)
 	
 	NV_TEST_NAME;
 
-	nv_vector_normalize_all(data);
 	//nv_kmeans_progress(1);
 	nv_kmeans(centroids, count, cluster_labels, data, K, 50);
 	
-	purity = nv_purity(K, NV_TEST_DATA_K, cluster_labels, labels);
+	purity = nv_purity(K, k, cluster_labels, labels);
 	NV_ASSERT(purity > 0.6f);
 	printf("purity: %f\n", purity);
 	
-	nv_matrix_free(&data);
-	nv_matrix_free(&labels);
 	nv_matrix_free(&cluster_labels);
 	nv_matrix_free(&centroids);
 	nv_matrix_free(&count);

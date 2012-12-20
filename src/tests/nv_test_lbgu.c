@@ -25,10 +25,8 @@
 
 #define K 31
 
-void nv_test_lbgu(void)
+void nv_test_lbgu(const nv_matrix_t *data, const nv_matrix_t *labels)
 {
-	nv_matrix_t *data = nv_load_matrix(NV_TEST_DATA);
-	nv_matrix_t *labels = nv_load_matrix(NV_TEST_LABEL);
 	nv_matrix_t *cluster_labels = nv_matrix_alloc(1, data->m);
 	nv_matrix_t *centroids = nv_matrix_alloc(data->n, K);
 	nv_matrix_t *count = nv_matrix_alloc(1, K);
@@ -42,8 +40,6 @@ void nv_test_lbgu(void)
 	printf("purity: %f\n", purity);
 	NV_ASSERT(purity > 0.7f);
 	
-	nv_matrix_free(&data);
-	nv_matrix_free(&labels);
 	nv_matrix_free(&cluster_labels);
 	nv_matrix_free(&centroids);
 	nv_matrix_free(&count);

@@ -114,7 +114,7 @@ nv_pa_train(nv_pa_t *pa,
 	} else {
 		int k;
 #ifdef _OPENMP
-#pragma omp	parallel for num_threads(nv_omp_procs())
+#pragma omp	parallel for num_threads(nv_omp_procs()) schedule(dynamic, 1)
 #endif
 		for (k = 0; k < pa->k; ++k) {
 			nv_pa_train_at(pa, data, labels, k, c, max_epoch);
@@ -124,7 +124,7 @@ nv_pa_train(nv_pa_t *pa,
 
 int
 nv_pa_predict_label(const nv_pa_t *pa,
-					nv_matrix_t *vec, int j)
+					const nv_matrix_t *vec, int j)
 {
 	if (pa->n == 2) {
 		return nv_vector_dot(pa->w, 0, vec, j) >= 0.0f ? 0 : 1;

@@ -25,18 +25,14 @@
 
 #define K 31
 
-void nv_test_plsi(void)
+void nv_test_plsi(const nv_matrix_t *data, const nv_matrix_t *labels)
 {
-	nv_matrix_t *data = nv_load_matrix(NV_TEST_DATA);
-	nv_matrix_t *labels = nv_load_matrix(NV_TEST_LABEL);
 	nv_matrix_t *cluster_labels = nv_matrix_alloc(1, data->m);
 	nv_plsi_t *plsi = nv_plsi_alloc(data->m, data->n, K);
 	float purity;
 	int i;
 	
 	NV_TEST_NAME;
-
-	nv_vector_normalize_all(data);
 
 	nv_plsi_init(plsi);
 	nv_plsi(plsi, data, 50);
@@ -48,8 +44,6 @@ void nv_test_plsi(void)
 	NV_ASSERT(purity > 0.4f);
 	
 	nv_plsi_free(&plsi);
-	nv_matrix_free(&data);
-	nv_matrix_free(&labels);
 	nv_matrix_free(&cluster_labels);
 
 	fflush(stdout);

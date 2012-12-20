@@ -7,7 +7,7 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License,
  * or any later version.
- * 
+ * 4
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -103,6 +103,16 @@ nv_lmca_init_cov(nv_matrix_t *ldm,
 	for (i = 0; i < ldm->m; ++i) {
 		memcpy(&NV_MAT_V(ldm, i, 0), &NV_MAT_V(c, i, 1), sizeof(float) * ldm->n);
 	}
+	/* Power Normalize */
+	/*
+	for (i = 0; i < ldm->m; ++i) {	
+		int j;
+		for (j = 0; j < ldm->n; ++j) {
+			NV_MAT_V(ldm, i, j) = NV_SIGN(NV_MAT_V(ldm, i, j)) * powf(fabsf(NV_MAT_V(ldm, i, j)), 0.5f);
+		}
+	}
+	*/
+	/* L2 Normalize */	
 	nv_vector_normalize_all(ldm);
 	
 	nv_matrix_free(&c);
@@ -112,6 +122,32 @@ nv_lmca_init_cov(nv_matrix_t *ldm,
 		printf("%ldms\n", nv_clock() - t);
 		fflush(stdout);
 	}
+}
+
+void
+nv_lmca_init_diag1(nv_matrix_t *ldm)
+{
+	int i;
+	
+	nv_matrix_zero(ldm);
+	
+	for (i = 0; i < ldm->n; ++i) {
+		NV_MAT_V(ldm, i, i) = 1.0f;
+	}
+}
+
+/* Random Projectionで初期化 */
+void
+nv_lmca_init_random_projection(nv_matrix_t *ldm)
+{
+	int j, i;
+	
+	for (i = 0; i < ldm->m; ++i) {
+		for (j = 0; j < ldm->n; ++j) {
+			NV_MAT_V(ldm, i, j) = nv_gaussian_rand(0.0f, 1.0f);
+		}
+	}
+	nv_vector_normalize_all(ldm);
 }
 
 static void
@@ -141,7 +177,8 @@ nv_lmca_loss(const nv_matrix_t *lx,
 			 nv_knn_result_t **eta_lx,
 			 int mk,
 			 float margin,
-			 float c
+			 float c,
+			 int epoch
 	)
 {
 	int i;
@@ -196,17 +233,18 @@ nv_lmca_loss(const nv_matrix_t *lx,
 		}
 	}
 	if (nv_lmca_progress_flag) {
-		printf("nv_lmca: pull_error: %E push_error: %E, knn precision: %f(%d/%d)\n", eps1, eps2, (float)ok / (lx->m * nk), ok, lx->m);
+		printf("nv_lmca: %d: pull_error: %E push_error: %E, knn precision: %f(%d/%d)\n", epoch, eps1, eps2, (float)ok / (lx->m * nk), ok, lx->m * nk);		
 	}
 	return (1.0f - c) * eps1 + c * eps2;
 }
 
 void
-nv_lmca_train(nv_matrix_t *ldm,
-			  const nv_matrix_t *data, const nv_matrix_t *labels,
-			  int nk, int mk,
-			  float margin, float push_ratio, float delta,
-			  int max_epoch
+nv_lmca_train_ex(nv_matrix_t *ldm,
+				 nv_lmca_type_e type,
+				 const nv_matrix_t *data, const nv_matrix_t *labels,
+				 int nk, int mk,
+				 float margin, float push_ratio, float delta,
+				 int max_epoch
 	)
 {
 	nv_matrix_t *lx = nv_matrix_alloc(ldm->m, data->m);
@@ -222,6 +260,7 @@ nv_lmca_train(nv_matrix_t *ldm,
 	float last_error = FLT_MAX;
 	int retry_count;
 
+	NV_ASSERT(type == NV_LMCA_FULL || (type == NV_LMCA_DIAG && ldm->m == ldm->n));
 	NV_ASSERT(data->m >= nk);
 	NV_ASSERT(data->m >= mk);
 	
@@ -268,36 +307,72 @@ nv_lmca_train(nv_matrix_t *ldm,
 		for (j = 0; j < nk; ++j) {
 			int j_idx = eta[i][j].index;
 			if (il == NV_MAT_VI(labels, j_idx, 0)) {
-				int ii, jj;
+				nv_vector_sub(d, 0, data, i, data, j_idx);
+				if (type == NV_LMCA_FULL) {
+					int ii, jj;
 #if NV_ENABLE_SSE
-				int pk_lp = (data->n & 0xfffffffc);
-				nv_vector_sub(d, 0, data, i, data, j_idx);
-				for (ii = 0; ii < d->n; ++ii) {
-					const __m128 iv = _mm_set1_ps(NV_MAT_V(d, 0, ii));
-					for (jj = 0; jj < pk_lp; jj += 4) {
-						__m128 jv = _mm_load_ps(&NV_MAT_V(d, 0, jj));
-						jv = _mm_mul_ps(jv, iv);
-						jv = _mm_add_ps(jv, *(const __m128 *)&NV_MAT_V(mat, ii, jj));
-						_mm_store_ps(&NV_MAT_V(mat, ii, jj), jv);
-					}
-					for (jj = pk_lp; jj < data->n; ++jj) {
-						NV_MAT_V(mat, ii, jj) += NV_MAT_V(d, 0, jj) * NV_MAT_V(d, 0, ii);
-					}
-				}
-#else
-				nv_vector_sub(d, 0, data, i, data, j_idx);
-				for (ii = 0; ii < d->n; ++ii) {
-					for (jj = ii; jj < d->n; ++jj) {
-						float v = NV_MAT_V(d, 0, jj) * NV_MAT_V(d, 0, ii);
-						if (ii == jj) {
-							NV_MAT_V(mat, ii, jj) += v;
-						} else {
-							NV_MAT_V(mat, ii, jj) += v;
-							NV_MAT_V(mat, jj, ii) += v;
+					int pk_lp = (data->n & 0xfffffffc);
+				
+					if (pk_lp == data->n) {
+						for (ii = 0; ii < data->n; ii += 4) {
+							const __m128 d0 = _mm_load_ps(&NV_MAT_V(d, 0, ii));
+							const __m128 iv0 = _mm_shuffle_ps(d0, d0, _MM_SHUFFLE(0, 0, 0, 0));
+							const __m128 iv1 = _mm_shuffle_ps(d0, d0, _MM_SHUFFLE(1, 1, 1, 1));
+							const __m128 iv2 = _mm_shuffle_ps(d0, d0, _MM_SHUFFLE(2, 2, 2, 2));
+							const __m128 iv3 = _mm_shuffle_ps(d0, d0, _MM_SHUFFLE(3, 3, 3, 3));
+						
+							for (jj = 0; jj < data->n; jj += 4) {
+								__m128 jv = _mm_load_ps(&NV_MAT_V(d, 0, jj));
+								_mm_store_ps(&NV_MAT_V(mat, ii, jj),
+											 _mm_add_ps(_mm_mul_ps(jv, iv0),
+														*(const __m128 *)&NV_MAT_V(mat, ii, jj)));
+								_mm_store_ps(&NV_MAT_V(mat, ii + 1, jj),
+											 _mm_add_ps(_mm_mul_ps(jv, iv1),
+														*(const __m128 *)&NV_MAT_V(mat, ii + 1, jj)));
+								_mm_store_ps(&NV_MAT_V(mat, ii + 2, jj),
+											 _mm_add_ps(_mm_mul_ps(jv, iv2),
+														*(const __m128 *)&NV_MAT_V(mat, ii + 2, jj)));
+								_mm_store_ps(&NV_MAT_V(mat, ii + 3, jj),
+											 _mm_add_ps(_mm_mul_ps(jv, iv3),
+														*(const __m128 *)&NV_MAT_V(mat, ii + 3, jj)));
+							}
+						}
+					} else {
+						for (ii = 0; ii < d->n; ++ii) {
+							const __m128 iv = _mm_set1_ps(NV_MAT_V(d, 0, ii));
+							for (jj = 0; jj < pk_lp; jj += 4) {
+								__m128 jv = _mm_load_ps(&NV_MAT_V(d, 0, jj));
+								jv = _mm_mul_ps(jv, iv);
+								jv = _mm_add_ps(jv, *(const __m128 *)&NV_MAT_V(mat, ii, jj));
+								_mm_store_ps(&NV_MAT_V(mat, ii, jj), jv);
+							}
+							for (jj = pk_lp; jj < data->n; ++jj) {
+								NV_MAT_V(mat, ii, jj) += NV_MAT_V(d, 0, jj) * NV_MAT_V(d, 0, ii);
+							}
 						}
 					}
+#else
+					for (ii = 0; ii < d->n; ++ii) {
+						for (jj = ii; jj < d->n; ++jj) {
+							float v = NV_MAT_V(d, 0, jj) * NV_MAT_V(d, 0, ii);
+							if (ii == jj) {
+								NV_MAT_V(mat, ii, jj) += v;
+							} else {
+								NV_MAT_V(mat, ii, jj) += v;
+								NV_MAT_V(mat, jj, ii) += v;
+							}
+						}
+					}
+#endif
+				} else if (type == NV_LMCA_DIAG) {
+					int ii;
+					for (ii = 0; ii < d->n; ++ii) {
+						float v = NV_MAT_V(d, 0, ii) * NV_MAT_V(d, 0, ii);
+						NV_MAT_V(mat, ii, ii) += v;
+					}
+				} else {
+					NV_ASSERT("unknown type" == NULL);
 				}
-#endif				
 			}
 		}
 		nv_matrix_free(&d);
@@ -327,6 +402,7 @@ nv_lmca_train(nv_matrix_t *ldm,
 	if (tm1_scale > 0.0f) {
 		tm1_scale = 1.0f / tm1_scale;
 	}
+
 #ifdef _OPENMP
 #pragma omp parallel for	
 #endif
@@ -338,7 +414,23 @@ nv_lmca_train(nv_matrix_t *ldm,
 	}
 	
 	/* 変換行列を正則化して全データを変換する  0回目 */
-	nv_vector_normalize_all(ldm);
+	if (type == NV_LMCA_FULL) {
+		/* FULLの場合は各ベクトルのノルムを1にする  */
+		nv_vector_normalize_all(ldm);
+	} else if (type == NV_LMCA_DIAG) {
+		/* DIAGの場合は対角成分のノルムを1にする  */
+		float dot = 0.0f;
+		for (i = 0; i < ldm->n; ++i) {
+			dot += NV_MAT_V(ldm, i, i) * NV_MAT_V(ldm, i, i);
+		}
+		if (dot > 0.0f) {
+			float scale = 1.0f / sqrtf(dot);
+			for (i = 0; i < ldm->n; ++i) {
+				NV_MAT_V(ldm, i, i) *= scale;
+			}
+		}
+	}
+	
 	nv_lmca_lx(lx, ldm, data);
 
 	/* 各データの射影後のmk近傍にあるデータを保存 0回目 */
@@ -366,71 +458,108 @@ nv_lmca_train(nv_matrix_t *ldm,
 			int j;
 			const int thread_id = nv_omp_thread_id();
 			const int il = NV_MAT_VI(labels, i, 0);
-			nv_matrix_t *d = nv_matrix_alloc(data->n, 2);
 			nv_matrix_t *mat = tm2[thread_id];
+			nv_matrix_t *d = nv_matrix_alloc(data->n, 2);
 			
-			for (j = 0; j < nk; ++j) {
+			for (j = 1; j < nk; ++j) {
 				const int j_idx = eta[i][j].index;
-				/* nk近傍のうち同一ラベルのみについて  */
+				/* nk近傍のうち同一ラベルについて(自分自身は除く j=0) */
 				if (il == NV_MAT_VI(labels, j_idx, 0)) {
 					int l;
 					int nc = 0;
-					
 					const float d_ij = nv_euclidean2(lx, i, lx, j_idx);
+					
+					nv_vector_sub(d, 0, data, i, data, j_idx);
+					
 					for (l = 1; l < mk; ++l) {
 						const int l_idx = eta_lx[i][l].index;
 						if (il != NV_MAT_VI(labels, l_idx, 0)) {
 							const float d_il = eta_lx[i][l].dist;
-							const float h = NV_LMCA_DHINGE(d_ij + margin - d_il);
-							if (h > 0.0f) {
+							if (d_ij + margin - d_il > 0.0f) {
 								/* mk近傍のうちnk近傍内の同一ラベルからmergin以内のデータについて  */
-								int ii, jj;
+								nv_vector_sub(d, 1, data, i, data, l_idx);
+								if (type == NV_LMCA_FULL) {
+									int ii, jj;
 #if NV_ENABLE_SSE
-								const __m128 hv = _mm_set1_ps(h);
-								const int pk_lp = (data->n & 0xfffffffc);
-								
-								nv_vector_sub(d, 0, data, i, data, j_idx);
-								nv_vector_sub(d, 1, data, i, data, l_idx);
-								
-								for (ii = 0; ii < data->n; ++ii) {
-									const __m128 iv1 = _mm_set1_ps(NV_MAT_V(d, 0, ii));
-									const __m128 iv2 = _mm_set1_ps(NV_MAT_V(d, 1, ii));
-									for (jj = 0; jj < pk_lp; jj += 4) {
-										__m128 jv1 = _mm_load_ps(&NV_MAT_V(d, 0, jj));
-										__m128 jv2 = _mm_load_ps(&NV_MAT_V(d, 1, jj));
-										jv1 = _mm_mul_ps(iv1, jv1);
-										jv2 = _mm_mul_ps(iv2, jv2);
-										jv1 = _mm_sub_ps(jv1, jv2);
-										jv1 = _mm_mul_ps(jv1, hv);
-										jv1 = _mm_add_ps(jv1, *(const __m128 *)&NV_MAT_V(mat, ii, jj));
-										_mm_store_ps(&NV_MAT_V(mat, ii, jj), jv1);
-									}
-									for (jj = pk_lp; jj < data->n; ++jj) {
-										NV_MAT_V(mat, ii, jj) +=
-											(NV_MAT_V(d, 0, ii) * NV_MAT_V(d, 0, jj)
-											 -
-											 NV_MAT_V(d, 1, ii) * NV_MAT_V(d, 1, jj)) * h;
-									}
-								}
-#else
-								nv_vector_sub(d, 0, data, i, data, j_idx);
-								nv_vector_sub(d, 1, data, i, data, l_idx);
-
-								for (ii = 0; ii < data->n; ++ii) {
-									for (jj = ii; jj < data->n; ++jj) {
-										const float v =
-											(NV_MAT_V(d, 0, ii) *  NV_MAT_V(d, 0, jj)
-											-
-											 NV_MAT_V(d, 1, ii) *  NV_MAT_V(d, 1, jj)) * h;
-										if (ii == jj) {
-											NV_MAT_V(mat, ii, jj) += v;
-										} else {
-											NV_MAT_V(mat, ii, jj) += v;
-											NV_MAT_V(mat, jj, ii) += v;
+									const int pk_lp = (data->n & 0xfffffffc);
+									if (pk_lp == data->n) {
+										for (ii = 0; ii < data->n; ii += 4) {
+											const __m128 d0 = _mm_load_ps(&NV_MAT_V(d, 0, ii));
+											const __m128 iv0 = _mm_shuffle_ps(d0, d0, _MM_SHUFFLE(0, 0, 0, 0));
+											const __m128 iv1 = _mm_shuffle_ps(d0, d0, _MM_SHUFFLE(1, 1, 1, 1));
+											const __m128 iv2 = _mm_shuffle_ps(d0, d0, _MM_SHUFFLE(2, 2, 2, 2));
+											const __m128 iv3 = _mm_shuffle_ps(d0, d0, _MM_SHUFFLE(3, 3, 3, 3));
+											const __m128 d1 = _mm_load_ps(&NV_MAT_V(d, 1, ii));
+											const __m128 iv4 = _mm_shuffle_ps(d1, d1, _MM_SHUFFLE(0, 0, 0, 0));
+											const __m128 iv5 = _mm_shuffle_ps(d1, d1, _MM_SHUFFLE(1, 1, 1, 1));
+											const __m128 iv6 = _mm_shuffle_ps(d1, d1, _MM_SHUFFLE(2, 2, 2, 2));
+											const __m128 iv7 = _mm_shuffle_ps(d1, d1, _MM_SHUFFLE(3, 3, 3, 3));
+										
+											for (jj = 0; jj < data->n; jj += 4) {
+												const __m128 jv0 = _mm_load_ps(&NV_MAT_V(d, 0, jj));
+												const __m128 jv1 = _mm_load_ps(&NV_MAT_V(d, 1, jj));
+											
+												_mm_store_ps(&NV_MAT_V(mat, ii, jj),
+															 _mm_add_ps(_mm_sub_ps(_mm_mul_ps(iv0, jv0), _mm_mul_ps(iv4, jv1)),
+																		*(const __m128 *)&NV_MAT_V(mat, ii, jj)));
+												_mm_store_ps(&NV_MAT_V(mat, ii + 1, jj),
+															 _mm_add_ps(_mm_sub_ps(_mm_mul_ps(iv1, jv0), _mm_mul_ps(iv5, jv1)),
+																		*(const __m128 *)&NV_MAT_V(mat, ii + 1, jj)));
+												_mm_store_ps(&NV_MAT_V(mat, ii + 2, jj),
+															 _mm_add_ps(_mm_sub_ps(_mm_mul_ps(iv2, jv0), _mm_mul_ps(iv6, jv1)),
+																		*(const __m128 *)&NV_MAT_V(mat, ii + 2, jj)));
+												_mm_store_ps(&NV_MAT_V(mat, ii + 3, jj),
+															 _mm_add_ps(_mm_sub_ps(_mm_mul_ps(iv3, jv0), _mm_mul_ps(iv7, jv1)),
+																		*(const __m128 *)&NV_MAT_V(mat, ii + 3, jj)));
+											}
+										}
+									} else {
+										for (ii = 0; ii < data->n; ++ii) {
+											const __m128 iv1 = _mm_set1_ps(NV_MAT_V(d, 0, ii));
+											const __m128 iv2 = _mm_set1_ps(NV_MAT_V(d, 1, ii));
+											for (jj = 0; jj < pk_lp; jj += 4) {
+												const __m128 jv1 = _mm_load_ps(&NV_MAT_V(d, 0, jj));
+												const __m128 jv2 = _mm_load_ps(&NV_MAT_V(d, 1, jj));
+												_mm_store_ps(&NV_MAT_V(mat, ii, jj),
+															 _mm_add_ps(_mm_sub_ps(_mm_mul_ps(iv1, jv1), _mm_mul_ps(iv2, jv2)),
+																		*(const __m128 *)&NV_MAT_V(mat, ii, jj)));
+											}
+											for (jj = pk_lp; jj < data->n; ++jj) {
+												NV_MAT_V(mat, ii, jj) +=
+													NV_MAT_V(d, 0, ii) * NV_MAT_V(d, 0, jj)
+													-
+													NV_MAT_V(d, 1, ii) * NV_MAT_V(d, 1, jj);
+											}
 										}
 									}
-								}
+#else
+									for (ii = 0; ii < data->n; ++ii) {
+										for (jj = ii; jj < data->n; ++jj) {
+											const float v =
+												NV_MAT_V(d, 0, ii) *  NV_MAT_V(d, 0, jj)
+												-
+												NV_MAT_V(d, 1, ii) *  NV_MAT_V(d, 1, jj);
+											if (ii == jj) {
+												NV_MAT_V(mat, ii, jj) += v;
+											} else {
+												NV_MAT_V(mat, ii, jj) += v;
+												NV_MAT_V(mat, jj, ii) += v;
+											}
+										}
+									}
 #endif
+								} else if (type == NV_LMCA_DIAG) {
+									int ii;
+									for (ii = 0; ii < data->n; ++ii) {
+										const float v =
+											NV_MAT_V(d, 0, ii) *  NV_MAT_V(d, 0, ii)
+											-
+											NV_MAT_V(d, 1, ii) *  NV_MAT_V(d, 1, ii);
+										NV_MAT_V(mat, ii, ii) += v;
+									}
+								} else {
+									NV_ASSERT("unknown type" == NULL);
+								}
 								++nc;
 							} else {
 								/* eta_lxは距離順なのでこれより近いデータはない */
@@ -484,28 +613,16 @@ nv_lmca_train(nv_matrix_t *ldm,
 		 *   dL = (1.0 - push_ratio) * L * tm1 + push_ratio * L * tm2
 		 *  を勾配とする
 		 */
-		/* dL = pull_ratio * L * tm1 */
 #ifdef _OPENMP
 #pragma omp parallel for
 #endif
 		for (i = 0; i < dl->n; ++i) {
 			int j;
 			for (j = 0; j < dl->m; ++j) {
-				NV_MAT_V(dl, j, i) = pull_ratio * nv_vector_dot(ldm, j, tm1[0], i);
+				NV_MAT_V(dl, j, i) = pull_ratio * nv_vector_dot(ldm, j, tm1[0], i)
+					+ push_ratio * nv_vector_dot(ldm, j, tm2[0], i);
 			}
 		}
-
-		/* dL += pull_ratio * L * tm2 */
-#ifdef _OPENMP
-#pragma omp parallel for
-#endif	
-		for (i = 0; i < dl->n; ++i) {
-			int j;
-			for (j = 0; j < dl->m; ++j) {
-				NV_MAT_V(dl, j, i) += push_ratio * nv_vector_dot(ldm, j, tm2[0], i);
-			}
-		}
-		
 		/*
 		 * L_new = L_old - delta * dL
 		 */
@@ -530,8 +647,23 @@ nv_lmca_train(nv_matrix_t *ldm,
 			}
 			/* 結果を評価する */
 			
-			/* 変換行列を正則化して全データを変換する  */
-			nv_vector_normalize_all(ldm);
+			/* 変換行列を正則化して全データを変換する  0回目 */
+			if (type == NV_LMCA_FULL) {
+				/* FULLの場合は各ベクトルのノルムを1にする  */
+				nv_vector_normalize_all(ldm);
+			} else if (type == NV_LMCA_DIAG) {
+				/* DIAGの場合は対角成分のノルムを1にする  */
+				float dot = 0.0f;
+				for (i = 0; i < ldm->n; ++i) {
+					dot += NV_MAT_V(ldm, i, i) * NV_MAT_V(ldm, i, i);
+				}
+				if (dot > 0.0f) {
+					float scale = 1.0f / sqrtf(dot);
+					for (i = 0; i < ldm->n; ++i) {
+						NV_MAT_V(ldm, i, i) *= scale;
+					}
+				}
+			}
 			nv_lmca_lx(lx, ldm, data);
 			/* 各データの射影後のk近傍にあるデータを保存 */
 #ifdef _OPENMP
@@ -542,8 +674,9 @@ nv_lmca_train(nv_matrix_t *ldm,
 			}
 			
 			/* 目的関数（最小化） */
-			cur_error = nv_lmca_loss(lx, labels, eta, nk, eta_lx, mk, margin, push_ratio);
+			cur_error = nv_lmca_loss(lx, labels, eta, nk, eta_lx, mk, margin, push_ratio, e);
 			retry_count += 1;
+			/* 前回より大きくなったら更新係数を下げてやり直す */
 		} while (cur_error > last_error && retry_count < NV_LMCA_RETRY_MAX && delta_p > NV_LMCA_DELTA_MIN);
 		if (retry_count > NV_LMCA_RETRY_MAX || delta_p < NV_LMCA_DELTA_MIN) {
 			if (last_error > cur_error) {
@@ -553,14 +686,13 @@ nv_lmca_train(nv_matrix_t *ldm,
 		}
 		last_error = cur_error;
 		if (nv_lmca_progress_flag) {
-			printf("nv_lmca: %d: %ldms, error: %f, push_avg: %d\n",
+			printf("nv_lmca: %d: %ldms, error: %f, push_avg: %f\n",
 				   e, nv_clock() - t,
 				   last_error,
-				   push_sum / push_count
+				   (float)push_sum / push_count
 				);
 		}
 	}
-	
 
 	for (i = 0; i < procs; ++i) {
 		nv_matrix_free(&tm1[i]);
@@ -580,6 +712,17 @@ nv_lmca_train(nv_matrix_t *ldm,
 }
 
 void
+nv_lmca_train(nv_matrix_t *ldm,
+			  const nv_matrix_t *data, const nv_matrix_t *labels,
+			  int nk, int mk,
+			  float margin, float push_ratio, float delta,
+			  int max_epoch
+	)
+{
+	nv_lmca_train_ex(ldm, NV_LMCA_FULL, data, labels, nk, mk, margin, push_ratio, delta, max_epoch);
+}
+
+void
 nv_lmca(nv_matrix_t *ldm,
 		const nv_matrix_t *data, const nv_matrix_t *labels,
 		int nk, int mk, float margin, float push_ratio, float delta,
@@ -592,7 +735,8 @@ nv_lmca(nv_matrix_t *ldm,
 	/* PCAで初期化 */
 	nv_lmca_init_pca(ldm, data);
 	//nv_lmca_init_cov(ldm, data);
-
+	//nv_lmca_init_random_projection(ldm);
+	
 	/* ldmをkNNの結果がよくなるように更新 */
 	nv_lmca_train(ldm, data, labels, nk, mk, margin, push_ratio, delta, max_epoch);
 }

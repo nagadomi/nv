@@ -26,34 +26,25 @@
 #define HIDDEN_UNIT 128
 
 void
-nv_test_mlp(void)
+nv_test_mlp(const nv_matrix_t *train_data,
+			const nv_matrix_t *train_labels,
+			const nv_matrix_t *test_data,
+			const nv_matrix_t *test_labels)
 {
-	nv_matrix_t *data = nv_load_matrix(NV_TEST_DATA);
-	nv_matrix_t *labels = nv_load_matrix(NV_TEST_LABEL);
-	nv_matrix_t *train_data = nv_matrix_alloc(data->n, data->m / 4 * 3);
-	nv_matrix_t *train_labels = nv_matrix_alloc(labels->n, labels->m / 4 * 3);
-	nv_matrix_t *test_data = nv_matrix_alloc(data->n, data->m - train_data->m);
-	nv_matrix_t *test_labels = nv_matrix_alloc(labels->n, labels->m - train_labels->m);
-	nv_mlp_t *mlp = nv_mlp_alloc(data->n, HIDDEN_UNIT, NV_TEST_DATA_K);
+	nv_mlp_t *mlp = nv_mlp_alloc(train_data->n, HIDDEN_UNIT, NV_TEST_DATA_K);
 	nv_matrix_t *ir = nv_matrix_alloc(1, mlp->output == 1 ? 2 : mlp->output);
 	nv_matrix_t *hr = nv_matrix_alloc(1, mlp->output == 1 ? 2 : mlp->output);
 	int i, ok;
 	
 	NV_TEST_NAME;
 	
-	nv_vector_normalize_all(data);
-	
 	printf("train: %d, test: %d, %ddim\n",
 		   train_data->m,
 		   test_data->m,
 		   train_data->n);
 
-	nv_dataset(data, labels,
-			   train_data, train_labels,
-			   test_data, test_labels);
-	
-	//nv_mlp_progress(1);
-	nv_mlp_gaussian_init(mlp, 1.0f, (int)sqrtf(data->n), (int)sqrtf(data->n), 1);
+	nv_mlp_progress(1);
+	nv_mlp_gaussian_init(mlp, 1.0f, (int)sqrtf(train_data->n), (int)sqrtf(train_data->n), 1);
 	nv_matrix_fill(ir, 0.2f);
 	nv_matrix_fill(hr, 0.1f);
 	nv_mlp_train_ex(mlp, train_data, train_labels, ir, hr, 1, 0, 150, 200);
@@ -75,14 +66,6 @@ nv_test_mlp(void)
 
 	nv_matrix_free(&ir);
 	nv_matrix_free(&hr);
-	nv_matrix_free(&data);
-	nv_matrix_free(&labels);
-	nv_matrix_free(&train_data);
-	nv_matrix_free(&train_labels);
-	nv_matrix_free(&test_data);
-	nv_matrix_free(&test_labels);
-
 	nv_mlp_free(&mlp);
-
 	fflush(stdout);
 }

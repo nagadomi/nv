@@ -27,24 +27,20 @@
 #define NPCA  32
 
 void
-nv_test_knn_pca(void)
+nv_test_knn_pca(const nv_matrix_t *train_data,
+				const nv_matrix_t *train_labels,
+				const nv_matrix_t *test_data,
+				const nv_matrix_t *test_labels)
 {
-	nv_matrix_t *data = nv_load_matrix(NV_TEST_DATA);
-	nv_matrix_t *labels = nv_load_matrix(NV_TEST_LABEL);
-	nv_matrix_t *train_data = nv_matrix_alloc(data->n, data->m / 4 * 3);
-	nv_matrix_t *train_labels = nv_matrix_alloc(labels->n, labels->m / 4 * 3);
-	nv_matrix_t *test_data = nv_matrix_alloc(data->n, data->m - train_data->m);
-	nv_matrix_t *test_labels = nv_matrix_alloc(labels->n, labels->m - train_labels->m);
+	nv_matrix_t *tmp = nv_matrix_alloc(train_data->n, 1);
 	nv_matrix_t *train_data_pca = nv_matrix_alloc(NPCA, train_data->m);
 	nv_matrix_t *vec = nv_matrix_alloc(NPCA, 1);
-	nv_cov_t *cov = nv_cov_alloc(data->n);
+	nv_cov_t *cov = nv_cov_alloc(train_data->n);
 	int i, ok;
 	nv_knn_result_t results[KNN_K];
 	long t;
 	
 	NV_TEST_NAME;
-	
-	nv_vector_normalize_all(data);
 	
 	printf("train: %d, test: %d, %ddim ->  %ddim\n",
 		   train_data->m,
@@ -53,18 +49,14 @@ nv_test_knn_pca(void)
 		   NPCA
 		);
 	
-	nv_dataset(data, labels,
-			   train_data, train_labels,
-			   test_data, test_labels);
-	
 	t = nv_clock();
-	nv_cov_eigen_ex(cov, data, 10);
+	nv_cov_eigen_ex(cov, train_data, 10);
 	printf("%ldms\n", nv_clock() - t);
 	
 	nv_matrix_m(cov->eigen_vec, NPCA);
 	for (i = 0; i < train_data->m; ++i) {
-		nv_vector_sub(train_data, i, train_data, i, cov->u, 0);
-		nv_gemv(train_data_pca, i, NV_MAT_TR, cov->eigen_vec, train_data, i);
+		nv_vector_sub(tmp, 0, train_data, i, cov->u, 0);
+		nv_gemv(train_data_pca, i, NV_MAT_TR, cov->eigen_vec, tmp, 0);
 	}
 	
 	ok = 0;
@@ -72,8 +64,8 @@ nv_test_knn_pca(void)
 		int knn[NV_TEST_DATA_K] = {0};
 		int j, n, max_v, max_i;
 
-		nv_vector_sub(test_data, i, test_data, i, cov->u, 0);
-		nv_gemv(vec, 0, NV_MAT_TR, cov->eigen_vec, test_data, i);
+		nv_vector_sub(tmp, 0, test_data, i, cov->u, 0);
+		nv_gemv(vec, 0, NV_MAT_TR, cov->eigen_vec, tmp, 0);
 		n = nv_knn(results, KNN_K, train_data_pca, vec, 0);
 		for (j = 0; j < n; ++j) {
 			++knn[NV_MAT_VI(train_labels, results[j].index, 0)];
@@ -94,12 +86,7 @@ nv_test_knn_pca(void)
 		   ok, test_data->m);
 	
 	nv_cov_free(&cov);
-	nv_matrix_free(&data);
-	nv_matrix_free(&labels);
-	nv_matrix_free(&train_data);
-	nv_matrix_free(&train_labels);
-	nv_matrix_free(&test_data);
-	nv_matrix_free(&test_labels);
+	nv_matrix_free(&tmp);
 	nv_matrix_free(&train_data_pca);
 	nv_matrix_free(&vec);
 	

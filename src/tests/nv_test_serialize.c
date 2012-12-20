@@ -51,6 +51,7 @@ void nv_test_serialize(void)
 	}
 
 	nv_matrix_free(&mat);
+	nv_matrix_free(&mat2);
 	nv_free(s);
 
 	fflush(stdout);

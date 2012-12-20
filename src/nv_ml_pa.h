@@ -27,6 +27,7 @@ typedef struct
 	nv_matrix_t *w;
 } nv_pa_t;
 
+void nv_pa_progress(int onoff);
 nv_pa_t *nv_pa_alloc(int n, int k);
 void nv_pa_free(nv_pa_t **pa);
 	
@@ -35,7 +36,7 @@ void nv_pa_train(nv_pa_t *pa,
 				   const nv_matrix_t *data, const nv_matrix_t *label,
 				   float r,
 				   int max_epoch);
-int nv_pa_predict_label(const nv_pa_t *pa, nv_matrix_t *vec, int j);
+int nv_pa_predict_label(const nv_pa_t *pa, const nv_matrix_t *vec, int j);
 void nv_pa_dump_c(FILE *out,
 					const nv_pa_t *pa, const char *name, int static_variable);
 

@@ -23,6 +23,11 @@
 extern "C" {
 #endif
 
+typedef enum {
+	NV_LMCA_DIAG,
+	NV_LMCA_FULL
+} nv_lmca_type_e;
+
 void nv_lmca_progress(int onoff);
 void nv_lmca(nv_matrix_t *ldm,
 			 const nv_matrix_t *data,
@@ -30,18 +35,24 @@ void nv_lmca(nv_matrix_t *ldm,
 			 int nk, int mk, float margin, float pull_ratio, float delta,
 			 int max_epoch);
 
-void
-nv_lmca_init_cov(nv_matrix_t *ldm,
+void nv_lmca_init_cov(nv_matrix_t *ldm,
 				 const nv_matrix_t *data);
+void nv_lmca_init_random_projection(nv_matrix_t *ldm);
+void nv_lmca_init_pca(nv_matrix_t *ldm,
+					  const nv_matrix_t *data);
+void nv_lmca_init_diag1(nv_matrix_t *ldm);
+void nv_lmca_train(nv_matrix_t *ldm,
+				   const nv_matrix_t *data, const nv_matrix_t *labels,
+				   int nk, int mk,
+				   float margin, float push_ratio, float delta,
+				   int max_epoch);
 void
-nv_lmca_init_pca(nv_matrix_t *ldm,
-				 const nv_matrix_t *data);
-void
-nv_lmca_train(nv_matrix_t *ldm,
-			  const nv_matrix_t *data, const nv_matrix_t *labels,
-			  int nk, int mk,
-			  float margin, float push_ratio, float delta,
-			  int max_epoch);
+nv_lmca_train_ex(nv_matrix_t *ldm,
+				 nv_lmca_type_e type,
+				 const nv_matrix_t *data, const nv_matrix_t *labels,
+				 int nk, int mk,
+				 float margin, float push_ratio, float delta,
+				 int max_epoch);
 
 void nv_lmca_projection(nv_matrix_t *v1, int v1_j,
 						const nv_matrix_t *ldm,

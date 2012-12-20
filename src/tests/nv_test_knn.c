@@ -24,9 +24,8 @@
 #include "nv_test.h"
 
 static void
-nv_test_knn_nn(void)
+nv_test_knn_nn(const nv_matrix_t *data)
 {
-	nv_matrix_t *data = nv_load_matrix(NV_TEST_DATA);
 	int i;
 
 	NV_TEST_NAME;
@@ -46,14 +45,11 @@ nv_test_knn_nn(void)
 		nn = nv_nn_ex(data, data, i, nv_euclidean2);
 		NV_ASSERT(nv_vector_eq(data, i, data, nn));
 	}
-	
-	nv_matrix_free(&data);
 }
 
 static void
-nv_test_knn_knn(void)
+nv_test_knn_knn(const nv_matrix_t *data)
 {
-	nv_matrix_t *data = nv_load_matrix(NV_TEST_DATA);
 	int k = 10;
 	nv_knn_result_t *results = nv_alloc_type(nv_knn_result_t, k);
 	int i;
@@ -93,13 +89,12 @@ nv_test_knn_knn(void)
 		}
 	}
 	nv_free(results);
-	nv_matrix_free(&data);
 }
 
-void nv_test_knn(void)
+void nv_test_knn(const nv_matrix_t *data)
 {
-	nv_test_knn_nn();
-	nv_test_knn_knn();
+	nv_test_knn_nn(data);
+	nv_test_knn_knn(data);
 
 	fflush(stdout);
 }

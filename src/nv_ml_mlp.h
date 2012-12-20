@@ -46,6 +46,7 @@ void nv_mlp_free(nv_mlp_t **mlp);
 
 float nv_mlp_sigmoid(float a);
 void nv_mlp_init(nv_mlp_t *mlp);
+void nv_mlp_init_rand(nv_mlp_t *mlp);
 void nv_mlp_init_nonnegative(nv_mlp_t *mlp);
 void nv_mlp_init_kmeans(nv_mlp_t *mlp, const nv_matrix_t *data);
 void nv_mlp_gaussian_init(nv_mlp_t *mlp, float var, int height, int width, int zdim);
