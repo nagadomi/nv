@@ -235,7 +235,7 @@ nv_lmca_loss(const nv_matrix_t *lx,
 		}
 	}
 	if (nv_lmca_progress_flag) {
-		printf("nv_lmca: %d: pull_error: %E push_error: %E, knn precision: %f(%d/%d)\n", epoch, eps1, eps2, (float)ok / (lx->m * nk), ok, lx->m);
+		printf("nv_lmca: %d: pull_error: %E push_error: %E, knn precision: %f(%d/%d)\n", epoch, eps1, eps2, (float)ok / (lx->m * nk), ok, lx->m * nk);
 	}
 	return (1.0f - c) * eps1 + c * eps2;
 }
