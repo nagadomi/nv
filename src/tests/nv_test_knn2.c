@@ -26,29 +26,20 @@
 #define KNN_K 5
 
 void
-nv_test_knn2(void)
+nv_test_knn2(const nv_matrix_t *train_data,
+			 const nv_matrix_t *train_labels,
+			 const nv_matrix_t *test_data,
+			 const nv_matrix_t *test_labels)
 {
-	nv_matrix_t *data = nv_load_matrix(NV_TEST_DATA);
-	nv_matrix_t *labels = nv_load_matrix(NV_TEST_LABEL);
-	nv_matrix_t *train_data = nv_matrix_alloc(data->n, data->m / 4 * 3);
-	nv_matrix_t *train_labels = nv_matrix_alloc(labels->n, labels->m / 4 * 3);
-	nv_matrix_t *test_data = nv_matrix_alloc(data->n, data->m - train_data->m);
-	nv_matrix_t *test_labels = nv_matrix_alloc(labels->n, labels->m - train_labels->m);
 	nv_knn_result_t results[KNN_K];
 	int i, ok;
 	
 	NV_TEST_NAME;
 	
-	nv_vector_normalize_all(data);
-	
 	printf("train: %d, test: %d, %ddim\n",
 		   train_data->m,
 		   test_data->m,
 		   train_data->n);
-	
-	nv_dataset(data, labels,
-			   train_data, train_labels,
-			   test_data, test_labels);
 	
 	ok = 0;
 	for (i = 0; i < test_data->m; ++i) {
@@ -72,13 +63,6 @@ nv_test_knn2(void)
 	printf("Accuracy = %f%% (%d/%d)\n",
 		   (float)ok / test_data->m * 100.0f,
 		   ok, test_data->m);
-
-	nv_matrix_free(&data);
-	nv_matrix_free(&labels);
-	nv_matrix_free(&train_data);
-	nv_matrix_free(&train_labels);
-	nv_matrix_free(&test_data);
-	nv_matrix_free(&test_labels);
 
 	fflush(stdout);
 }

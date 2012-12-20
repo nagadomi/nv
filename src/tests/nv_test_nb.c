@@ -25,29 +25,20 @@
 
 // 
 
-void nv_test_nb(void)
+void nv_test_nb(const nv_matrix_t *train_data,
+				const nv_matrix_t *train_labels,
+				const nv_matrix_t *test_data,
+				const nv_matrix_t *test_labels)
 {
-	nv_matrix_t *data = nv_load_matrix(NV_TEST_DATA);
-	nv_matrix_t *labels = nv_load_matrix(NV_TEST_LABEL);
-	nv_matrix_t *train_data = nv_matrix_alloc(data->n, data->m / 4 * 3);
-	nv_matrix_t *train_labels = nv_matrix_alloc(labels->n, labels->m / 4 * 3);
-	nv_matrix_t *test_data = nv_matrix_alloc(data->n, data->m - train_data->m);
-	nv_matrix_t *test_labels = nv_matrix_alloc(labels->n, labels->m - train_labels->m);
-	nv_nb_t *nb = nv_nb_alloc(data->n, NV_TEST_DATA_K);
+	nv_nb_t *nb = nv_nb_alloc(train_data->n, NV_TEST_DATA_K);
 	int i, ok;
 	
 	NV_TEST_NAME;
-	
-	nv_vector_normalize_all(data);
 	
 	printf("train: %d, test: %d, %ddim\n",
 		   train_data->m,
 		   test_data->m,
 		   train_data->n);
-
-	nv_dataset(data, labels,
-			   train_data, train_labels,
-			   test_data, test_labels);
 	
 	nv_nb_train_all(nb, NV_TEST_DATA_K, train_data, train_labels);
 	
@@ -65,13 +56,6 @@ void nv_test_nb(void)
 	
 	NV_ASSERT((float)ok / test_data->m > 0.7f);
 
-	nv_matrix_free(&data);
-	nv_matrix_free(&labels);
-	nv_matrix_free(&train_data);
-	nv_matrix_free(&train_labels);
-	nv_matrix_free(&test_data);
-	nv_matrix_free(&test_labels);
 	nv_nb_free(&nb);
-
 	fflush(stdout);
 }

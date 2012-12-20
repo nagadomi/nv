@@ -18,39 +18,61 @@
  */
 
 #include "nv_core.h"
+#include "nv_num.h"
+#include "nv_io.h"
 #include "nv_test.h"
 
 int main(void)
 {
+	nv_matrix_t *data = nv_load_matrix(NV_TEST_DATA);
+	nv_matrix_t *labels = nv_load_matrix(NV_TEST_LABEL);
+	nv_matrix_t *train_data = nv_matrix_alloc(data->n, data->m / 4 * 3);
+	nv_matrix_t *train_labels = nv_matrix_alloc(labels->n, labels->m / 4 * 3);
+	nv_matrix_t *test_data = nv_matrix_alloc(data->n, data->m - train_data->m);
+	nv_matrix_t *test_labels = nv_matrix_alloc(labels->n, labels->m - train_labels->m);
+
+	nv_vector_normalize_all(data);
+	nv_dataset(data, labels,
+			   train_data, train_labels,
+			   test_data, test_labels);
+
 	NV_BACKTRACE;
-	
 	nv_test_sha1();
 	nv_test_io();
 	nv_test_serialize();
 	
 	nv_test_keypoint();
 	
-	nv_test_knn_pca();
-	nv_test_knn2();
-	nv_test_knn_lmca();
-	nv_test_lr();
-	nv_test_arow();
-	nv_test_pa();	
-	nv_test_mlp();
-	nv_test_nb();
+	nv_test_knn_pca(train_data, train_labels, test_data, test_labels);
+	nv_test_knn2(train_data, train_labels, test_data, test_labels);
+	nv_test_knn_lmca(train_data, train_labels, test_data, test_labels);
+	nv_test_knn_2pass_lmca(train_data, train_labels, test_data, test_labels);
 	
-	nv_test_knn();
-	nv_test_munkres();
+	nv_test_lr(train_data, train_labels, test_data, test_labels);
+	nv_test_arow(train_data, train_labels, test_data, test_labels);
+	nv_test_pa(train_data, train_labels, test_data, test_labels);
+	nv_test_mlp(train_data, train_labels, test_data, test_labels);
+	nv_test_nb(train_data, train_labels, test_data, test_labels);
 	
-	nv_test_kmeans();
-	nv_test_lbgu();	
-	nv_test_klr();
-	nv_test_knb();
+	nv_test_knn(train_data);
+	nv_test_kmeans(train_data, train_labels, NV_TEST_DATA_K);
+	nv_test_lbgu(train_data, train_labels);	
+	nv_test_klr(train_data, train_labels);
+	nv_test_knb(train_data, train_labels);
 
-	nv_test_kmeans_tree();
-	nv_test_klr_tree();
+	nv_test_kmeans_tree(train_data, train_labels);
+	nv_test_pca_kmeans_tree(train_data, train_labels);
+	nv_test_klr_tree(train_data, train_labels);
 	
 	//nv_test_plsi();
+	nv_test_munkres();
+	
+	nv_matrix_free(&data);
+	nv_matrix_free(&labels);
+	nv_matrix_free(&train_data);
+	nv_matrix_free(&train_labels);
+	nv_matrix_free(&test_data);
+	nv_matrix_free(&test_labels);
 	
 	return 0;
 }

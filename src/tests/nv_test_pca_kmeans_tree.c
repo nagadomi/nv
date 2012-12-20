@@ -27,10 +27,9 @@
 #define K 31
 
 static void
-nv_test_pca_kmeans_tree_ex(int *width, int height)
+nv_test_pca_kmeans_tree_ex(const nv_matrix_t *data, const nv_matrix_t *labels,
+						   int *width, int height)
 {
-	nv_matrix_t *data = nv_load_matrix(NV_TEST_DATA);
-	nv_matrix_t *labels = nv_load_matrix(NV_TEST_LABEL);
 	nv_matrix_t *cluster_labels = nv_matrix_alloc(1, data->m);
 	nv_pca_kmeans_tree_t *tree = nv_pca_kmeans_tree_alloc(data->n, NPCA, width, height);
 	float purity;
@@ -46,8 +45,6 @@ nv_test_pca_kmeans_tree_ex(int *width, int height)
 	}
 	printf("\n");
 
-	nv_vector_normalize_all(data);
-
 	nv_pca_kmeans_tree_train(tree, data, 100);
 	for (i = 0; i < data->m; ++i) {
 		NV_MAT_V(cluster_labels, i, 0) = (float)nv_pca_kmeans_tree_predict_label(tree, data, i);
@@ -58,16 +55,13 @@ nv_test_pca_kmeans_tree_ex(int *width, int height)
 	NV_ASSERT(purity > 0.2f);
 	
 	nv_pca_kmeans_tree_free(&tree);
-	nv_matrix_free(&data);
-	nv_matrix_free(&labels);
 	nv_matrix_free(&cluster_labels);
 }
 
 static void
-nv_test_pca_kmeans_tree_inherit(nv_pca_kmeans_tree_t *tree, const nv_pca_kmeans_tree_t *base)
+nv_test_pca_kmeans_tree_inherit(const nv_matrix_t *data, const nv_matrix_t *labels,
+								nv_pca_kmeans_tree_t *tree, const nv_pca_kmeans_tree_t *base)
 {
-	nv_matrix_t *data = nv_load_matrix(NV_TEST_DATA);
-	nv_matrix_t *labels = nv_load_matrix(NV_TEST_LABEL);
 	nv_matrix_t *cluster_labels = nv_matrix_alloc(1, data->m);
 	float purity;
 	int i;
@@ -82,8 +76,6 @@ nv_test_pca_kmeans_tree_inherit(nv_pca_kmeans_tree_t *tree, const nv_pca_kmeans_
 	}
 	printf("\n");
 
-	nv_vector_normalize_all(data);
-
 	if (base == NULL) {
 		nv_pca_kmeans_tree_train(tree, data, 100);
 	} else {
@@ -97,13 +89,11 @@ nv_test_pca_kmeans_tree_inherit(nv_pca_kmeans_tree_t *tree, const nv_pca_kmeans_
 	printf("purity: %f\n", purity);
 	NV_ASSERT(purity > 0.2f);
 	
-	nv_matrix_free(&data);
-	nv_matrix_free(&labels);
 	nv_matrix_free(&cluster_labels);
 }
 
 static void
-nv_test_pca_kmeans_tree_nodes(void)
+nv_test_pca_kmeans_tree_nodes(const nv_matrix_t *data, const nv_matrix_t *labels)
 {
 	int width0[] = { 32 };	
 	int width1[] = { 16, 2 };
@@ -114,20 +104,19 @@ nv_test_pca_kmeans_tree_nodes(void)
 	int width6[] = { 2, 2, 8 };
 	int width7[] = { 2, 4, 4 };	
 	
-	nv_test_pca_kmeans_tree_ex(width0, 1);
-	nv_test_pca_kmeans_tree_ex(width1, 2);
-	nv_test_pca_kmeans_tree_ex(width2, 3);
-	nv_test_pca_kmeans_tree_ex(width3, 3);
-	nv_test_pca_kmeans_tree_ex(width4, 4);
-	nv_test_pca_kmeans_tree_ex(width5, 2);
-	nv_test_pca_kmeans_tree_ex(width6, 3);
-	nv_test_pca_kmeans_tree_ex(width7, 3);
+	nv_test_pca_kmeans_tree_ex(data, labels, width0, 1);
+	nv_test_pca_kmeans_tree_ex(data, labels, width1, 2);
+	nv_test_pca_kmeans_tree_ex(data, labels, width2, 3);
+	nv_test_pca_kmeans_tree_ex(data, labels, width3, 3);
+	nv_test_pca_kmeans_tree_ex(data, labels, width4, 4);
+	nv_test_pca_kmeans_tree_ex(data, labels, width5, 2);
+	nv_test_pca_kmeans_tree_ex(data, labels, width6, 3);
+	nv_test_pca_kmeans_tree_ex(data, labels, width7, 3);
 }
 
 static void
-nv_test_pca_kmeans_tree_inherit_all(void)
+nv_test_pca_kmeans_tree_inherit_all(const nv_matrix_t *data, const nv_matrix_t *labels)
 {
-	nv_matrix_t *data = nv_load_matrix(NV_TEST_DATA);
 	int width0[] = { 8, 4 };
 	int width1[] = { 8, 2, 2 };
 	int width2[] = { 4, 2, 4 };
@@ -141,23 +130,22 @@ nv_test_pca_kmeans_tree_inherit_all(void)
 	nv_pca_kmeans_tree_t *tree3 = nv_pca_kmeans_tree_alloc(data->n, NPCA, width3,
 														   sizeof(width3)/ sizeof(int));
 	
-	nv_test_pca_kmeans_tree_inherit(tree0, NULL);
-	nv_test_pca_kmeans_tree_inherit(tree1, tree0);	
-	nv_test_pca_kmeans_tree_inherit(tree2, NULL);
-	nv_test_pca_kmeans_tree_inherit(tree3, tree2);
+	nv_test_pca_kmeans_tree_inherit(data, labels, tree0, NULL);
+	nv_test_pca_kmeans_tree_inherit(data, labels, tree1, tree0);	
+	nv_test_pca_kmeans_tree_inherit(data, labels, tree2, NULL);
+	nv_test_pca_kmeans_tree_inherit(data, labels, tree3, tree2);
 
 	nv_pca_kmeans_tree_free(&tree0);
 	nv_pca_kmeans_tree_free(&tree1);
+	nv_pca_kmeans_tree_free(&tree2);
 	nv_pca_kmeans_tree_free(&tree3);
-	nv_pca_kmeans_tree_free(&tree3);
-	nv_matrix_free(&data);
 }
 
 void
-nv_test_pca_kmeans_tree(void)
+nv_test_pca_kmeans_tree(const nv_matrix_t *data, const nv_matrix_t *labels)
 {
-	nv_test_pca_kmeans_tree_inherit_all();
-	nv_test_pca_kmeans_tree_nodes();
+	nv_test_pca_kmeans_tree_inherit_all(data, labels);
+	nv_test_pca_kmeans_tree_nodes(data, labels);
 
 	fflush(stdout);
 }

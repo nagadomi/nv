@@ -30,6 +30,8 @@ nv_test_munkres(void)
 	nv_matrix_t *task = nv_matrix_alloc(4, 1);
 	int j, i;
 	float min_cost;
+
+	NV_TEST_NAME;
 	
 	for (j = 0; j < cost->m; ++j) {
 		for (i = 0; i < cost->n; ++i) {

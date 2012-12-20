@@ -27,24 +27,55 @@
 
 void nv_test_sha1(void);
 void nv_test_serialize(void);
-void nv_test_lr(void);
-void nv_test_arow(void);
-void nv_test_pa(void);
-void nv_test_mlp(void);
-void nv_test_nb(void);
+void nv_test_lr(const nv_matrix_t *train_data,
+				const nv_matrix_t *train_labels,
+				const nv_matrix_t *test_data,
+				const nv_matrix_t *test_labels);
+void nv_test_arow(const nv_matrix_t *train_data,
+				  const nv_matrix_t *train_labels,
+				  const nv_matrix_t *test_data,
+				  const nv_matrix_t *test_labels);
+
+void nv_test_pa(const nv_matrix_t *train_data,
+				const nv_matrix_t *train_labels,
+				const nv_matrix_t *test_data,
+				const nv_matrix_t *test_labels);
+void nv_test_mlp(const nv_matrix_t *train_data,
+				 const nv_matrix_t *train_labels,
+				 const nv_matrix_t *test_data,
+				 const nv_matrix_t *test_labels);
+void nv_test_nb(const nv_matrix_t *train_data,
+				const nv_matrix_t *train_labels,
+				const nv_matrix_t *test_data,
+				const nv_matrix_t *test_labels);
 void nv_test_keypoint(void);
-void nv_test_knn(void);
-void nv_test_kmeans(void);
-void nv_test_klr(void);
-void nv_test_klr_tree(void);
-void nv_test_kmeans_tree(void);
-void nv_test_lbgu(void);
-void nv_test_knb(void);
-void nv_test_plsi(void);
+void nv_test_knn(const nv_matrix_t *data);
+void nv_test_kmeans(const nv_matrix_t *data, const nv_matrix_t *labels, int k);
+void nv_test_klr(const nv_matrix_t *data, const nv_matrix_t *labels);
+void nv_test_klr_tree(const nv_matrix_t *data, const nv_matrix_t *labels);
+void nv_test_kmeans_tree(const nv_matrix_t *data, const nv_matrix_t *labels);
+void nv_test_pca_kmeans_tree(const nv_matrix_t *data, const nv_matrix_t *labels);
+void nv_test_lbgu(const nv_matrix_t *data, const nv_matrix_t *labels);
+void nv_test_knb(const nv_matrix_t *data, const nv_matrix_t *labels);
+void nv_test_plsi(const nv_matrix_t *data, const nv_matrix_t *labels);
 void nv_test_io(void);
 void nv_test_munkres(void);
-void nv_test_knn2(void);
-void nv_test_knn_pca(void);
-void nv_test_knn_lmca(void);
+void nv_test_knn2(const nv_matrix_t *train_data,
+				  const nv_matrix_t *train_labels,
+				  const nv_matrix_t *test_data,
+				  const nv_matrix_t *test_labels);
+void nv_test_knn_pca(const nv_matrix_t *train_data,
+					 const nv_matrix_t *train_labels,
+					 const nv_matrix_t *test_data,
+					 const nv_matrix_t *test_labels);
+
+void nv_test_knn_lmca(const nv_matrix_t *train_data,
+					  const nv_matrix_t *train_labels,
+					  const nv_matrix_t *test_data,
+					  const nv_matrix_t *test_labels);
+void nv_test_knn_2pass_lmca(const nv_matrix_t *train_data,
+							const nv_matrix_t *train_labels,
+							const nv_matrix_t *test_data,
+							const nv_matrix_t *test_labels);
 
 #endif
