@@ -24,16 +24,16 @@
 #include "nv_ml.h"
 #include "nv_test.h"
 
-#define KNN_K 16
+#define KNN_K 8
 #define NK 16
-#define MK 64
-#define DIM  32
-#define MARGIN 0.5f
+#define MK 32
+#define DIM  128
+#define MARGIN 1.0f
 #define PUSH_RATIO1 0.8f
 #define PUSH_RATIO 0.8f
 #define DELTA 0.1f
 #define DELTA1 0.1f
-#define EPOCH 20
+#define EPOCH 30
 
 void
 nv_test_knn_lmca(const nv_matrix_t *train_data,
