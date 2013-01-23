@@ -22,9 +22,10 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+	
 typedef enum {
-	NV_LMCA_DIAG,
-	NV_LMCA_FULL
+	NV_LMCA_DIAG, /* only diagonal element */
+	NV_LMCA_FULL  /* full matrix */
 } nv_lmca_type_e;
 
 void nv_lmca_progress(int onoff);
