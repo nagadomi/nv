@@ -87,6 +87,9 @@ nv_eigen_sym(nv_matrix_t *eigen_vec,
 		
 		for (ip = 0; ip < n - 1; ++ip) {
 			int iq;
+#ifdef _OPENMP
+#pragma omp parallel for reduction(+:sm)
+#endif
 			for (iq = ip + 1; iq < n; ++iq) {
 				sm += fabsf(NV_MAT_V(a, ip, iq));
 			}
@@ -106,7 +109,6 @@ nv_eigen_sym(nv_matrix_t *eigen_vec,
 					NV_MAT_V(a, ip, iq) = 0.0f;
 				} else if (fabs(NV_MAT_V(a, ip, iq)) > tresh) {
 					float t, h, theta, c, s, tau;
-					int j;
 					
 					h = NV_MAT_V(d, iq, 0) - NV_MAT_V(d, ip, 0);
 					if (g <= FLT_EPSILON) {
@@ -127,31 +129,46 @@ nv_eigen_sym(nv_matrix_t *eigen_vec,
 					NV_MAT_V(d, ip, 0) -= h;
 					NV_MAT_V(d, iq, 0) += h;
 					NV_MAT_V(a, ip, iq) = 0.0f;
-
-					for (j = 0; j < ip; ++j) {
-						g = NV_MAT_V(a, j, ip);
-						h = NV_MAT_V(a, j, iq);
-						NV_MAT_V(a, j, ip) = g - s * (h + g * tau); 
-						NV_MAT_V(a, j, iq) = h + s * (g - h * tau); 
-					}
-					for (j = ip + 1; j < iq; ++j) {
-						g = NV_MAT_V(a, ip, j); 
-						h = NV_MAT_V(a, j, iq); 
-						NV_MAT_V(a, j, iq) = h + s * (g - h * tau); 
-						NV_MAT_V(a, ip, j) = g - s * (h + g * tau); 
-					}
-					for (j = iq + 1; j < n; ++j) {
-						g = NV_MAT_V(a, ip, j); 
-						h = NV_MAT_V(a, iq, j); 
-						NV_MAT_V(a, iq, j) = h + s * (g - h * tau); 
-						NV_MAT_V(a, ip, j) = g - s * (h + g * tau); 
-					}
-
-					for (j = 0; j < n; ++j) {
-						g = NV_MAT_V(v, j, ip); 
-						h = NV_MAT_V(v, j, iq); 
-						NV_MAT_V(v, j, iq) = h + s * (g - h * tau); 
-						NV_MAT_V(v, j, ip) = g - s * (h + g * tau); 
+#ifdef _OPENMP
+#pragma omp parallel sections num_threads(2)
+#endif
+					{					
+#ifdef _OPENMP
+#pragma omp section
+#endif
+						{
+							int j;
+							for (j = 0; j < ip; ++j) {
+								const float g = NV_MAT_V(a, j, ip);
+								const float h = NV_MAT_V(a, j, iq);
+								NV_MAT_V(a, j, ip) = g - s * (h + g * tau);
+								NV_MAT_V(a, j, iq) = h + s * (g - h * tau); 
+							}
+							for (j = ip + 1; j < iq; ++j) {
+								const float g = NV_MAT_V(a, ip, j); 
+								const float h = NV_MAT_V(a, j, iq); 
+								NV_MAT_V(a, j, iq) = h + s * (g - h * tau); 
+								NV_MAT_V(a, ip, j) = g - s * (h + g * tau); 
+							}
+							for (j = iq + 1; j < n; ++j) {
+								const float g = NV_MAT_V(a, ip, j); 
+								const float h = NV_MAT_V(a, iq, j); 
+								NV_MAT_V(a, iq, j) = h + s * (g - h * tau); 
+								NV_MAT_V(a, ip, j) = g - s * (h + g * tau); 
+							}
+						}
+#ifdef _OPENMP
+#pragma omp section
+#endif
+						{
+							int j;
+							for (j = 0; j < n; ++j) {
+								const float g = NV_MAT_V(v, j, ip); 
+								const float h = NV_MAT_V(v, j, iq); 
+								NV_MAT_V(v, j, iq) = h + s * (g - h * tau); 
+								NV_MAT_V(v, j, ip) = g - s * (h + g * tau); 
+							}
+						}
 					}
 					++nrot;
 				} else {
