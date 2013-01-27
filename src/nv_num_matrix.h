@@ -30,7 +30,7 @@ nv_matrix_t *nv_matrix_tr(const nv_matrix_t *mat);
 nv_matrix_t *nv_matrix3d_tr(const nv_matrix_t *mat);
 
 void nv_matrix_normalize_maxmin(nv_matrix_t *mat, int mat_n, float min_v, float max_v);
-
+void nv_matrix_muls(nv_matrix_t *mat, float scale);
 
 typedef enum {
 	NV_MAT_TR,

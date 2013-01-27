@@ -194,3 +194,14 @@ void nv_matrix_normalize_maxmin(nv_matrix_t *mat, int mat_n, float min_v, float 
 	}
 }
 
+void
+nv_matrix_muls(nv_matrix_t *mat, float scale)
+{
+	int i;
+#ifdef _OPENMP
+#pragma omp parallel for	
+#endif
+	for (i = 0; i < mat->m; ++i) {
+		nv_vector_muls(mat, i, mat, i, scale);
+	}
+}
