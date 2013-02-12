@@ -26,9 +26,9 @@
  *  Lorenzo Torresani, Kuang-chih Lee
  */
 
-#define NV_LMCA_RETRY_MAX 4
-#define NV_LMCA_LEARNING_RATE_MIN 1.0E-3f
 #define NV_LMCA_TERM2_SCALE 0.5f
+#define NV_LMCA_MOMENTUM_W 0.5f
+#define NV_LMCA_LEARNING_RATE(w, max_iteration, e) (w - (w * 0.5f * (1.0f - ((max_iteration - e) / (float)max_iteration))))
 
 static int nv_lmca_progress_flag = 0;
 
@@ -37,6 +37,21 @@ static int nv_lmca_progress_flag = 0;
 
 #define NV_LMCA_D_SMOOTH_HINGE(s, margin) \
 	((s) < 0.0f ? 0.0f : ((s) > (margin) ? 1.0f : (s) / (margin)))
+
+#define NV_LMCA_DEFAULT_HINGE(s, margin)   \
+	((s) < 0.0f ? 0.0f : (s) / (margin))
+
+#define NV_LMCA_D_DEFAULT_HINGE(s, margin) \
+	((s) < 0.0f ? 0.0f : 1.0f)
+
+#define NV_LMCA_SMOOTH 0
+#if NV_LMCA_SMOOTH
+#  define NV_LMCA_HINGE(s, margin) NV_LMCA_SMOOTH_HINGE(s, margin)
+#  define NV_LMCA_D_HINGE(s, margin) NV_LMCA_D_SMOOTH_HINGE(s, margin)
+#else
+#  define NV_LMCA_HINGE(s, margin) NV_LMCA_DEFAULT_HINGE(s, margin)
+#  define NV_LMCA_D_HINGE(s, margin) NV_LMCA_D_DEFAULT_HINGE(s, margin)
+#endif
 
 void
 nv_lmca_progress(int onoff)
@@ -171,25 +186,7 @@ static void
 nv_lmca_normalize_l(nv_matrix_t *ldm, nv_lmca_type_e type)
 {
 	if (type == NV_LMCA_FULL) {
-#if 0		
-		/* FULLの場合は各ベクトルのノルムの最大が1になるようにする */
-		float max_norm = 0.0f;
-		int i;
-		for (i = 0; i < ldm->m; ++i) {
-			float norm = nv_vector_norm(ldm, i);
-			if (norm > max_norm) {
-				max_norm = norm;
-			}
-		}
-		if (max_norm > 0.0f) {
-			float scale = 1.0f / max_norm;
-			for (i = 0; i < ldm->m; ++i) {
-				nv_vector_muls(ldm, i, ldm, i, scale);
-			}
-		}
-#else
 		nv_vector_normalize_all(ldm);
-#endif
 	} else if (type == NV_LMCA_DIAG) {
 		/* DIAGの場合は対角成分のノルムを1にする  */
 		int i;
@@ -271,7 +268,7 @@ nv_lmca_cost(const nv_matrix_t *lx,
 					int yil = (il == NV_MAT_VI(labels, l_idx, 0)) ? 1 : 0;
 					if (yil == 0) {
 						float s = d_ij + margin - nv_euclidean2(lx, i, lx, l_idx);
-						eps2 += NV_LMCA_SMOOTH_HINGE(s, margin);
+						eps2 += NV_LMCA_HINGE(s, margin);
 					}
 				}
 			}
@@ -294,6 +291,21 @@ nv_lmca_cost(const nv_matrix_t *lx,
 	return (1.0f - c) * eps1 + c * eps2;
 }
 
+static void
+nv_lmca_momentum_add(nv_matrix_t *dl, nv_matrix_t *dl_old, float weight, int epoch)
+{
+	if (epoch == 0) {
+		nv_matrix_copy_all(dl_old, dl);
+	} else {
+		nv_matrix_t *tmp = nv_matrix_dup(dl);
+		//nv_matrix_muls(dl, dl, 1.0 - weight);
+		nv_matrix_muls(dl_old, dl_old, weight);
+		nv_matrix_add(dl, dl, dl_old);
+		nv_matrix_copy_all(dl_old, tmp);
+		nv_matrix_free(&tmp);
+	}
+}
+
 void
 nv_lmca_train_ex(nv_matrix_t *ldm,
 				 nv_lmca_type_e type,
@@ -306,14 +318,11 @@ nv_lmca_train_ex(nv_matrix_t *ldm,
 	nv_matrix_t *lx = nv_matrix_alloc(ldm->m, data->m);
 	nv_knn_result_t **eta = nv_alloc_type(nv_knn_result_t *, data->m);
 	nv_knn_result_t **eta_lx = nv_alloc_type(nv_knn_result_t *, data->m);
-	nv_matrix_t *dl, **term1, **term2, *ldm_old;
+	nv_matrix_t *dl, *dl_old, **term1, **term2;
 	int e, i;
 	int procs = nv_omp_procs();
 	long t = nv_clock();
-	float learning_rate_p = 1.0f;
 	float pull_ratio = 1.0f - push_weight;
-	float last_cost = FLT_MAX;
-	int retry_count;
 	int knn_correct = 0;
 	float delta_scale;
 
@@ -322,7 +331,7 @@ nv_lmca_train_ex(nv_matrix_t *ldm,
 	NV_ASSERT(data->m >= k_n);
 	
 	dl = nv_matrix_clone(ldm);
-	ldm_old = nv_matrix_clone(ldm);	
+	dl_old = nv_matrix_clone(ldm);
 	term1 = nv_alloc_type(nv_matrix_t *, procs);
 	term2 = nv_alloc_type(nv_matrix_t *, procs);
 	for (i = 0; i < procs; ++i) {
@@ -450,7 +459,7 @@ nv_lmca_train_ex(nv_matrix_t *ldm,
 	if (delta_scale > 0.0f) {
 		delta_scale = 1.0f / delta_scale * NV_LMCA_TERM2_SCALE;
 	}
-	nv_matrix_muls(term1[0], delta_scale);
+	nv_matrix_muls(term1[0], term1[0], delta_scale);
 	
 	if (nv_lmca_progress_flag) {
 		printf("nv_lmca: term1: %ldms, input space knn correct rate: %f(%d/%d)\n",
@@ -471,7 +480,7 @@ nv_lmca_train_ex(nv_matrix_t *ldm,
 	
 	/* 第二項 */
 	for (e = 0; e < max_iteration; ++e) {
-		float cur_cost;
+		float cost;
 		int push_sum = 0;
 		int push_count = 0;
 		t = nv_clock();
@@ -503,7 +512,7 @@ nv_lmca_train_ex(nv_matrix_t *ldm,
 							const float d_il = eta_lx[i][l].dist;
 							/* lからマージンまでの距離 */
 							const float dist_margin = d_ij + margin - d_il;
-							const float d_hinge = NV_LMCA_D_SMOOTH_HINGE(dist_margin, margin);
+							const float d_hinge = NV_LMCA_D_HINGE(dist_margin, margin);
 							if (d_hinge > 0.0f) {
 								/* k_n近傍のうちk近傍内の同一ラベルからmergin以内のデータについて  */
 								nv_vector_sub(d, 0, data, i, data, j_idx);
@@ -612,7 +621,7 @@ nv_lmca_train_ex(nv_matrix_t *ldm,
 				nv_vector_add(term2[0], j, term2[0], j, term2[i], j);
 			}
 		}
-		nv_matrix_muls(term2[0], delta_scale);
+		nv_matrix_muls(term2[0], term2[0], delta_scale);
 		
 		/*
 		 *　dL = 2 * L * term1 + 2 * c * L * term2
@@ -635,53 +644,36 @@ nv_lmca_train_ex(nv_matrix_t *ldm,
 		/*
 		 * L_new = L_old - learning_rate * dL
 		 */
-		retry_count = 0;
-		nv_matrix_copy_all(ldm_old, ldm);
-		do {
-			float w;
-			if (retry_count > 0) {
-				learning_rate_p *= 0.5f;
-				nv_matrix_copy_all(ldm, ldm_old);
-			}
-			w = learning_rate_p * learning_rate;
+		nv_lmca_momentum_add(dl, dl_old, NV_LMCA_MOMENTUM_W, e);
 #ifdef _OPENMP
 #pragma omp parallel for
 #endif
-			for (i = 0; i < ldm->m; ++i) {
-				int j;
-				for (j = 0; j < ldm->n; ++j) {
-					NV_MAT_V(ldm, i, j) -= w * NV_MAT_V(dl, i, j);
-				}
+		for (i = 0; i < ldm->m; ++i) {
+			int j;
+			float w = NV_LMCA_LEARNING_RATE(learning_rate, max_iteration, e);
+			for (j = 0; j < ldm->n; ++j) {
+				NV_MAT_V(ldm, i, j) -= w * NV_MAT_V(dl, i, j);
 			}
-			
-			/* 結果を評価する */
-			nv_lmca_normalize_l(ldm, type);
-			nv_lmca_lx(lx, ldm, data);
-			
-			/* 各データの射影後のk_n近傍にあるデータを保存 */
+		}
+		
+		/* 結果を評価する */
+		nv_lmca_normalize_l(ldm, type);
+		nv_lmca_lx(lx, ldm, data);
+		
+		/* 各データの射影後のk_n近傍にあるデータを保存 */
 #ifdef _OPENMP
 #pragma omp parallel for	
 #endif
-			for (i = 0; i < lx->m; ++i) {
-				nv_knn(eta_lx[i], k_n, lx, lx, i);
-			}
-			
-			/* コスト */
-			cur_cost = nv_lmca_cost(lx, labels, eta, k, eta_lx, k_n, margin, push_weight, e);
-			retry_count += 1;
-			/* 前回よりコストが大きくなったら学習係数を下げてやり直す */
-		} while (cur_cost > last_cost && retry_count < NV_LMCA_RETRY_MAX && learning_rate_p > NV_LMCA_LEARNING_RATE_MIN);
-		if (retry_count >= NV_LMCA_RETRY_MAX || learning_rate_p < NV_LMCA_LEARNING_RATE_MIN) {
-			if (last_cost > cur_cost) {
-				nv_matrix_copy_all(ldm, ldm_old);
-			}
-			break;
+		for (i = 0; i < lx->m; ++i) {
+			nv_knn(eta_lx[i], k_n, lx, lx, i);
 		}
-		last_cost = cur_cost;
+		
+		/* コスト */
+		cost = nv_lmca_cost(lx, labels, eta, k, eta_lx, k_n, margin, push_weight, e);
 		if (nv_lmca_progress_flag) {
 			printf("nv_lmca: %3d: %ldms, cost: %f, push count avg: %f\n",
 				   e, nv_clock() - t,
-				   last_cost,
+				   cost,
 				   (float)push_sum / push_count
 				);
 		}
@@ -696,7 +688,7 @@ nv_lmca_train_ex(nv_matrix_t *ldm,
 	nv_free(term2);
 	nv_matrix_free(&lx);
 	nv_matrix_free(&dl);
-	nv_matrix_free(&ldm_old);
+	nv_matrix_free(&dl_old);
 	for (i = 0; i < data->m; ++i) {
 		nv_free(eta[i]);
 		nv_free(eta_lx[i]);
