@@ -780,6 +780,7 @@ enable_native
 enable_popcnt
 enable_profile_generate
 enable_profile_use
+enable_opencv
 enable_openmp
 enable_openssl
 enable_eiio
@@ -1432,6 +1433,7 @@ Optional Features:
 --enable-profile-generate
                           enable -fprofile-generate
 --enable-profile-use    enable -fprofile-use
+--enable-opencv         enable libopencv support
 --disable-openmp        disable OpenMP
 --disable-openssl       disable SHA1 with OpenSSL
 --disable-eiio          disable libeiio support
@@ -16071,6 +16073,369 @@ fi
 #	],
 #	[nv_opencv=0])
 nv_opencv=0
+# Check whether --enable-opencv was given.
+if test "${enable_opencv+set}" = set; then :
+  enableval=$enable_opencv; case  "${enableval}" in
+  yes)
+
+                nv_opencv=1
+                for ac_header in opencv/cv.h
+do :
+  ac_fn_c_check_header_mongrel "$LINENO" "opencv/cv.h" "ac_cv_header_opencv_cv_h" "$ac_includes_default"
+if test "x$ac_cv_header_opencv_cv_h" = xyes; then :
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_OPENCV_CV_H 1
+_ACEOF
+
+else
+  as_fn_error $? "opencv not found. please either install libopencv-dev or use the --disable-opencv option." "$LINENO" 5
+fi
+
+done
+
+                for ac_header in opencv/highgui.h
+do :
+  ac_fn_c_check_header_mongrel "$LINENO" "opencv/highgui.h" "ac_cv_header_opencv_highgui_h" "$ac_includes_default"
+if test "x$ac_cv_header_opencv_highgui_h" = xyes; then :
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_OPENCV_HIGHGUI_H 1
+_ACEOF
+
+else
+  as_fn_error $? "opencv not found. please either install libopencv-dev or use the --disable-opencv option." "$LINENO" 5
+fi
+
+done
+
+                for ac_header in opencv/cxcore.h
+do :
+  ac_fn_c_check_header_mongrel "$LINENO" "opencv/cxcore.h" "ac_cv_header_opencv_cxcore_h" "$ac_includes_default"
+if test "x$ac_cv_header_opencv_cxcore_h" = xyes; then :
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_OPENCV_CXCORE_H 1
+_ACEOF
+
+else
+  as_fn_error $? "opencv not found. please either install libopencv-dev or use the --disable-opencv option." "$LINENO" 5
+fi
+
+done
+
+                { $as_echo "$as_me:${as_lineno-$LINENO}: checking for main in -lopencv_core" >&5
+$as_echo_n "checking for main in -lopencv_core... " >&6; }
+if ${ac_cv_lib_opencv_core_main+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-lopencv_core  $LIBS"
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+
+int
+main ()
+{
+return main ();
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_link "$LINENO"; then :
+  ac_cv_lib_opencv_core_main=yes
+else
+  ac_cv_lib_opencv_core_main=no
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_opencv_core_main" >&5
+$as_echo "$ac_cv_lib_opencv_core_main" >&6; }
+if test "x$ac_cv_lib_opencv_core_main" = xyes; then :
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_LIBOPENCV_CORE 1
+_ACEOF
+
+  LIBS="-lopencv_core $LIBS"
+
+else
+  as_fn_error $? "opencv not found. please either install libopencv-dev or use the --disable-opencv option." "$LINENO" 5
+fi
+
+                { $as_echo "$as_me:${as_lineno-$LINENO}: checking for main in -lopencv_imgproc" >&5
+$as_echo_n "checking for main in -lopencv_imgproc... " >&6; }
+if ${ac_cv_lib_opencv_imgproc_main+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-lopencv_imgproc  $LIBS"
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+
+int
+main ()
+{
+return main ();
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_link "$LINENO"; then :
+  ac_cv_lib_opencv_imgproc_main=yes
+else
+  ac_cv_lib_opencv_imgproc_main=no
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_opencv_imgproc_main" >&5
+$as_echo "$ac_cv_lib_opencv_imgproc_main" >&6; }
+if test "x$ac_cv_lib_opencv_imgproc_main" = xyes; then :
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_LIBOPENCV_IMGPROC 1
+_ACEOF
+
+  LIBS="-lopencv_imgproc $LIBS"
+
+else
+  as_fn_error $? "opencv not found. please either install libopencv-dev or use the --disable-opencv option." "$LINENO" 5
+fi
+
+                { $as_echo "$as_me:${as_lineno-$LINENO}: checking for main in -lopencv_highgui" >&5
+$as_echo_n "checking for main in -lopencv_highgui... " >&6; }
+if ${ac_cv_lib_opencv_highgui_main+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-lopencv_highgui  $LIBS"
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+
+int
+main ()
+{
+return main ();
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_link "$LINENO"; then :
+  ac_cv_lib_opencv_highgui_main=yes
+else
+  ac_cv_lib_opencv_highgui_main=no
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_opencv_highgui_main" >&5
+$as_echo "$ac_cv_lib_opencv_highgui_main" >&6; }
+if test "x$ac_cv_lib_opencv_highgui_main" = xyes; then :
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_LIBOPENCV_HIGHGUI 1
+_ACEOF
+
+  LIBS="-lopencv_highgui $LIBS"
+
+else
+  as_fn_error $? "opencv not found. please either install libopencv-dev or use the --disable-opencv option." "$LINENO" 5
+fi
+
+
+    ;;
+  no)
+
+
+    ;;
+  *)
+   as_fn_error $? "*** bad value ${enableval} for opencv" "$LINENO" 5
+   ;;
+esac
+
+else
+  case  "no" in
+  yes)
+
+                nv_opencv=1
+                for ac_header in opencv/cv.h
+do :
+  ac_fn_c_check_header_mongrel "$LINENO" "opencv/cv.h" "ac_cv_header_opencv_cv_h" "$ac_includes_default"
+if test "x$ac_cv_header_opencv_cv_h" = xyes; then :
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_OPENCV_CV_H 1
+_ACEOF
+
+else
+  as_fn_error $? "opencv not found. please either install libopencv-dev or use the --disable-opencv option." "$LINENO" 5
+fi
+
+done
+
+                for ac_header in opencv/highgui.h
+do :
+  ac_fn_c_check_header_mongrel "$LINENO" "opencv/highgui.h" "ac_cv_header_opencv_highgui_h" "$ac_includes_default"
+if test "x$ac_cv_header_opencv_highgui_h" = xyes; then :
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_OPENCV_HIGHGUI_H 1
+_ACEOF
+
+else
+  as_fn_error $? "opencv not found. please either install libopencv-dev or use the --disable-opencv option." "$LINENO" 5
+fi
+
+done
+
+                for ac_header in opencv/cxcore.h
+do :
+  ac_fn_c_check_header_mongrel "$LINENO" "opencv/cxcore.h" "ac_cv_header_opencv_cxcore_h" "$ac_includes_default"
+if test "x$ac_cv_header_opencv_cxcore_h" = xyes; then :
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_OPENCV_CXCORE_H 1
+_ACEOF
+
+else
+  as_fn_error $? "opencv not found. please either install libopencv-dev or use the --disable-opencv option." "$LINENO" 5
+fi
+
+done
+
+                { $as_echo "$as_me:${as_lineno-$LINENO}: checking for main in -lopencv_core" >&5
+$as_echo_n "checking for main in -lopencv_core... " >&6; }
+if ${ac_cv_lib_opencv_core_main+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-lopencv_core  $LIBS"
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+
+int
+main ()
+{
+return main ();
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_link "$LINENO"; then :
+  ac_cv_lib_opencv_core_main=yes
+else
+  ac_cv_lib_opencv_core_main=no
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_opencv_core_main" >&5
+$as_echo "$ac_cv_lib_opencv_core_main" >&6; }
+if test "x$ac_cv_lib_opencv_core_main" = xyes; then :
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_LIBOPENCV_CORE 1
+_ACEOF
+
+  LIBS="-lopencv_core $LIBS"
+
+else
+  as_fn_error $? "opencv not found. please either install libopencv-dev or use the --disable-opencv option." "$LINENO" 5
+fi
+
+                { $as_echo "$as_me:${as_lineno-$LINENO}: checking for main in -lopencv_imgproc" >&5
+$as_echo_n "checking for main in -lopencv_imgproc... " >&6; }
+if ${ac_cv_lib_opencv_imgproc_main+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-lopencv_imgproc  $LIBS"
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+
+int
+main ()
+{
+return main ();
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_link "$LINENO"; then :
+  ac_cv_lib_opencv_imgproc_main=yes
+else
+  ac_cv_lib_opencv_imgproc_main=no
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_opencv_imgproc_main" >&5
+$as_echo "$ac_cv_lib_opencv_imgproc_main" >&6; }
+if test "x$ac_cv_lib_opencv_imgproc_main" = xyes; then :
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_LIBOPENCV_IMGPROC 1
+_ACEOF
+
+  LIBS="-lopencv_imgproc $LIBS"
+
+else
+  as_fn_error $? "opencv not found. please either install libopencv-dev or use the --disable-opencv option." "$LINENO" 5
+fi
+
+                { $as_echo "$as_me:${as_lineno-$LINENO}: checking for main in -lopencv_highgui" >&5
+$as_echo_n "checking for main in -lopencv_highgui... " >&6; }
+if ${ac_cv_lib_opencv_highgui_main+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-lopencv_highgui  $LIBS"
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+
+int
+main ()
+{
+return main ();
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_link "$LINENO"; then :
+  ac_cv_lib_opencv_highgui_main=yes
+else
+  ac_cv_lib_opencv_highgui_main=no
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_opencv_highgui_main" >&5
+$as_echo "$ac_cv_lib_opencv_highgui_main" >&6; }
+if test "x$ac_cv_lib_opencv_highgui_main" = xyes; then :
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_LIBOPENCV_HIGHGUI 1
+_ACEOF
+
+  LIBS="-lopencv_highgui $LIBS"
+
+else
+  as_fn_error $? "opencv not found. please either install libopencv-dev or use the --disable-opencv option." "$LINENO" 5
+fi
+
+
+    ;;
+  no)
+
+
+    ;;
+  *) as_fn_error $? "*** bad value no for opencv" "$LINENO" 5 ;;
+esac
+
+fi
+
 
 # Check whether --enable-openmp was given.
 if test "${enable_openmp+set}" = set; then :
