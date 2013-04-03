@@ -39,6 +39,15 @@
 /* Define to 1 if you have the `m' library (-lm). */
 #undef HAVE_LIBM
 
+/* Define to 1 if you have the `opencv_core' library (-lopencv_core). */
+#undef HAVE_LIBOPENCV_CORE
+
+/* Define to 1 if you have the `opencv_highgui' library (-lopencv_highgui). */
+#undef HAVE_LIBOPENCV_HIGHGUI
+
+/* Define to 1 if you have the `opencv_imgproc' library (-lopencv_imgproc). */
+#undef HAVE_LIBOPENCV_IMGPROC
+
 /* Define to 1 if you have the `rt' library (-lrt). */
 #undef HAVE_LIBRT
 
@@ -56,6 +65,15 @@
 
 /* Define to 1 if you have the <omp.h> header file. */
 #undef HAVE_OMP_H
+
+/* Define to 1 if you have the <opencv/cv.h> header file. */
+#undef HAVE_OPENCV_CV_H
+
+/* Define to 1 if you have the <opencv/cxcore.h> header file. */
+#undef HAVE_OPENCV_CXCORE_H
+
+/* Define to 1 if you have the <opencv/highgui.h> header file. */
+#undef HAVE_OPENCV_HIGHGUI_H
 
 /* Define to 1 if you have the <openssl/sha.h> header file. */
 #undef HAVE_OPENSSL_SHA_H

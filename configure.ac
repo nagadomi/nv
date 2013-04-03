@@ -100,6 +100,19 @@ AX_ARG_ENABLE(profile-use,
 #	],
 #	[nv_opencv=0])
 nv_opencv=0
+AX_ARG_ENABLE(opencv,
+        AS_HELP_STRING([--enable-opencv],[enable libopencv support]), [no],
+        [
+                nv_opencv=1
+                AC_CHECK_HEADERS([opencv/cv.h],	[], [AC_MSG_ERROR(opencv not found. please either install libopencv-dev or use the --disable-opencv option.)])
+                AC_CHECK_HEADERS([opencv/highgui.h],	[], [AC_MSG_ERROR(opencv not found. please either install libopencv-dev or use the --disable-opencv option.)])
+                AC_CHECK_HEADERS([opencv/cxcore.h],	[], [AC_MSG_ERROR(opencv not found. please either install libopencv-dev or use the --disable-opencv option.)])
+                AC_CHECK_LIB(opencv_core, main, [], [AC_MSG_ERROR(opencv not found. please either install libopencv-dev or use the --disable-opencv option.)])
+                AC_CHECK_LIB(opencv_imgproc, main, [], [AC_MSG_ERROR(opencv not found. please either install libopencv-dev or use the --disable-opencv option.)])
+                AC_CHECK_LIB(opencv_highgui, main, [], [AC_MSG_ERROR(opencv not found. please either install libopencv-dev or use the --disable-opencv option.)])
+	],
+	[]
+)
 
 AX_ARG_ENABLE(openmp,
         AS_HELP_STRING([--disable-openmp],[ disable OpenMP]), [yes],
