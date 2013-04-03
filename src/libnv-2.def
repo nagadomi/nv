@@ -393,3 +393,7 @@ sha1_final
 sha1_init
 sha1_update
 nv_initialize
+nv_lmca
+nv_lmca_progress
+nv_lmca_train_ex
+nv_lmca_init_diag1
