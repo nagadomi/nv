@@ -39,7 +39,7 @@ void nv_arow_train(nv_arow_t *arow,
 				   const nv_matrix_t *data, const nv_matrix_t *label,
 				   float r,
 				   int max_epoch);
-int nv_arow_predict_label(const nv_arow_t *arow, nv_matrix_t *vec, int j);
+int nv_arow_predict_label(const nv_arow_t *arow, const nv_matrix_t *vec, int j);
 void nv_arow_dump_c(FILE *out,
 					const nv_arow_t *arow, const char *name, int static_variable);
 

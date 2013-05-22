@@ -190,7 +190,7 @@ nv_arow_train(nv_arow_t *arow,
 
 int
 nv_arow_predict_label(const nv_arow_t *arow,
-					  nv_matrix_t *vec, int j)
+					  const nv_matrix_t *vec, int j)
 {
 	if (arow->n == 2) {
 		return nv_vector_dot(arow->w, 0, vec, j) >= 0.0f ? 0 : 1;
