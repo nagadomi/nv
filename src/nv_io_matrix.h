@@ -27,11 +27,17 @@ extern "C" {
 
 nv_matrix_t *nv_load_matrix_fp(FILE *fp);
 void nv_save_matrix_fp(FILE *fp, const nv_matrix_t *mat);
+
 nv_matrix_t *nv_load_matrix_bin_fp(FILE *fp);
 void nv_save_matrix_bin_fp(FILE *fp, const nv_matrix_t *mat);
 
 nv_matrix_t *nv_load_matrix(const char *filename);
 int nv_save_matrix(const char *filename, const nv_matrix_t *mat);
+
+int nv_load_matrix_array_text(const char *filename, nv_matrix_t **array, int *len);
+int nv_save_matrix_array_text(const char *filename, nv_matrix_t **array, int len);
+int nv_load_matrix_array_bin(const char *filename, nv_matrix_t **array, int *len);
+int nv_save_matrix_array_bin(const char *filename, nv_matrix_t **array, int len);
 
 #define nv_load_matrix_text(filename) nv_load_matrix(filename)
 #define nv_save_matrix_text(filename, mat) nv_save_matrix(filename, mat)

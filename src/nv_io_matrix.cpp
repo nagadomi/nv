@@ -21,6 +21,7 @@
 #include "nv_io.h"
 #include <string>
 #include <sstream>
+#include <vector>
 
 #define NV_LINE_SIZE(n) (n * 32)
 
@@ -45,7 +46,7 @@ nv_load_matrix_fp(FILE *fp)
 	nv_matrix_zero(mat);
 	
 	loop16 = (n & 0xfffffff0);
-
+	
 	for (list = 0; list < mat->list; ++list) {
 		for (m = 0; m < mat->m; ++m) {
 			for (n = 0; n < loop16; n += 16) {
@@ -72,7 +73,7 @@ nv_load_matrix_fp(FILE *fp)
 					return NULL;
 				}
 			}
-
+			
 			for (n = loop16; n < mat->n; ++n) {
 				i = fscanf(fp, "%E ", &NV_MAT_LIST_V(mat, list, m, n));
 				if (i == 0) {
@@ -306,3 +307,85 @@ nv_save_matrix_bin(const char *filename, const nv_matrix_t *mat)
 	return 0;
 }
 
+int
+nv_load_matrix_array_bin(const char *filename, nv_matrix_t **array, int *len)
+{
+	FILE *fp;
+	int i;
+	
+	fp = fopen(filename, "rb");
+	if (fp == NULL) {
+		return -1;
+	}
+	for (i = 0; i < *len; ++i) {
+		nv_matrix_t *mat = nv_load_matrix_bin_fp(fp);
+		if (mat) {
+			array[i] = mat;
+		} else {
+			break;
+		}
+	}
+	*len = i;
+	fclose(fp);
+	
+	return 0;
+}
+
+int
+nv_save_matrix_array_bin(const char *filename, nv_matrix_t **array, int len)
+{
+	FILE *fp;
+	int i;
+
+	fp = fopen(filename, "wb");
+	if (fp == NULL) {
+		return -1;
+	}
+	for (i = 0; i < len; ++i) {
+		nv_save_matrix_bin_fp(fp, array[i]);
+	}
+	fclose(fp);
+	
+	return 0;
+}
+
+int
+nv_load_matrix_array_text(const char *filename, nv_matrix_t **array, int *len)
+{
+	FILE *fp;
+	int i;
+	
+	fp = fopen(filename, "rb");
+	if (fp == NULL) {
+		return -1;
+	}
+	for (i = 0; i < *len; ++i) {
+		nv_matrix_t *mat = nv_load_matrix_fp(fp);
+		if (mat) {
+			array[i] = mat;
+		} else {
+			break;
+		}
+	}
+	*len = i;
+	fclose(fp);
+	
+	return 0;
+}
+
+int
+nv_save_matrix_array_text(const char *filename, nv_matrix_t **array, int len)
+{
+	FILE *fp = fopen(filename, "wb");
+	int i;
+	
+	if (fp == NULL) {
+		return -1;
+	}
+	for (i = 0; i < len; ++i) {
+		nv_save_matrix_fp(fp, array[i]);
+	}
+	fclose(fp);
+	
+	return 0;
+}

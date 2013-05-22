@@ -22,8 +22,8 @@
 #include "nv_io.h"
 #include "nv_test.h"
 
-void
-nv_test_io(void)
+static void
+nv_test_io_mat(void)
 {
 	nv_matrix_t *mat = nv_matrix_alloc(72, 1024);
 	nv_matrix_t *mat2, *mat3;
@@ -67,4 +67,54 @@ nv_test_io(void)
 	nv_matrix_free(&mat3);
 
 	fflush(stdout);
+}
+
+static void
+nv_test_io_mat_array(void)
+{
+	nv_matrix_t *array[3];
+	nv_matrix_t *ret1[3], *ret2[3];
+	nv_matrix_t *mat = nv_matrix_alloc(72, 1024);
+	int i, j, k, n;
+	
+	nv_matrix_zero(mat);
+	
+	NV_TEST_NAME;
+	
+	for (j = 0; j < mat->m; ++j) {
+		for (i = 0; i < mat->n; ++i) {
+			NV_MAT_V(mat, j, i) = nv_rand() * nv_rand_index(10000);
+		}
+	}
+	
+	array[0] = mat;
+	array[1] = mat;
+	array[2] = mat;
+	NV_ASSERT(nv_save_matrix_array_text("test.mat", array, 3) == 0);
+	n = 3;
+	NV_ASSERT(nv_load_matrix_array_text("test.mat", ret1, &n) == 0);
+	NV_ASSERT(n == 3);
+	
+	NV_ASSERT(nv_save_matrix_array_bin("test.matb", array, 3) == 0);
+	n = 3;
+	NV_ASSERT(nv_load_matrix_array_bin("test.matb", ret2, &n) == 0);
+	NV_ASSERT(n == 3);
+	
+	for (k = 0; k < 3; ++k) {
+		for (j = 0; j < mat->m; ++j) {
+			for (i = 0; i < mat->n; ++i) {
+				NV_ASSERT(NV_TEST_EQ(NV_MAT_V(mat, j, i), NV_MAT_V(ret1[k], j, i)));
+				NV_ASSERT(NV_TEST_EQ(NV_MAT_V(mat, j, i), NV_MAT_V(ret2[k], j, i)));
+			}
+		}
+	}
+	nv_matrix_free(&mat);
+	fflush(stdout);
+}
+
+void
+nv_test_io(void)
+{
+	nv_test_io_mat();
+	nv_test_io_mat_array();
 }
