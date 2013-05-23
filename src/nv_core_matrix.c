@@ -72,13 +72,14 @@ nv_matrix_list_alloc32(int n, int m, int list)
 	step = step_n * sizeof(float);
 
 	matrix = nv_alloc_type(nv_matrix_t, 1);
+	memset(matrix, 0, sizeof(*matrix));
 	mem_size = ((size_t)step * m) * list;
 	if (nv_aligned_malloc((void **)&matrix->v, 0x20, mem_size) != 0) {
 		return NULL;
 	}
 	matrix->n = n;
 	matrix->m = m;
-	matrix->step = step / sizeof(float);
+	matrix->step = step_n;
 	matrix->rows = 1;
 	matrix->cols = m;
 	matrix->list = list;
