@@ -57,9 +57,9 @@ nv_lmca_init_pca(nv_matrix_t *ldm,
 		fflush(stdout);
 	}
 	cov = nv_cov_alloc(data->n);
-	
-	/* 初期値なのであまり正確でなくていいから速くしたい... 1 */
-	nv_cov_eigen_ex(cov, data, 1);
+
+	/* 初期値用 */
+	nv_cov_eigen_ex(cov, data, 3);
 	
 	/* 固有値が大きい方から使う  */
 	for (i = 0; i < ldm->m; ++i) {
@@ -120,6 +120,7 @@ nv_lmca_init_cov(nv_matrix_t *ldm,
 	}
 }
 
+/* 対角成分1, それ以外を0で初期化 */
 void
 nv_lmca_init_diag1(nv_matrix_t *ldm)
 {
@@ -697,7 +698,9 @@ nv_lmca_train(nv_matrix_t *ldm,
 			  int max_iteration
 	)
 {
-	nv_lmca_train_ex(ldm, NV_LMCA_FULL, data, labels, k, k_n, margin, push_weight, learning_rate, max_iteration);
+	if (max_iteration > 0) {
+		nv_lmca_train_ex(ldm, NV_LMCA_FULL, data, labels, k, k_n, margin, push_weight, learning_rate, max_iteration);
+	}
 }
 
 void
