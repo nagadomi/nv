@@ -251,11 +251,20 @@ nv_matrix_t *
 nv_load_matrix_bin_fp(FILE *fp)
 {
 	nv_matrix_t hdr, *mat;
-	size_t n = fread(&hdr, sizeof(hdr), 1, fp);
+	size_t n;
 	size_t len;
-	if (n != 1) {
-		return NULL;
-	}
+	
+	n = fread(&hdr.list, sizeof(hdr.list), 1, fp);
+	if (n != 1) return NULL;
+	n = fread(&hdr.n, sizeof(hdr.n), 1, fp);
+	if (n != 1) return NULL;
+	n = fread(&hdr.m, sizeof(hdr.m), 1, fp);
+	if (n != 1) return NULL;
+	n = fread(&hdr.rows, sizeof(hdr.rows), 1, fp);
+	if (n != 1) return NULL;
+	n = fread(&hdr.cols, sizeof(hdr.cols), 1, fp);
+	if (n != 1) return NULL;
+	
 	mat = nv_matrix3d_list_alloc(hdr.n, hdr.rows, hdr.cols, hdr.list);
 	nv_matrix_zero(mat);
 	
@@ -267,14 +276,18 @@ nv_load_matrix_bin_fp(FILE *fp)
 		nv_matrix_free(&mat);
 		return NULL;
 	}
-
+	
 	return mat;
 }
 
 void
 nv_save_matrix_bin_fp(FILE *fp, const nv_matrix_t *mat)
 {
-	fwrite(mat, sizeof(*mat), 1, fp);
+	fwrite(&mat->list, sizeof(mat->list), 1, fp);
+	fwrite(&mat->n, sizeof(mat->n), 1, fp);
+	fwrite(&mat->m, sizeof(mat->m), 1, fp);
+	fwrite(&mat->rows, sizeof(mat->rows), 1, fp);
+	fwrite(&mat->cols, sizeof(mat->cols), 1, fp);
 	fwrite(mat->v, sizeof(float), (size_t)mat->list_step * mat->list, fp);
 }
 
