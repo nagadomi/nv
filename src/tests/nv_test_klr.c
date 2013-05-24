@@ -34,8 +34,6 @@ void nv_test_klr(const nv_matrix_t *data, const nv_matrix_t *labels)
 
 	NV_TEST_NAME;
 
-	nv_vector_normalize_all(data);
-
 	nv_klr_train(lr, count, cluster_labels, data,
 				 NV_LR_PARAM(2, 0.15f, NV_LR_REG_L2, 0.000001f), 50);
 	
