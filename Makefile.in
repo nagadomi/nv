@@ -759,7 +759,7 @@ uninstall-am:
 
 
 valgrind:
-	cd src/tests; LD_LIBRARY_PATH=../.libs valgrind -v --tool=memcheck --leak-check=full --show-reachable=yes --run-libc-freeres=no --log-file=./valgrind.log ./.libs/nv_test ; cat valgrind.log; cd -
+	cd src/tests; LD_LIBRARY_PATH=../.libs valgrind -v --tool=memcheck --leak-check=full --show-reachable=yes --run-libc-freeres=no --track-origins=yes --log-file=./valgrind.log ./.libs/nv_test ; cat valgrind.log; cd -
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
