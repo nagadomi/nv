@@ -25,7 +25,7 @@
 static void
 nv_test_io_mat(void)
 {
-	nv_matrix_t *mat = nv_matrix_alloc(72, 1024);
+	nv_matrix_t *mat = nv_matrix_alloc(72, 10000);
 	nv_matrix_t *mat2, *mat3;
 	int i, j;
 	long t;
@@ -108,6 +108,55 @@ nv_test_io_mat_array(void)
 			}
 		}
 	}
+	for (i = 0; i < 3; ++i) {
+		nv_matrix_free(&ret1[i]);
+		nv_matrix_free(&ret2[i]);
+	}
+	
+	array[0] = mat;
+	array[1] = mat;
+	NV_ASSERT(nv_save_matrix_array_text("test.mat", array, 2) == 0);
+	n = 2;
+	NV_ASSERT(nv_load_matrix_array_text("test.mat", ret1, &n) == 0);
+	NV_ASSERT(n == 2);
+	
+	NV_ASSERT(nv_save_matrix_array_bin("test.matb", array, 2) == 0);
+	n = 2;
+	NV_ASSERT(nv_load_matrix_array_bin("test.matb", ret2, &n) == 0);
+	NV_ASSERT(n == 2);
+
+	for (k = 0; k < 2; ++k) {
+		for (j = 0; j < mat->m; ++j) {
+			for (i = 0; i < mat->n; ++i) {
+				NV_ASSERT(NV_TEST_EQ(NV_MAT_V(mat, j, i), NV_MAT_V(ret1[k], j, i)));
+				NV_ASSERT(NV_TEST_EQ(NV_MAT_V(mat, j, i), NV_MAT_V(ret2[k], j, i)));
+			}
+		}
+	}
+	for (i = 0; i < 2; ++i) {
+		nv_matrix_free(&ret1[i]);
+		nv_matrix_free(&ret2[i]);
+	}
+	
+	n = 4;
+	NV_ASSERT(nv_load_matrix_array_text("test.mat", ret1, &n) == 0);
+	NV_ASSERT(n == 2);
+	n = 4;
+	NV_ASSERT(nv_load_matrix_array_bin("test.matb", ret2, &n) == 0);
+	NV_ASSERT(n == 2);
+	for (k = 0; k < 2; ++k) {
+		for (j = 0; j < mat->m; ++j) {
+			for (i = 0; i < mat->n; ++i) {
+				NV_ASSERT(NV_TEST_EQ(NV_MAT_V(mat, j, i), NV_MAT_V(ret1[k], j, i)));
+				NV_ASSERT(NV_TEST_EQ(NV_MAT_V(mat, j, i), NV_MAT_V(ret2[k], j, i)));
+			}
+		}
+	}
+	for (i = 0; i < 2; ++i) {
+		nv_matrix_free(&ret1[i]);
+		nv_matrix_free(&ret2[i]);
+	}
+	
 	nv_matrix_free(&mat);
 	fflush(stdout);
 }
