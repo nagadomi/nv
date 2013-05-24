@@ -194,3 +194,32 @@ void nv_matrix_normalize_maxmin(nv_matrix_t *mat, int mat_n, float min_v, float 
 	}
 }
 
+void
+nv_matrix_muls(nv_matrix_t *y, const nv_matrix_t *a, float scale)
+{
+	int i;
+	
+	NV_ASSERT(y->m == a->m);
+	NV_ASSERT(y->n == a->n);
+	
+#ifdef _OPENMP
+#pragma omp parallel for	
+#endif
+	for (i = 0; i < y->m; ++i) {
+		nv_vector_muls(y, i, a, i, scale);
+	}
+}
+
+void
+nv_matrix_add(nv_matrix_t *y, const nv_matrix_t *a, const nv_matrix_t *b)
+{
+	int i;
+	NV_ASSERT(y->m == a->m && y->m == b->m);
+	NV_ASSERT(y->n == a->n && y->n == b->n);
+#ifdef _OPENMP
+#pragma omp parallel for	
+#endif
+	for (i = 0; i < y->m; ++i) {
+		nv_vector_add(y, i, a, i, b, i);
+	}
+}

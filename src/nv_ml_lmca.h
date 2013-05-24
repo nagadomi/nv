@@ -22,7 +22,7 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-	
+
 typedef enum {
 	NV_LMCA_DIAG, /* only diagonal element */
 	NV_LMCA_FULL  /* full matrix */
@@ -53,6 +53,7 @@ nv_lmca_train_ex(nv_matrix_t *ldm,
 				 int nk, int mk,
 				 float margin, float push_ratio, float delta,
 				 int max_epoch);
+
 void nv_lmca_projection(nv_matrix_t *v1, int v1_j,
 						const nv_matrix_t *ldm,
 						const nv_matrix_t *v2, int v2_j);
