@@ -287,7 +287,7 @@ nv_lmca_cost(const nv_matrix_t *lx,
 		}
 	}
 	if (nv_lmca_progress_flag) {
-		printf("nv_lmca: %3d: pull_cost: %E push_cost: %E, knn correct rate: %f(%d/%d)\n", iteration, eps1, eps2, (float)correct / (lx->m * k), correct, lx->m * k);
+		printf("nv_lmca: %3d: pull_cost: %E push_cost: %E, knn precision: %f(%d/%d/%d)\n", iteration, eps1, eps2, (float)correct / (lx->m * k), correct, k, lx->m);
 	}
 	return (1.0f - c) * eps1 + c * eps2;
 }
@@ -463,8 +463,8 @@ nv_lmca_train_ex(nv_matrix_t *ldm,
 	nv_matrix_muls(term1[0], term1[0], delta_scale);
 	
 	if (nv_lmca_progress_flag) {
-		printf("nv_lmca: term1: %ldms, input space knn correct rate: %f(%d/%d)\n",
-			   nv_clock() - t, (float)knn_correct / (data->m * k), knn_correct, data->m * k);
+		printf("nv_lmca: term1: %ldms, input space knn precision: %f(%d/%d/%d)\n",
+			   nv_clock() - t, (float)knn_correct / (data->m * k), knn_correct, k, data->m);
 	}
 
 	/* 変換行列を正則化して全データを変換する */
