@@ -26,3 +26,6 @@ src/nv_flags
 src/nv_kmeans_tree_text2bin
 src/nv_matrix_text2bin
 src/tests/nv_test
+src/tests/test.mat
+src/tests/test.matb
+src/config.h
