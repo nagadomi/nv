@@ -50,7 +50,7 @@ nv_test_knn_pca(const nv_matrix_t *train_data,
 		);
 	
 	t = nv_clock();
-	nv_cov_eigen_ex(cov, train_data, 10);
+	nv_cov_eigen_ex(cov, train_data, NPCA, 10);
 	printf("%ldms\n", nv_clock() - t);
 	
 	nv_matrix_m(cov->eigen_vec, NPCA);

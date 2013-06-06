@@ -23,7 +23,7 @@
 #include "nv_num_matrix.h"
 #include "nv_num_eigen.h"
 
-#define NV_COV_JACOBI_EPOCH 20
+#define NV_COV_EIGEN_MAX_EPOCH 30
 
 /* 分散共分散 */
 
@@ -56,11 +56,12 @@ void nv_cov_free(nv_cov_t **cov)
 
 void
 nv_cov_eigen_ex(nv_cov_t *cov, const nv_matrix_t *data,
-				int max_epoch)
+				int eigen_n, int max_epoch)
 {
 	nv_cov(cov->cov, cov->u, data);
-	nv_eigen_sym(cov->eigen_vec, cov->eigen_val,
-				 cov->cov, max_epoch);
+	nv_matrix_zero(cov->eigen_vec);
+	nv_matrix_zero(cov->eigen_val);
+	nv_eigen(cov->eigen_vec, cov->eigen_val, cov->cov, eigen_n, max_epoch);
 	cov->data_m = data->m;
 }
 
@@ -68,8 +69,8 @@ void
 nv_cov_eigen(nv_cov_t *cov, const nv_matrix_t *data)
 {
 	nv_cov(cov->cov, cov->u, data);
-	nv_eigen_sym(cov->eigen_vec, cov->eigen_val,
-						cov->cov, NV_COV_JACOBI_EPOCH);
+	nv_eigen(cov->eigen_vec, cov->eigen_val, cov->cov,
+			 cov->eigen_vec->n, NV_COV_EIGEN_MAX_EPOCH);
 	cov->data_m = data->m;
 }
 

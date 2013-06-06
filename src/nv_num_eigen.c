@@ -19,197 +19,77 @@
 
 #include "nv_core.h"
 #include "nv_num_matrix.h"
+#include "nv_num_vector.h"
 #include "nv_num_eigen.h"
 
-static int 
-sort_eigen(const void *p1, const void *p2)
+/* べき乗法で上位Nの固有値,固有ベクトルを求める */
+
+int
+nv_eigen(nv_matrix_t *eigen_vec, 
+		 nv_matrix_t *eigen_val,
+		 const nv_matrix_t *mat,
+		 int n,
+		 int max_epoch)
 {
-	float *f1 = (float *)p1;
-	float *f2 = (float *)p2;
+	int i;
+	nv_matrix_t *a = nv_matrix_dup(mat);
+	
+	NV_ASSERT(n > 0);
+	NV_ASSERT(n <= mat->m);
+	NV_ASSERT(n <= eigen_vec->m);
+	NV_ASSERT(n <= eigen_val->m);
+	NV_ASSERT(mat->m == mat->n);
+	NV_ASSERT(mat->m == eigen_vec->n);
 
-	if (f1[0] > f2[0]) {
-		return -1;
-	} else if (f1[0] < f2[0]) {
-		return 1;
-	}
-
-	return 0;
-}
-
-
-/* 巡回Jacobi法で実対称行列の固有値, 固有ベクトルを求める.
- * 参考: Numerical Recipes in C
- */
-int 
-nv_eigen_sym(nv_matrix_t *eigen_vec, 
-			nv_matrix_t *eigen_val,
-			const nv_matrix_t *smat,
-			int max_epoch)
-{
-	int i, nrot, converge;
-	const int n = smat->n;
-	nv_matrix_t *b, *z;
-	nv_matrix_t *v = eigen_vec;
-	nv_matrix_t *d = eigen_val;
-	nv_matrix_t *a = nv_matrix_alloc(smat->n, smat->m);
-
-	NV_ASSERT(
-		smat->m == smat->n
-		&& eigen_vec->n == smat->n
-		&& eigen_vec->m == smat->m
-		&& eigen_val->n == 1
-		&& eigen_val->m == eigen_vec->m
-	);
-
-	nv_matrix_copy(a, 0, smat, 0, smat->m);
-	b = nv_matrix_alloc(1, n);
-	z = nv_matrix_alloc(1, n);
-
-	nv_matrix_zero(z);
-	nv_matrix_zero(v);
-
-	/* 単位行列に初期化 */
+	nv_matrix_zero(eigen_val);
+	nv_matrix_fill(eigen_vec, 1.0f);
+	nv_vector_normalize_all(eigen_vec);
+	
 	for (i = 0; i < n; ++i) {
-		NV_MAT_V(v, i, i) = 1.0f;
-	}
-	/* d, bをaの対角成分で初期化 */
-	for (i = 0; i < n; ++i) {
-		NV_MAT_V(b, i, 0) = NV_MAT_V(d, i, 0) = NV_MAT_V(a, i, i);
-	}
-
-	nrot = 0;
-	converge = 0;
-	for (i = 0; i < max_epoch; ++i) {
-		/* 収束判定 */
-		float sm = 0.0f;
-		float tresh;
-		int ip;
+		int k, jj;
+		float lambda_old;
 		
-		for (ip = 0; ip < n - 1; ++ip) {
-			int iq;
+		for (k = 0; k < max_epoch; ++k) {
+			int j;
+			nv_matrix_t *vec_tmp = nv_matrix_alloc(a->m, 1);
+			float lambda;
+			
 #ifdef _OPENMP
-#pragma omp parallel for reduction(+:sm)
+#pragma omp parallel for
 #endif
-			for (iq = ip + 1; iq < n; ++iq) {
-				sm += fabsf(NV_MAT_V(a, ip, iq));
+			for (j = 0; j < a->m; ++j) {
+				NV_MAT_V(vec_tmp, 0, j) = nv_vector_dot(a, j, eigen_vec, i);
 			}
-		}
-		if (sm <= FLT_EPSILON) {
-			converge = 1;
-			break;
-		}
-		tresh = (i > 3)  ? 0.0f: (0.2f * sm / (n * n));
-
-		/* 上三角成分(対角成分含まず)が0になるように回転していく */
-		for (ip = 0; ip < n - 1; ++ip) {
-			int iq;
-			for (iq = ip + 1; iq < n; ++iq) {
-				float g = 100.0f * fabsf(NV_MAT_V(a, ip, iq));
-				if (i > 3 && g <= FLT_EPSILON) {
-					NV_MAT_V(a, ip, iq) = 0.0f;
-				} else if (fabs(NV_MAT_V(a, ip, iq)) > tresh) {
-					float t, h, theta, c, s, tau;
-					
-					h = NV_MAT_V(d, iq, 0) - NV_MAT_V(d, ip, 0);
-					if (g <= FLT_EPSILON) {
-						t = NV_MAT_V(a, ip, iq) / h;
-					} else {
-						theta = 0.5f * h / NV_MAT_V(a, ip, iq);
-						t = 1.0f / (fabsf(theta) + sqrtf(1.0f + theta * theta));
-						if (theta < 0.0f) {
-							t = -t;
-						}
-					}
-					c = 1.0f / sqrtf(1.0f + t * t);
-					s = t * c;
-					tau = s / (1.0f + c);
-					h = t * NV_MAT_V(a, ip, iq);
-					NV_MAT_V(z, ip, 0) -= h;
-					NV_MAT_V(z, iq, 0) += h;
-					NV_MAT_V(d, ip, 0) -= h;
-					NV_MAT_V(d, iq, 0) += h;
-					NV_MAT_V(a, ip, iq) = 0.0f;
-#ifdef _OPENMP
-#pragma omp parallel sections num_threads(2)
-#endif
-					{					
-#ifdef _OPENMP
-#pragma omp section
-#endif
-						{
-							int j;
-							for (j = 0; j < ip; ++j) {
-								const float g = NV_MAT_V(a, j, ip);
-								const float h = NV_MAT_V(a, j, iq);
-								NV_MAT_V(a, j, ip) = g - s * (h + g * tau);
-								NV_MAT_V(a, j, iq) = h + s * (g - h * tau); 
-							}
-							for (j = ip + 1; j < iq; ++j) {
-								const float g = NV_MAT_V(a, ip, j); 
-								const float h = NV_MAT_V(a, j, iq); 
-								NV_MAT_V(a, j, iq) = h + s * (g - h * tau); 
-								NV_MAT_V(a, ip, j) = g - s * (h + g * tau); 
-							}
-							for (j = iq + 1; j < n; ++j) {
-								const float g = NV_MAT_V(a, ip, j); 
-								const float h = NV_MAT_V(a, iq, j); 
-								NV_MAT_V(a, iq, j) = h + s * (g - h * tau); 
-								NV_MAT_V(a, ip, j) = g - s * (h + g * tau); 
-							}
-						}
-#ifdef _OPENMP
-#pragma omp section
-#endif
-						{
-							int j;
-							for (j = 0; j < n; ++j) {
-								const float g = NV_MAT_V(v, j, ip); 
-								const float h = NV_MAT_V(v, j, iq); 
-								NV_MAT_V(v, j, iq) = h + s * (g - h * tau); 
-								NV_MAT_V(v, j, ip) = g - s * (h + g * tau); 
-							}
-						}
-					}
-					++nrot;
-				} else {
-					/* 飛ばす */
+			lambda = nv_vector_norm(vec_tmp, 0);
+			if (lambda > 0.0f) {
+				nv_vector_muls(vec_tmp, 0, vec_tmp, 0, 1.0f / lambda);
+			}
+			NV_MAT_V(eigen_val, i, 0) = lambda;
+			nv_vector_copy(eigen_vec, i, vec_tmp, 0);
+			nv_matrix_free(&vec_tmp);
+			
+			if (k > 0) {
+				if (fabsf(lambda_old - lambda) < FLT_EPSILON) {
+					break;
 				}
 			}
+			lambda_old = NV_MAT_V(eigen_val, i, 0);
 		}
-		for (ip = 0; ip < n; ++ip) {
-			NV_MAT_V(b, ip, 0) += NV_MAT_V(z, ip, 0);
-			NV_MAT_V(d, ip, 0) = NV_MAT_V(b, ip, 0);
-			NV_MAT_V(z, ip, 0) = 0.0f;
-		}
-	}
-
-	//if (converge) 
-	{
-		/* 固有値で降順ソート. 固有ベクトルを転置. */
-		nv_matrix_t *eigen = nv_matrix_alloc(eigen_vec->n + 1, eigen_vec->m);
-		for (i = 0; i < eigen_vec->m; ++i) {
-			int j;
-			/* 0:固有値 */
-			NV_MAT_V(eigen, i, 0) = NV_MAT_V(d, i, 0); 
-			/* 1-:固有ベクトル */
-			for (j = 0; j < eigen_vec->n; ++j) {
-				NV_MAT_V(eigen, i, 1 + j) = NV_MAT_V(v, j, i);
+		
+#ifdef _OPENMP
+#pragma omp parallel for
+#endif
+		for (jj = 0; jj < a->m; ++jj) {
+			int ii;
+			for (ii = 0; ii < a->n; ++ii) {
+				NV_MAT_V(a, jj, ii) -=
+					NV_MAT_V(eigen_val, i, 0)
+					* NV_MAT_V(eigen_vec, i, ii)
+					* NV_MAT_V(eigen_vec, i, jj);
 			}
 		}
-		qsort(eigen->v, eigen->m, NV_VEC_SIZE(eigen), sort_eigen);
-
-		for (i = 0; i < eigen_vec->m; ++i) {
-			int j;
-			NV_MAT_V(eigen_val, i, 0) = NV_MAT_V(eigen, i, 0);
-			for (j = 0; j < eigen_vec->n; ++j) {
-				NV_MAT_V(eigen_vec, i, j) = NV_MAT_V(eigen, i, 1 + j);
-			}
-		}
-		nv_matrix_free(&eigen);
 	}
-	nv_matrix_free(&b);
-	nv_matrix_free(&z);
 	nv_matrix_free(&a);
-
-	return converge ? 0:1;
+	
+	return 0;
 }

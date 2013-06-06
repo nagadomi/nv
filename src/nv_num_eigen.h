@@ -24,11 +24,12 @@
 extern "C" {
 #endif
 
+int nv_eigen(nv_matrix_t *eigen_vec, 
+			 nv_matrix_t *eigen_val,
+			 const nv_matrix_t *mat,
+			 int n,
+			 int max_epoch);
 
-int nv_eigen_sym(nv_matrix_t *eigen_vec, 
-				 nv_matrix_t *eigen_val,
-				 const nv_matrix_t *dmat,
-				 int max_epoch);
 #ifdef __cplusplus
 }
 #endif

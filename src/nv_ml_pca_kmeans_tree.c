@@ -295,6 +295,8 @@ nv_pca_kmeans_tree_train(nv_pca_kmeans_tree_t *tree,
 	}
 }
 
+#define NV_PCA_KMEANS_EIGEN_MAX_EPOCH 30
+
 void
 nv_pca_kmeans_tree_train_at(nv_pca_kmeans_tree_t *tree,
 							const nv_matrix_t *data, int y, int x, int max_epoch)
@@ -311,7 +313,7 @@ nv_pca_kmeans_tree_train_at(nv_pca_kmeans_tree_t *tree,
 	nv_matrix_zero(count);
 	nv_matrix_zero(labels);
 
-	nv_cov_eigen_ex(cov, data, 20);
+	nv_cov_eigen_ex(cov, data, tree->d, NV_PCA_KMEANS_EIGEN_MAX_EPOCH);
 	for (i = 0; i < tree->d; ++i) {
 		nv_vector_copy(eigen_vec, i, cov->eigen_vec, i);
 	}
