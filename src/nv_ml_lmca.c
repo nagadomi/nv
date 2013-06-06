@@ -74,9 +74,9 @@ nv_lmca_init_pca(nv_matrix_t *ldm,
 		fflush(stdout);
 	}
 	cov = nv_cov_alloc(data->n);
-
+	
 	/* 初期値用 */
-	nv_cov_eigen_ex(cov, data, ldm->m, 4);
+	nv_cov_eigen_ex(cov, data, ldm->m, 50);
 	
 	/* 固有値が大きい方から使う  */
 	for (i = 0; i < ldm->m; ++i) {
