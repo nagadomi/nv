@@ -22,42 +22,8 @@
 #include "nv_num.h"
 #include "nv_test.h"
 
-static void
-nv_test_eigen_sym()
-{
-	nv_matrix_t *a = nv_matrix_alloc(3, 3);
-	nv_matrix_t *vec = nv_matrix_alloc(3, 3);
-	nv_matrix_t *val = nv_matrix_alloc(1, 3);
-
-	nv_matrix_zero(vec);
-	nv_matrix_zero(val);
-	NV_MAT_V(a, 0, 0) = 1.0f;
-	NV_MAT_V(a, 0, 1) = 0.5f;
-	NV_MAT_V(a, 0, 2) = 0.3f;
-	NV_MAT_V(a, 1, 0) = 0.5f;
-	NV_MAT_V(a, 1, 1) = 1.0f;
-	NV_MAT_V(a, 1, 2) = 0.6f;
-	NV_MAT_V(a, 2, 0) = 0.3f;
-	NV_MAT_V(a, 2, 1) = 0.6f;
-	NV_MAT_V(a, 2, 2) = 1.0f;
-
-	NV_TEST_NAME;
-	nv_eigen_sym(vec, val, a, 50);
-	
-	nv_matrix_print(stdout, val);
-	nv_matrix_print(stdout, vec);
-	
-	NV_ASSERT((fabsf(NV_MAT_V(val, 0, 0)) - fabsf(1.944f)) < 0.001f);
-	NV_ASSERT((fabsf(NV_MAT_V(val, 1, 0)) - fabsf(0.707f)) < 0.001f);
-	NV_ASSERT((fabsf(NV_MAT_V(val, 2, 0)) - fabsf(0.349f)) < 0.001f);
-	
-	nv_matrix_free(&val);
-	nv_matrix_free(&vec);
-	nv_matrix_free(&a);
-}
-
-static void
-nv_test_eigen_pow()
+void
+nv_test_eigen(void)
 {
 	nv_matrix_t *a = nv_matrix_alloc(3, 3);
 	nv_matrix_t *vec = nv_matrix_alloc(3, 3);
@@ -89,12 +55,5 @@ nv_test_eigen_pow()
 	nv_matrix_free(&val);
 	nv_matrix_free(&vec);
 	nv_matrix_free(&a);
-}
-
-void
-nv_test_eigen(void)
-{
-	//nv_test_eigen_sym();
-	nv_test_eigen_pow();
 }
 
