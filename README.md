@@ -29,7 +29,7 @@ Ubuntu 12.04、FreeBSD 9.0 RELEASE、MinGW32、 Microsoft Visual C++ 2008 Expres
 
 もし開発環境などを入れていない場合は、
 
-    sudo apt-get install gcc g++ make autoconf
+    sudo apt-get install gcc g++ make autoconf automake libtool
 
 などと入れておきます。
 
@@ -38,6 +38,7 @@ Ubuntu 12.04、FreeBSD 9.0 RELEASE、MinGW32、 Microsoft Visual C++ 2008 Expres
     wget https://github.com/nagadomi/eiio/tarball/master -O eiio.tar.gz
     tar -xzvf eiio.tar.gz
     cd nagadomi-eiio-*
+    ./autogen.sh
     ./configure
     make
     sudo make install
@@ -48,6 +49,7 @@ Ubuntu 12.04、FreeBSD 9.0 RELEASE、MinGW32、 Microsoft Visual C++ 2008 Expres
     wget https://github.com/nagadomi/nv/tarball/master -O nv.tar.gz
     tar -xzvf nv.tar.gz
     cd nagadomi-nv-*
+    ./autogen.sh
     ./configure
     make
     sudo make install
