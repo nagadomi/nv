@@ -36,6 +36,13 @@ AC_PROG_LN_S
 AC_PROG_MAKE_SET
 AC_PROG_MKDIR_P
 
+AC_PATH_PROG([DEBUILD], [debuild], [notfound])
+AC_PATH_PROG([TEST], [test], [notfound])
+AC_PATH_PROG([ECHO], [echo], [notfound])
+AC_PATH_PROG([CP], [cp], [notfound])
+AC_PATH_PROG([MV], [mv], [notfound])
+AC_PATH_PROG([TAR], [tar], [notfound])
+
 # Checks for libraries.
 LT_INIT([win32-dll])
 
@@ -57,6 +64,22 @@ AC_CHECK_LIB(stdc++, main)
 nv_glibc_backtrace=0
 
 AC_CHECK_HEADERS([execinfo.h], [AC_CHECK_FUNCS(backtrace backtrace_symbols_fd,[nv_glibc_backtrace=1;CFLAGS="$CFLAGS -rdynamic "])])
+
+nv_deb=0
+nv_debsign=0
+DPKG_FLAGS=""
+AX_ARG_ENABLE(deb,
+        AC_HELP_STRING([--enable-deb], [build debian package. ]), [no],
+	[nv_deb=1],
+        [])
+AX_ARG_ENABLE(sdeb,
+        AC_HELP_STRING([--enable-sdeb], [build debian source package. ]), [no],
+	[nv_deb=1;DPKG_FLAGS=" $DPKG_FLAGS -S -sa "],
+        [])
+AX_ARG_ENABLE(sign,
+        AC_HELP_STRING([--enable-sign], [build signed debian package. ]), [no],
+	[nv_deb=1],
+        [DPKG_FLAGS=" $DPKG_FLAGS -uc -us "])
 
 AX_ARG_ENABLE(debug,
         AS_HELP_STRING([--enable-debug],[enable assert -g and boundary check.]), [no],
@@ -204,6 +227,8 @@ CPPFLAGS="$CFLAGS"
 CXXFLAGS="$CFLAGS"
 CFLAGS="$CFLAGS "
 
+AM_CONDITIONAL([BUILDING_DEB], [$TEST $nv_deb = 1])
+AC_SUBST(DPKG_FLAGS)
 AC_SUBST(nv_avxemu)
 AC_SUBST(nv_strict)
 AC_SUBST(nv_glibc_backtrace)
