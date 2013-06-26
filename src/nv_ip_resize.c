@@ -85,7 +85,7 @@ nv_resize_biliner(nv_matrix_t *dest, const nv_matrix_t *src)
 				x1y1 = _mm_add_ps(x1y1, x1y2);
 				
 				_mm_store_ps(mm, x1y1);
-				memcpy(&NV_MAT3D_V(dest, y, x, 0), mm, sizeof(float) * 3);
+				memmove(&NV_MAT3D_V(dest, y, x, 0), mm, sizeof(float) * 3);
 			}
 #else
 			for (x = 0; x < dest->cols; ++x) {
@@ -181,7 +181,7 @@ nv_crop(const nv_matrix_t *src, nv_rect_t rect)
 			* src->step * sizeof(float);
 	}
 	for (y = 0; y < rect.height && y + rect.y < src->rows; ++y) {
-		memcpy(&NV_MAT3D_V(roi, y, 0, 0),
+		memmove(&NV_MAT3D_V(roi, y, 0, 0),
 			   &NV_MAT3D_V(src, rect.y + y, rect.x, 0),
 			   copy_len);
 	}

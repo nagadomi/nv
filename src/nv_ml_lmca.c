@@ -117,13 +117,13 @@ nv_lmca_init_cov(nv_matrix_t *ldm,
 #endif
 	for (i = 0; i < cov->cov->m; ++i) {
 		NV_MAT_V(c, i, 0) = nv_vector_norm(cov->cov, i);
-		memcpy(&NV_MAT_V(c, i, 1), &NV_MAT_V(cov->cov, i, 0), sizeof(float) * cov->cov->n);
+		memmove(&NV_MAT_V(c, i, 1), &NV_MAT_V(cov->cov, i, 0), sizeof(float) * cov->cov->n);
 	}
 	nv_matrix_sort(c, 0, NV_SORT_DIR_DESC);
 	
 	/* ノルムが大きい方から使う */
 	for (i = 0; i < ldm->m; ++i) {
-		memcpy(&NV_MAT_V(ldm, i, 0), &NV_MAT_V(c, i, 1), sizeof(float) * ldm->n);
+		memmove(&NV_MAT_V(ldm, i, 0), &NV_MAT_V(c, i, 1), sizeof(float) * ldm->n);
 	}
 	/* L2 Normalize */	
 	nv_vector_normalize_all(ldm);

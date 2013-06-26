@@ -99,7 +99,7 @@ nv_keypoint_ctx_alloc(const nv_keypoint_param_t *param)
 	int i;
 	nv_keypoint_ctx_t *ctx = nv_alloc_type(nv_keypoint_ctx_t, 1);
 
-	memcpy(&ctx->param, param, sizeof(ctx->param));
+	memmove(&ctx->param, param, sizeof(ctx->param));
 	ctx->inner_r = nv_matrix_alloc(ctx->param.level, 1);
 	ctx->outer_r = nv_matrix_alloc(ctx->param.level, 1);
 	
@@ -916,7 +916,7 @@ nv_keypoint_gradient_histogram(const nv_keypoint_ctx_t *ctx,
 			integral, integral_tilted, memo
 		);
 		NV_KEYPOINT_GRADIENT_HISTOGRAM_NORMALIZE(hist);
-		memcpy(&NV_MAT_V(desc, keypoint_m, i * hist->n),
+		memmove(&NV_MAT_V(desc, keypoint_m, i * hist->n),
 			   &NV_MAT_V(hist, 0, 0),
 			   sizeof(float) * hist->n);
 	}
@@ -928,7 +928,7 @@ nv_keypoint_gradient_histogram(const nv_keypoint_ctx_t *ctx,
 		integral, integral_tilted, memo
 		);
 	NV_KEYPOINT_GRADIENT_HISTOGRAM_NORMALIZE(hist);
-	memcpy(&NV_MAT_V(desc, keypoint_m, 8 * hist->n),
+	memmove(&NV_MAT_V(desc, keypoint_m, 8 * hist->n),
 		   &NV_MAT_V(hist, 0, 0),
 		   sizeof(float) * hist->n);
 	nv_matrix_free(&hist);

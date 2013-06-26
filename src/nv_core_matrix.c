@@ -170,7 +170,7 @@ void
 nv_matrix_copy(nv_matrix_t *dest, int dm, const nv_matrix_t *src, int sm, int count_m)
 {
 	NV_ASSERT(dest->n == src->n);
-	memcpy(&NV_MAT_V(dest, dm, 0), &NV_MAT_V(src, sm, 0), dest->step * count_m * sizeof(float));
+	memmove(&NV_MAT_V(dest, dm, 0), &NV_MAT_V(src, sm, 0), dest->step * count_m * sizeof(float));
 }
 
 void nv_matrix_copy_all(nv_matrix_t *dest, const nv_matrix_t *src)
@@ -178,7 +178,7 @@ void nv_matrix_copy_all(nv_matrix_t *dest, const nv_matrix_t *src)
 	NV_ASSERT(dest->n == src->n);
 	NV_ASSERT(dest->m >= src->m);
 
-	memcpy(dest->v, src->v, (size_t)src->list_step * src->list * sizeof(float));
+	memmove(dest->v, src->v, (size_t)src->list_step * src->list * sizeof(float));
 }
 void
 nv_matrix_free(nv_matrix_t **matrix)
@@ -295,7 +295,7 @@ nv_vector_copy(nv_matrix_t *dest, int dm, const nv_matrix_t *src, int sm)
 {
 	NV_ASSERT(dest->n >= src->n);
 
-	memcpy(&NV_MAT_V(dest, dm, 0), &NV_MAT_V(src, sm, 0), src->step * sizeof(float));
+	memmove(&NV_MAT_V(dest, dm, 0), &NV_MAT_V(src, sm, 0), src->step * sizeof(float));
 }
 
 void
@@ -334,7 +334,7 @@ nv_vector_fill(nv_matrix_t *mat, int m, float v)
 		k = 1;
 		j = 1;
 		while (k * 2 < mat->n) {
-			memcpy(&p[j], &p[0], k * sizeof(float));
+			memmove(&p[j], &p[0], k * sizeof(float));
 			j += k;
 			k *= 2;
 		}
@@ -343,7 +343,7 @@ nv_vector_fill(nv_matrix_t *mat, int m, float v)
 		}
 		while (j < mat->n) {
 			if (j + k <= mat->n) {
-				memcpy(&p[j], &p[0], k * sizeof(float));
+				memmove(&p[j], &p[0], k * sizeof(float));
 				j += k;
 			} else {
 				if (k > 1) {
@@ -366,7 +366,7 @@ nv_matrix_fill(nv_matrix_t *mat, const float v)
 		k = 1;
 		j = 1;
 		while (k * 2 < mat->list_step) {
-			memcpy(&mat->v[j], &mat->v[0], k * sizeof(float));
+			memmove(&mat->v[j], &mat->v[0], k * sizeof(float));
 			j += k;
 			k *= 2;
 		}
@@ -375,7 +375,7 @@ nv_matrix_fill(nv_matrix_t *mat, const float v)
 		}
 		while (j < mat->list_step) {
 			if (j + k <= mat->list_step) {
-				memcpy(&mat->v[j], &mat->v[0], k * sizeof(float));
+				memmove(&mat->v[j], &mat->v[0], k * sizeof(float));
 				j += k;
 			} else {
 				if (k > 1) {

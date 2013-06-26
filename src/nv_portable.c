@@ -121,7 +121,7 @@ nv_gmtime_r(const time_t *clock, struct tm *result)
 	{
 		res = gmtime(clock); 
 		if (res != NULL) {
-			memcpy(result, res, sizeof(*result));
+			memmove(result, res, sizeof(*result));
 		}
 	}
 	if (res == NULL) {
@@ -152,7 +152,7 @@ nv_localtime_r(const time_t *clock, struct tm *result)
 	{
 		res = localtime(clock); 
 		if (res != NULL) {
-			memcpy(result, res, sizeof(*result));
+			memmove(result, res, sizeof(*result));
 		}
 	}
 	if (res == NULL) {

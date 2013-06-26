@@ -432,7 +432,7 @@ nv_klr_tree_predict_vector(const nv_klr_tree_t *tree,
 	for (i = 0; i < tree->node[y]; ++i) {
 		nv_matrix_t *v = nv_matrix_alloc(tree->lr[y][i]->k, 1);
 		nv_lr_predict_vector(tree->lr[y][i], v, 0, vec, vec_j);
-		memcpy(&NV_MAT_V(prob, pj, i * k), v->v, sizeof(float) * v->step);
+		memmove(&NV_MAT_V(prob, pj, i * k), v->v, sizeof(float) * v->step);
 		nv_matrix_free(&v);
 	}
 }

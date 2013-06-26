@@ -81,7 +81,7 @@ sha1_transform(sha1_quadbyte *state, const sha1_byte *buffer)
 	sha1_quadbyte	a, b, c, d, e;
 	BYTE64QUAD16	*block;
 	
-	memcpy(&workspace, buffer, sizeof(workspace));
+	memmove(&workspace, buffer, sizeof(workspace));
 	
 	//block = (BYTE64QUAD16*)buffer;
 	block = (BYTE64QUAD16*)&workspace;
@@ -143,7 +143,7 @@ void sha1_update(SHA_CTX *context, const sha1_byte *data, unsigned int len) {
 	context->count[1] += (len >> 29);
 	if ((j + len) > 63) {
 		i = 64-j;
-	    memcpy(&context->buffer[j], data, i);
+	    memmove(&context->buffer[j], data, i);
 	    sha1_transform(context->state, &context->buffer[0]);
 	    for ( ; i + 63 < len; i += 64) {
 	        sha1_transform(context->state, &data[i]);
@@ -153,7 +153,7 @@ void sha1_update(SHA_CTX *context, const sha1_byte *data, unsigned int len) {
 	else {
 		i = 0;
 	}
-	memcpy(&context->buffer[j], &data[i], len - i);
+	memmove(&context->buffer[j], &data[i], len - i);
 }
 
 
