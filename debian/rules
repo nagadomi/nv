@@ -13,4 +13,4 @@
 	dh $@  --with autotools-dev
 
 override_dh_auto_configure:
-	dh_auto_configure -- --disable-native
+	dh_auto_configure -- --disable-native --disable-ml-test

@@ -94,7 +94,11 @@ AX_ARG_ENABLE(native,
         [CFLAGS=" $CFLAGS -march=native "],
         [])
 
-    
+AX_ARG_ENABLE(ml-test,
+        AS_HELP_STRING([--disable-ml-test],[disable machine learning tests]), [yes],
+        [CFLAGS=" $CFLAGS -DNV_TEST_ML "],
+        [])
+
 AX_ARG_ENABLE(popcnt,
         AS_HELP_STRING([--enable-popcnt],[enable popcnt]), [no],
         [CFLAGS="$CFLAGS -mpopcnt -D__POPCNT__"],

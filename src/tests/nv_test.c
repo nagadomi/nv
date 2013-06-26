@@ -45,6 +45,8 @@ int main(void)
 	
 	nv_test_knn_pca(train_data, train_labels, test_data, test_labels);
 	nv_test_knn2(train_data, train_labels, test_data, test_labels);
+	
+#ifdef NV_TEST_ML
 	nv_test_knn_lmca(train_data, train_labels, test_data, test_labels);
 	nv_test_knn_2pass_lmca(train_data, train_labels, test_data, test_labels);
 	
@@ -65,6 +67,7 @@ int main(void)
 	nv_test_klr_tree(train_data, train_labels);
 	
 	//nv_test_plsi();
+#endif	
 	nv_test_munkres();
 	
 	nv_matrix_free(&data);
