@@ -48,9 +48,6 @@
 /* Define to 1 if you have the `opencv_imgproc' library (-lopencv_imgproc). */
 #undef HAVE_LIBOPENCV_IMGPROC
 
-/* Define to 1 if you have the `rt' library (-lrt). */
-#undef HAVE_LIBRT
-
 /* Define to 1 if you have the `stdc++' library (-lstdc++). */
 #undef HAVE_LIBSTDC__
 

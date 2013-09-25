@@ -273,7 +273,8 @@ EXTRA_DIST = README.md autogen.sh ChangeLog COPYING m4 .gitignore
 SUBDIRS = src nv_cuda src/tests vcproj
 @BUILDING_DEB_TRUE@DEBSOURCEPKG = $(PACKAGE)_$(VERSION).orig.tar.gz
 @BUILDING_DEB_TRUE@DEBSOURCEDIR = $(PACKAGE)-$(VERSION)
-CLEANFILES = *.deb *.debian.tar.gz *.dsc *.changes *.build $(DEBSOURCEPKG) 
+@BUILDING_DEB_TRUE@DEBIANDIR = packages/debian
+CLEANFILES = *.deb *.debian.tar.gz *.dsc *.changes *.build *.upload $(DEBSOURCEPKG) 
 all: all-recursive
 
 .SUFFIXES:
@@ -773,7 +774,7 @@ valgrind:
 	cd src/tests; LD_LIBRARY_PATH=../.libs valgrind -v --tool=memcheck --leak-check=full --show-reachable=yes --run-libc-freeres=no --track-origins=yes --log-file=./valgrind.log ./.libs/nv_test ; cat valgrind.log; cd -
 @BUILDING_DEB_TRUE@deb: dist
 @BUILDING_DEB_TRUE@	@$(ECHO) "Building Debian package..."; \
-@BUILDING_DEB_TRUE@	if $(TEST) ! -d debian; then \
+@BUILDING_DEB_TRUE@	if $(TEST) ! -d $(DEBIANDIR); then \
 @BUILDING_DEB_TRUE@		$(ECHO) "The files needed for building a Debian package are not" \
 @BUILDING_DEB_TRUE@		"included by default in the distribution. To build a package, check" \
 @BUILDING_DEB_TRUE@		"out the project from source control."; \
@@ -782,7 +783,7 @@ valgrind:
 @BUILDING_DEB_TRUE@	$(MV) $(PACKAGE)-$(VERSION).tar.gz $(DEBSOURCEPKG) && \
 @BUILDING_DEB_TRUE@	$(TAR) --extract --gunzip --file $(DEBSOURCEPKG) && \
 @BUILDING_DEB_TRUE@	$(MKDIR_P) $(DEBSOURCEDIR)/debian && \
-@BUILDING_DEB_TRUE@	$(CP) -r debian/ $(DEBSOURCEDIR) && \
+@BUILDING_DEB_TRUE@	$(CP) -r $(DEBIANDIR) $(DEBSOURCEDIR) && \
 @BUILDING_DEB_TRUE@	cd $(DEBSOURCEDIR) && \
 @BUILDING_DEB_TRUE@	$(DEBUILD) $(DPKG_FLAGS); \
 @BUILDING_DEB_TRUE@	cd ..;

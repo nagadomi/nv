@@ -2,18 +2,18 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.65)
-AC_INIT([nv],[2.0.0],[nagadomi@nurs.or.jp])
+AC_INIT([nv],[2.1.0],[nagadomi@nurs.or.jp])
 NV_MAJOR=2
-NV_MINOR=0
+NV_MINOR=1
 AM_INIT_AUTOMAKE([foreign])
 AC_CONFIG_SRCDIR([src])
 AC_CONFIG_HEADER([src/config.h:src/config.h.in])
 AC_CONFIG_MACRO_DIR([m4])
 
-# clear CFLAGS
 AC_SUBST(CFLAGS)
 AC_SUBST(CXXFLAGS)
 AC_SUBST(CPPFLAGS)
+AC_SUBST(LDFLAGS)
 if test "" = "$CFLAGS"; then
     CFLAGS=" "
 fi
@@ -23,8 +23,13 @@ fi
 if test "" = "$CPPFLAGS"; then
     CPPFLAGS=" "
 fi
-CFLAGS=" $CFLAGS -DNV_DLL -DNV_INTERNAL -D__STDC_LIMIT_MACROS -D__STDC_FORMAT_MACROS "
+if test "" = "$LDFLAGS"; then
+    LDFLAGS=" "
+fi
 
+CFLAGS=" $CFLAGS -DNV_DLL -DNV_INTERNAL -D__STDC_LIMIT_MACROS -D__STDC_FORMAT_MACROS "
+CFLAGS=" $CFLAGS -D_FORTIFY_SOURCE=2 -fstack-protector --param=ssp-buffer-size=4 -Wformat -Werror=format-security "
+LDFLAGS=" $LDFLAGS -Wl,-z,relro"
 
 # Checks for programs.
 AC_PROG_CXX
@@ -58,7 +63,6 @@ AC_CHECK_HEADERS([float.h inttypes.h limits.h stdlib.h string.h sys/time.h unist
 # Checks for typedefs, structures, and compiler characteristics.
 
 AC_CHECK_LIB(m, main)
-AC_CHECK_LIB(rt, main)
 AC_CHECK_LIB(stdc++, main)
 
 nv_glibc_backtrace=0
@@ -72,8 +76,8 @@ AX_ARG_ENABLE(deb,
         AC_HELP_STRING([--enable-deb], [build debian package. ]), [no],
 	[nv_deb=1],
         [])
-AX_ARG_ENABLE(sdeb,
-        AC_HELP_STRING([--enable-sdeb], [build debian source package. ]), [no],
+AX_ARG_ENABLE(debsrc,
+        AC_HELP_STRING([--enable-debsrc], [build debian source package. ]), [no],
 	[nv_deb=1;DPKG_FLAGS=" $DPKG_FLAGS -S -sa "],
         [])
 AX_ARG_ENABLE(sign,

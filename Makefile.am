@@ -9,9 +9,10 @@ valgrind:
 if BUILDING_DEB
 DEBSOURCEPKG=$(PACKAGE)_$(VERSION).orig.tar.gz
 DEBSOURCEDIR=$(PACKAGE)-$(VERSION)
+DEBIANDIR=packages/debian
 deb: dist
 	@$(ECHO) "Building Debian package..."; \
-	if $(TEST) ! -d debian; then \
+	if $(TEST) ! -d $(DEBIANDIR); then \
 		$(ECHO) "The files needed for building a Debian package are not" \
 		"included by default in the distribution. To build a package, check" \
 		"out the project from source control."; \
@@ -20,7 +21,7 @@ deb: dist
 	$(MV) $(PACKAGE)-$(VERSION).tar.gz $(DEBSOURCEPKG) && \
 	$(TAR) --extract --gunzip --file $(DEBSOURCEPKG) && \
 	$(MKDIR_P) $(DEBSOURCEDIR)/debian && \
-	$(CP) -r debian/ $(DEBSOURCEDIR) && \
+	$(CP) -r $(DEBIANDIR) $(DEBSOURCEDIR) && \
 	cd $(DEBSOURCEDIR) && \
 	$(DEBUILD) $(DPKG_FLAGS); \
 	cd ..;
@@ -33,4 +34,4 @@ endif
 clean-local:
 	-rm -rf $(DEBSOURCEDIR)
 
-CLEANFILES = *.deb *.debian.tar.gz *.dsc *.changes *.build $(DEBSOURCEPKG) 
+CLEANFILES = *.deb *.debian.tar.gz *.dsc *.changes *.build *.upload $(DEBSOURCEPKG) 

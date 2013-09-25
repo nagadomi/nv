@@ -1,0 +1,30 @@
+Source: nv
+Priority: extra
+Maintainer: nagadomi <nagadomi@nurs.or.jp>
+Build-Depends: debhelper (>= 8.0.0), autotools-dev, libeiio-dev, libssl-dev
+Standards-Version: 3.9.3
+Section: libs
+Homepage: http://github.com/nagadomi/nv
+
+Package: libnv-dev
+Section: libdevel
+Architecture: any
+Depends: ${misc:Depends}, libnv2 (= ${binary:Version})
+Description: header files for libnv
+ The libnv is a library for numerical computing and computer vision.
+ This package contains the header files. 
+
+Package: libnv2
+Section: libs
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: numerical computing and computer vision library
+ The libnv is a library for numerical computing and computer vision.
+
+Package: nv-utils
+Section: utils
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, libnv2 (= ${binary:Version})
+Description: utility command for libnv
+ The libnv is a library for numerical computing and computer vision.
+ This package contains the utility commands. 
