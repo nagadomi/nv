@@ -29,7 +29,6 @@ fi
 
 CFLAGS=" $CFLAGS -DNV_DLL -DNV_INTERNAL -D__STDC_LIMIT_MACROS -D__STDC_FORMAT_MACROS "
 CFLAGS=" $CFLAGS -D_FORTIFY_SOURCE=2 -fstack-protector --param=ssp-buffer-size=4 -Wformat -Werror=format-security "
-LDFLAGS=" $LDFLAGS -Wl,-z,relro"
 
 # Checks for programs.
 AC_PROG_CXX
@@ -226,6 +225,9 @@ case $host in
   *-*-mingw* | *-*-cygwin*)
     CFLAGS="$CFLAGS -mstackrealign -mthreads "
     LDFLAGS="$LDFLAGS -Wl,-no-undefined -Wl,--export-all-symbols -Wl,--stack,10485760 "
+    ;;
+  *-linux*)
+    LDFLAGS=" $LDFLAGS -Wl,-z,relro "
     ;;
   *)
     ;;
