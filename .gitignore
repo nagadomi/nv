@@ -38,7 +38,8 @@ GTAGS
 
 *.log
 
-src/nv_core/nv_config_auto.h
+src/nv_config_auto.h
+src/config.h.in
 src/nv_dump_lr
 tmp/
 src/nv_flags
