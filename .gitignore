@@ -40,11 +40,17 @@ GTAGS
 
 src/nv_config_auto.h
 src/config.h.in
-src/nv_dump_lr
 tmp/
 src/nv_flags
+src/nv_flags.exe
+src/nv_dump_lr
+src/nv_dump_lr.exe
 src/nv_kmeans_tree_text2bin
+src/nv_kmeans_tree_text2bin.exe
 src/nv_matrix_text2bin
+src/nv_matrix_text2bin.exe
 src/tests/nv_test
+src/tests/nv_test.exe
 src/tests/test.mat
 src/tests/test.matb
+
