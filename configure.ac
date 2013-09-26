@@ -62,6 +62,7 @@ AC_CHECK_HEADERS([float.h inttypes.h limits.h stdlib.h string.h sys/time.h unist
 # Checks for typedefs, structures, and compiler characteristics.
 
 AC_CHECK_LIB(m, main)
+AC_CHECK_LIB(ssp, main)
 AC_CHECK_LIB(stdc++, main)
 
 nv_glibc_backtrace=0
