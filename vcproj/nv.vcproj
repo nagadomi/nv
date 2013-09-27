@@ -672,6 +672,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\src\nv_ml_pca_kmeans_tree.c"
+					>
+				</File>
+				<File
 					RelativePath="..\src\nv_ml_plsi.c"
 					>
 				</File>
@@ -1035,6 +1039,10 @@
 				</File>
 				<File
 					RelativePath="..\src\nv_ml_pa.h"
+					>
+				</File>
+				<File
+					RelativePath="..\src\nv_ml_pca_kmeans_tree.h"
 					>
 				</File>
 				<File

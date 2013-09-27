@@ -41,7 +41,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="0"
 				AdditionalIncludeDirectories="&quot;$(ProjectDir)..\src&quot;;&quot;$(ProjectDir)..\src\3rd_party\msinttypes&quot;;&quot;$(ProjectDir)..\src\3rd_party\sha1&quot;"
-				PreprocessorDefinitions="NV_TEST_IMG=\&quot;./data/lena.jpg\&quot;;NV_TEST_NEGA=\&quot;./data/lena-nega.jpg\&quot;;NV_TEST_IMG_ROTATE=\&quot;./data/lena-rotate.jpg\&quot;;NV_TEST_AFFINE=\&quot;./data/lena-affine.jpg\&quot;;NV_TEST_DATA=\&quot;./data/mnist_test_14x14.vec\&quot;;NV_TEST_LABEL=\&quot;./data/mnist_test_labels.vec\&quot;;NV_TEST_DATA_K=10"
+				PreprocessorDefinitions="NV_TEST_ML;NV_TEST_IMG=\&quot;./data/lena.jpg\&quot;;NV_TEST_NEGA=\&quot;./data/lena-nega.jpg\&quot;;NV_TEST_IMG_ROTATE=\&quot;./data/lena-rotate.jpg\&quot;;NV_TEST_AFFINE=\&quot;./data/lena-affine.jpg\&quot;;NV_TEST_DATA=\&quot;./data/mnist_test_14x14.vec\&quot;;NV_TEST_LABEL=\&quot;./data/mnist_test_labels.vec\&quot;;NV_TEST_DATA_K=10"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
@@ -115,7 +115,7 @@
 				Optimization="2"
 				EnableIntrinsicFunctions="true"
 				AdditionalIncludeDirectories="&quot;$(ProjectDir)..\src&quot;;&quot;$(ProjectDir)..\src\3rd_party\msinttypes&quot;;&quot;$(ProjectDir)..\src\3rd_party\sha1&quot;"
-				PreprocessorDefinitions="NV_TEST_IMG=\&quot;./data/lena.jpg\&quot;;NV_TEST_NEGA=\&quot;./data/lena-nega.jpg\&quot;;NV_TEST_IMG_ROTATE=\&quot;./data/lena-rotate.jpg\&quot;;NV_TEST_AFFINE=\&quot;./data/lena-affine.jpg\&quot;;NV_TEST_DATA=\&quot;./data/mnist_test_14x14.vec\&quot;;NV_TEST_LABEL=\&quot;./data/mnist_test_labels.vec\&quot;;NV_TEST_DATA_K=10"
+				PreprocessorDefinitions="NV_TEST_ML;NV_TEST_IMG=\&quot;./data/lena.jpg\&quot;;NV_TEST_NEGA=\&quot;./data/lena-nega.jpg\&quot;;NV_TEST_IMG_ROTATE=\&quot;./data/lena-rotate.jpg\&quot;;NV_TEST_AFFINE=\&quot;./data/lena-affine.jpg\&quot;;NV_TEST_DATA=\&quot;./data/mnist_test_14x14.vec\&quot;;NV_TEST_LABEL=\&quot;./data/mnist_test_labels.vec\&quot;;NV_TEST_DATA_K=10"
 				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="true"
 				EnableEnhancedInstructionSet="2"
@@ -259,6 +259,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\src\tests\nv_test_eigen.c"
+				>
+			</File>
+			<File
 				RelativePath="..\src\tests\nv_test_io.c"
 				>
 			</File>
@@ -324,6 +328,10 @@
 			</File>
 			<File
 				RelativePath="..\src\tests\nv_test_pa.c"
+				>
+			</File>
+			<File
+				RelativePath="..\src\tests\nv_test_pca_kmeans_tree.c"
 				>
 			</File>
 			<File

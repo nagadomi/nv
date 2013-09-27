@@ -70,7 +70,7 @@ nv_decode_dib
 nv_decode_image
 nv_deserialize_matrix
 nv_dilate
-nv_eigen_sym
+nv_eigen
 nv_enable_sse2_math
 nv_erode
 nv_euclidean
@@ -105,6 +105,7 @@ nv_imap_free
 nv_imap_insert
 nv_imap_keys
 nv_imap_remove
+nv_initialize
 nv_integral
 nv_integral_tilted
 nv_keypoint
@@ -132,8 +133,6 @@ nv_klr_tree_predict_vector
 nv_klr_tree_progress
 nv_klr_tree_train
 nv_klr_tree_train_at
-nv_lmca
-nv_lmca_projection
 nv_kmeans
 nv_kmeans_em
 nv_kmeans_init_pp
@@ -145,8 +144,9 @@ nv_kmeans_tree_free
 nv_kmeans_tree_inherit_train
 nv_kmeans_tree_label_vec
 nv_kmeans_tree_predict_label
-nv_kmeans_tree_predict_label_ex
 nv_kmeans_tree_predict_label_and_dist
+nv_kmeans_tree_predict_label_and_dist_ex
+nv_kmeans_tree_predict_label_ex
 nv_kmeans_tree_progress
 nv_kmeans_tree_train
 nv_kmeans_tree_train_at
@@ -162,6 +162,15 @@ nv_laplacian3
 nv_lbgu
 nv_lbgu_em
 nv_lbgu_progress
+nv_lmca
+nv_lmca_init_cov
+nv_lmca_init_diag1
+nv_lmca_init_pca
+nv_lmca_init_random_projection
+nv_lmca_progress
+nv_lmca_projection
+nv_lmca_train
+nv_lmca_train_ex
 nv_load_cov
 nv_load_cov_fp
 nv_load_image
@@ -171,6 +180,8 @@ nv_load_kmeans_tree_text
 nv_load_lr
 nv_load_lr_fp
 nv_load_matrix
+nv_load_matrix_array_bin
+nv_load_matrix_array_text
 nv_load_matrix_bin
 nv_load_matrix_bin_fp
 nv_load_matrix_fp
@@ -203,6 +214,7 @@ nv_matrix3d_alloc
 nv_matrix3d_list_alloc
 nv_matrix3d_print
 nv_matrix3d_tr
+nv_matrix_add
 nv_matrix_alias
 nv_matrix_alloc
 nv_matrix_clone
@@ -215,9 +227,9 @@ nv_matrix_free
 nv_matrix_list_alloc
 nv_matrix_list_get
 nv_matrix_m
+nv_matrix_muls
 nv_matrix_normalize_maxmin
 nv_matrix_print
-nv_vector_print
 nv_matrix_realloc
 nv_matrix_scale
 nv_matrix_sort
@@ -277,6 +289,18 @@ nv_pa_init
 nv_pa_predict_label
 nv_pa_progress
 nv_pa_train
+nv_pca_kmeans_tree_alloc
+nv_pca_kmeans_tree_dump_c
+nv_pca_kmeans_tree_free
+nv_pca_kmeans_tree_inherit_train
+nv_pca_kmeans_tree_label_vec
+nv_pca_kmeans_tree_predict_label
+nv_pca_kmeans_tree_predict_label_and_dist
+nv_pca_kmeans_tree_predict_label_and_dist_ex
+nv_pca_kmeans_tree_predict_label_ex
+nv_pca_kmeans_tree_progress
+nv_pca_kmeans_tree_train
+nv_pca_kmeans_tree_train_at
 nv_plsi
 nv_plsi_alloc
 nv_plsi_emstep
@@ -298,6 +322,8 @@ nv_save_kmeans_tree_text
 nv_save_lr
 nv_save_lr_fp
 nv_save_matrix
+nv_save_matrix_array_bin
+nv_save_matrix_array_text
 nv_save_matrix_bin
 nv_save_matrix_bin_fp
 nv_save_matrix_fp
@@ -378,6 +404,7 @@ nv_vector_not10
 nv_vector_nrand
 nv_vector_nrand_ex
 nv_vector_pows
+nv_vector_print
 nv_vector_rand
 nv_vector_shuffle
 nv_vector_shuffle_pair
@@ -392,8 +419,3 @@ nv_xmeans
 sha1_final
 sha1_init
 sha1_update
-nv_initialize
-nv_lmca
-nv_lmca_progress
-nv_lmca_train_ex
-nv_lmca_init_diag1
