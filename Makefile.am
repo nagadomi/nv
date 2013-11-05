@@ -5,6 +5,11 @@ SUBDIRS    = src nv_cuda src/tests vcproj
 valgrind:
 	cd src/tests; LD_LIBRARY_PATH=../.libs valgrind -v --tool=memcheck --leak-check=full --show-reachable=yes --run-libc-freeres=no --track-origins=yes --log-file=./valgrind.log ./.libs/nv_test ; cat valgrind.log; cd -
 
+nv_test:
+	cd src/tests; make nv_test
+
+check-human: all nv_test
+	cd src/tests; LD_LIBRARY_PATH=../.libs ./.libs/nv_test
 
 if BUILDING_DEB
 DEBSOURCEPKG=$(PACKAGE)_$(VERSION).orig.tar.gz
