@@ -2,9 +2,10 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.65)
-AC_INIT([nv],[2.1.0],[nagadomi@nurs.or.jp])
+AC_INIT([nv],[2.1.1],[nagadomi@nurs.or.jp])
 NV_MAJOR=2
 NV_MINOR=1
+NV_REVISION=1
 AM_INIT_AUTOMAKE([foreign])
 AC_CONFIG_SRCDIR([src])
 AC_CONFIG_HEADER([src/config.h:src/config.h.in])
@@ -252,6 +253,7 @@ AC_SUBST(nv_sleep)
 AC_SUBST(pkgconfigdir)
 AC_SUBST(NV_MAJOR)
 AC_SUBST(NV_MINOR)
+AC_SUBST(NV_REVISION)
 
 AC_CONFIG_FILES([
 src/nv.pc

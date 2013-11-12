@@ -17,7 +17,7 @@ libnv_la_CFLAGS = -Wall \
 
 libnv_la_CXXFLAGS = $(libnv_la_CFLAGS)
 libnv_la_CPPFLAGS = $(libnv_la_CFLAGS)
-libnv_la_LDFLAGS = -no-undefined -version-number @NV_MAJOR@:@NV_MINOR@:0 -rpath "$(libdir)"
+libnv_la_LDFLAGS = -no-undefined -version-number @NV_MAJOR@:@NV_MINOR@:@NV_REVISION@ -rpath "$(libdir)"
 
 libnv_la_SOURCES = \
 nv_portable.c \
@@ -93,10 +93,10 @@ nv_io_klr_tree.c \
 3rd_party/getopt/getopt.c \
 3rd_party/sse_mathfun/sse_mathfun.cpp
 
+nodist_include_HEADERS = nv_config_auto.h
 include_HEADERS = \
 nv_core_alloc.h \
 nv_config.h \
-nv_config_auto.h \
 nv_core_util.h \
 nv_core_atomic.h \
 nv_core.h \
