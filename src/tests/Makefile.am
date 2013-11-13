@@ -1,4 +1,4 @@
-EXTRA_DIST = data
+EXTRA_DIST = data/iris_data.vec data/iris_labels.vec data/lena-768x768.jpg data/lena-affine.jpg data/lena-nega.jpg data/lena-rotate.jpg data/lena.jpg data/mnist_test_0-5.vec data/mnist_test_0-5_labels.vec data/mnist_test_14x14.vec data/mnist_test_14x14.vec data/mnist_test_labels.vec
 
 check_PROGRAMS = nv_test
 nv_test_SOURCES = nv_test.c nv_test.h \
