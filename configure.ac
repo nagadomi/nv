@@ -71,9 +71,17 @@ AX_ARG_ENABLE(debug,
     [nv_strict=0
 	CFLAGS="$CFLAGS -DNDEBUG -O3 -funroll-loops -ffast-math -g "])
 
+nv_native=0
 AX_ARG_ENABLE(native,
         AS_HELP_STRING([--disable-native],[disable -march=native]), [yes],
-        [CFLAGS=" $CFLAGS -march=native "],
+        [nv_native=1
+	CFLAGS=" $CFLAGS -march=native "],
+        [])
+	
+nv_sse2=0	
+AX_ARG_ENABLE(sse2,
+        AS_HELP_STRING([--disable-sse2],[disable -msse2]), [yes],
+        [nv_sse2=1],
         [])
 
 AX_ARG_ENABLE(ml-test,
@@ -211,11 +219,22 @@ case $host in
   *)
     ;;
 esac
+case $host in
+  i?86-* | x86_64-*)
+    if test $nv_sse2 = 1 -a $nv_native != 1; then
+      echo "Note: set -msse2 flag. (--enable-sse2)"
+      CFLAGS=" $CFLAGS -msse -msse2 "
+    fi
+    ;;
+  *)
+    ;;
+esac
 
 CPPFLAGS="$CFLAGS"
 CXXFLAGS="$CFLAGS"
 CFLAGS="$CFLAGS "
-
+AC_SUBST(nv_native)
+AC_SUBST(nv_sse2)
 AC_SUBST(nv_avxemu)
 AC_SUBST(nv_strict)
 AC_SUBST(nv_glibc_backtrace)
