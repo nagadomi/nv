@@ -7,6 +7,3 @@ valgrind: all nv_test
 
 nv_test:
 	cd src/tests; make nv_test
-
-check-human: all nv_test
-	cd src/tests; LD_LIBRARY_PATH=../.libs ./.libs/nv_test

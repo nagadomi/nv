@@ -45,5 +45,8 @@ nv_test_LDADD = $(builddir)/../libnv.la
 #-DNV_TEST_LABEL=\"$(srcdir)/data/mnist_test_0-5_labels.vec\" \
 #
 
-TESTS = nv_test
+#TESTS = $(check_PROGRAMS) # does not work on automake >= 1.13
+check-local:
+	$(builddir)/nv_test$(EXEEXT)
+
 CLEANFILES = test.mat test.matb
