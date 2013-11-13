@@ -6,7 +6,7 @@ AC_INIT([nv],[2.1.1],[nagadomi@nurs.or.jp])
 NV_MAJOR=2
 NV_MINOR=1
 NV_REVISION=1
-AM_INIT_AUTOMAKE([foreign])
+AM_INIT_AUTOMAKE([foreign serial-tests])
 AC_CONFIG_SRCDIR([src])
 AC_CONFIG_HEADER([src/config.h:src/config.h.in])
 AC_CONFIG_MACRO_DIR([m4])
