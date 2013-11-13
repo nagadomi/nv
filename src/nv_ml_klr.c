@@ -185,10 +185,10 @@ nv_klr_train(nv_lr_t *lr,         // k
 	nv_klr_init(lr, count, labels, data,
 				NV_LR_PARAM(10,
 							param.grad_w,
-							param.reg_type, param.reg_w));
+							param.reg_type, param.reg_w, 1));
 	nv_klr_em(lr, count, labels, data, param, max_epoch);
 	nv_lr_train(lr, data, labels,
 				NV_LR_PARAM(20,
 							param.grad_w,
-							param.reg_type, param.reg_w));
+							param.reg_type, param.reg_w, 1));
 }

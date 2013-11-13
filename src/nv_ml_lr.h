@@ -43,6 +43,7 @@ typedef struct
 	nv_lr_regulaization_e reg_type;
 	float reg_w;
 	int max_epoch;
+	int auto_balance;
 } nv_lr_param_t;
 
 void nv_lr_progress(int onoff);
@@ -50,12 +51,13 @@ nv_lr_t *nv_lr_alloc(int n, int k);
 void nv_lr_free(nv_lr_t **lr);
 void nv_lr_init(nv_lr_t *lr, const nv_matrix_t *data);
 
-#define NV_LR_PARAM(max_epoch, grad_w, reg_type, reg_w) \
-	nv_lr_param_create((max_epoch), (grad_w), (reg_type), (reg_w))
+#define NV_LR_PARAM(max_epoch, grad_w, reg_type, reg_w, auto_balance)			\
+	nv_lr_param_create((max_epoch), (grad_w), (reg_type), (reg_w), (auto_balance))
 nv_lr_param_t nv_lr_param_create(int max_epoch,
 								 float grad_w,
 								 nv_lr_regulaization_e reg_type, 
-								 float reg_w);
+								 float reg_w,
+								 int auto_balance);
 void nv_lr_train(nv_lr_t *lr,
 				 const nv_matrix_t *data, const nv_matrix_t *label,
 				 nv_lr_param_t param);

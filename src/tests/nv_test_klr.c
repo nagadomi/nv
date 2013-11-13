@@ -35,7 +35,7 @@ void nv_test_klr(const nv_matrix_t *data, const nv_matrix_t *labels)
 	NV_TEST_NAME;
 
 	nv_klr_train(lr, count, cluster_labels, data,
-				 NV_LR_PARAM(2, 0.15f, NV_LR_REG_L2, 0.000001f), 50);
+				 NV_LR_PARAM(2, 0.15f, NV_LR_REG_L2, 0.000001f, 1), 50);
 	
 	purity = nv_purity(K, NV_TEST_DATA_K, cluster_labels, labels);
 	printf("purity: %f\n", purity);

@@ -43,7 +43,7 @@ static void nv_test_klr_tree_ex(const nv_matrix_t *data, const nv_matrix_t *labe
 	}
 	printf("\n");
 
-	nv_klr_tree_train(tree, data, NV_LR_PARAM(4, 0.1f, NV_LR_REG_L1, 0.0001f), 100);
+	nv_klr_tree_train(tree, data, NV_LR_PARAM(4, 0.1f, NV_LR_REG_L1, 0.0001f, 1), 100);
 	for (i = 0; i < data->m; ++i) {
 		NV_MAT_V(cluster_labels, i, 0) = (float)nv_klr_tree_predict_label(tree, data, i);
 	}
@@ -74,10 +74,10 @@ nv_test_klr_tree_inherit(const nv_matrix_t *data,const nv_matrix_t *labels,
 	printf("\n");
 
 	if (base == NULL) {
-		nv_klr_tree_train(tree, data, NV_LR_PARAM(4, 0.1f, NV_LR_REG_L1, 0.0001f), 100);
+		nv_klr_tree_train(tree, data, NV_LR_PARAM(4, 0.1f, NV_LR_REG_L1, 0.0001f, 1), 100);
 	} else {
 		nv_klr_tree_inherit_train(tree, base,
-								  data, NV_LR_PARAM(4, 0.1f, NV_LR_REG_L1, 0.0001f), 100);
+								  data, NV_LR_PARAM(4, 0.1f, NV_LR_REG_L1, 0.0001f, 1), 100);
 	}
 	for (i = 0; i < data->m; ++i) {
 		NV_MAT_V(cluster_labels, i, 0) = (float)nv_klr_tree_predict_label(tree, data, i);

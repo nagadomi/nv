@@ -60,14 +60,16 @@ nv_lr_param_t
 nv_lr_param_create(int max_epoch,
 				   float grad_w,
 				   nv_lr_regulaization_e reg_type, 
-				   float reg_w)
+				   float reg_w,
+				   int auto_balance
+	)
 {
 	nv_lr_param_t param;
 	param.max_epoch = max_epoch;
 	param.grad_w = grad_w;
 	param.reg_type = reg_type;
 	param.reg_w = reg_w;
-
+	param.auto_balance = auto_balance;
 	return param;
 }
 
@@ -158,25 +160,23 @@ nv_lr_train(nv_lr_t *lr,
 	
 	nv_matrix_zero(count);
 	nv_matrix_fill(label_weight, 1.0f);
-#if 1
-	/* クラスごとに数が違う場合に更新重みをスケーリングする */
-	/* TODO: これここでやるのをやめたいのでこれに頼っているところを直す */
-
-	for (m = 0; m < data->m; ++m) {
-		NV_MAT_V(count, 0, (int)NV_MAT_V(label, m, 0)) += 1.0f;
-	}
-	count_max_log = logf(3.0f + NV_MAT_V(count, 0, nv_vector_max_n(count, 0)));
-	for (n = 0; n < count->n; ++n) {
-		if (NV_MAT_V(count, 0, n) > 0.0f) {
-			float count_log = logf(3.0f + NV_MAT_V(count, 0, n));
-			NV_MAT_V(label_weight, 0, n) = 
-				powf(count_max_log, NV_LR_CLASS_COUNT_PENALTY_EXP) 
-				/ powf(count_log, NV_LR_CLASS_COUNT_PENALTY_EXP);
-		} else {
-			NV_MAT_V(label_weight, 0, n) = 1.0f;
+	if (param.auto_balance) {
+		/* クラスごとに数が違う場合に更新重みをスケーリングする */
+		for (m = 0; m < data->m; ++m) {
+			NV_MAT_V(count, 0, (int)NV_MAT_V(label, m, 0)) += 1.0f;
+		}
+		count_max_log = logf(3.0f + NV_MAT_V(count, 0, nv_vector_max_n(count, 0)));
+		for (n = 0; n < count->n; ++n) {
+			if (NV_MAT_V(count, 0, n) > 0.0f) {
+				float count_log = logf(3.0f + NV_MAT_V(count, 0, n));
+				NV_MAT_V(label_weight, 0, n) = 
+					powf(count_max_log, NV_LR_CLASS_COUNT_PENALTY_EXP) 
+					/ powf(count_log, NV_LR_CLASS_COUNT_PENALTY_EXP);
+			} else {
+				NV_MAT_V(label_weight, 0, n) = 1.0f;
+			}
 		}
 	}
-#endif
 	do {
 		we = 1.0f / er;
 		tm = nv_clock();

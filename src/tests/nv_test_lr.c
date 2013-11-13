@@ -43,7 +43,7 @@ nv_test_lr(const nv_matrix_t *train_data,
 	nv_lr_init(lr, train_data);
 	nv_lr_train(lr,
 				train_data, train_labels,
-				NV_LR_PARAM(100, 1.0f, NV_LR_REG_L2, 0.0001f));
+				NV_LR_PARAM(100, 1.0f, NV_LR_REG_L2, 0.0001f, 0));
 	ok = 0;
 	for (i = 0; i < test_data->m; ++i) {
 		if (nv_lr_predict_label(lr, test_data, i) == (int)NV_MAT_V(test_labels, i, 0)) {
