@@ -37,7 +37,6 @@ nv_test_CFLAGS= -Wall \
 -DNV_TEST_DATA_K=10
 
 nv_test_CXXFLAGS = $(nv_test_CFLAGS)
-nv_test_CPPFLAGS = $(nv_test_CFLAGS)
 nv_test_LDADD = $(builddir)/../libnv.la
 
 

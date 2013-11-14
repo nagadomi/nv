@@ -16,7 +16,6 @@ libnv_la_CFLAGS = -Wall \
 -I$(srcdir)/3rd_party/sha1 -I$(srcdir)/3rd_party/mt -I$(srcdir)/3rd_party/avxintrin_emu
 
 libnv_la_CXXFLAGS = $(libnv_la_CFLAGS)
-libnv_la_CPPFLAGS = $(libnv_la_CFLAGS)
 libnv_la_LDFLAGS = -no-undefined -version-number @NV_MAJOR@:@NV_MINOR@:@NV_REVISION@ -rpath "$(libdir)"
 
 libnv_la_SOURCES = \
@@ -176,27 +175,23 @@ bin_PROGRAMS = nv_dump_lr nv_flags nv_matrix_text2bin nv_kmeans_tree_text2bin
 
 nv_dump_lr_CFLAGS = $(libnv_la_CFLAGS)
 nv_dump_lr_CXXFLAGS = $(libnv_la_CXXFLAGS)
-nv_dump_lr_CPPFLAGS = $(libnv_la_CPPFLAGS)
 nv_dump_lr_LDFLAGS = 
 nv_dump_lr_LDADD = libnv.la
 nv_dump_lr_SOURCES = util/nv_dump_lr.c
 
 nv_matrix_text2bin_CFLAGS = $(libnv_la_CFLAGS)
 nv_matrix_text2bin_CXXFLAGS = $(libnv_la_CXXFLAGS)
-nv_matrix_text2bin_CPPFLAGS = $(libnv_la_CPPFLAGS)
 nv_matrix_text2bin_LDFLAGS = 
 nv_matrix_text2bin_LDADD = libnv.la
 nv_matrix_text2bin_SOURCES = util/nv_matrix_text2bin.c
 
 nv_kmeans_tree_text2bin_CFLAGS = $(libnv_la_CFLAGS)
 nv_kmeans_tree_text2bin_CXXFLAGS = $(libnv_la_CXXFLAGS)
-nv_kmeans_tree_text2bin_CPPFLAGS = $(libnv_la_CPPFLAGS)
 nv_kmeans_tree_text2bin_LDFLAGS = 
 nv_kmeans_tree_text2bin_LDADD = libnv.la
 nv_kmeans_tree_text2bin_SOURCES = util/nv_kmeans_tree_text2bin.c
 
 nv_flags_CFLAGS = $(libnv_la_CFLAGS)
-nv_flags_CPPFLAGS = $(libnv_la_CPPFLAGS)
 nv_flags_LDADD = libnv.la
 nv_flags_SOURCES = util/nv_flags.c 
 
