@@ -61,7 +61,8 @@ nv_matrix_list_alloc32(int n, int m, int list)
 	int step_n;
 	size_t mem_size;
 	nv_matrix_t *matrix;
-
+	void *p;
+	
 	NV_ASSERT(n != 0 && m != 0);
 	if (n > 4 && n % 8 != 0) {	
 		// SSE ALIGN
@@ -73,9 +74,11 @@ nv_matrix_list_alloc32(int n, int m, int list)
 
 	matrix = nv_alloc_type(nv_matrix_t, 1);
 	mem_size = ((size_t)step * m) * list;
-	if (nv_aligned_malloc((void **)&matrix->v, 0x20, mem_size) != 0) {
+	if (nv_aligned_malloc(&p, 0x20, mem_size) != 0) {
+		matrix->v = NULL;
 		return NULL;
 	}
+	matrix->v = (float *)p;
 	matrix->n = n;
 	matrix->m = m;
 	matrix->step = step_n;

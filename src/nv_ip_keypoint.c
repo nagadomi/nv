@@ -165,7 +165,8 @@ static int
 nv_keypoint_memo_free(int key, void *data)
 {
 	if (data != NULL) {
-		nv_matrix_free((nv_matrix_t **)&data);
+		nv_matrix_t *p = (nv_matrix_t *)data;
+		nv_matrix_free(&p);
 	}
 	return 0;
 }
