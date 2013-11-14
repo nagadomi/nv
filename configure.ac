@@ -220,7 +220,7 @@ case $host in
     ;;
 esac
 case $host in
-  i?86-* | x86_64-*)
+  i?86-*)
     if test $nv_sse2 = 1 -a $nv_native != 1; then
       echo "Note: set -msse2 flag. (--enable-sse2)"
       CFLAGS=" $CFLAGS -msse -msse2 "
