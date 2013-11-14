@@ -230,9 +230,8 @@ case $host in
     ;;
 esac
 
-CPPFLAGS="$CFLAGS"
-CXXFLAGS="$CFLAGS"
-CFLAGS="$CFLAGS "
+CXXFLAGS=$CFLAGS
+
 AC_SUBST(nv_native)
 AC_SUBST(nv_sse2)
 AC_SUBST(nv_avxemu)
