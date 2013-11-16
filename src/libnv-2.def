@@ -136,6 +136,7 @@ nv_klr_tree_train_at
 nv_kmeans
 nv_kmeans_em
 nv_kmeans_init_pp
+nv_kmeans_init_dist
 nv_kmeans_init_rand
 nv_kmeans_progress
 nv_kmeans_tree_alloc

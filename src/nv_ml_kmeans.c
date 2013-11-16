@@ -39,12 +39,10 @@ nv_kmeans_init_pp(nv_matrix_t *means, int k,
 	nv_matrix_t *min_dists = nv_matrix_alloc(1, data->m);
 	int m, c;
 	float pot;
-	int first_idx;
 	int threads = nv_omp_procs();
 
 	/* 1つ目 */
-	first_idx = NV_ROUND_INT((data->m - 1) * nv_rand());
-	nv_vector_copy(means, 0, data, first_idx);
+	nv_vector_copy(means, 0, data, nv_rand_index(data->m));
 
 	pot = 0.0f;
 	if (data->n == 3) {
@@ -158,6 +156,56 @@ nv_kmeans_init_pp(nv_matrix_t *means, int k,
 	}
 
 	nv_matrix_free(&min_dists);
+}
+
+/* 選択済みクラスから一番距離が遠いクラスを選ぶ初期値選択 */
+void 
+nv_kmeans_init_dist(nv_matrix_t *means, int k,
+					const nv_matrix_t *data)
+{
+	nv_matrix_t *dists = nv_matrix_alloc(data->m, k);	
+	int i, j;
+	int threads = nv_omp_procs();
+
+	if (data->m == 0) {
+		nv_matrix_free(&dists);
+		return;
+	}
+	nv_vector_copy(means, 0, data, nv_rand_index(data->m));
+	j = 0;
+#ifdef _OPENMP
+#pragma omp parallel for num_threads(threads)
+#endif
+	for (i = 0; i < data->m; ++i) {
+		NV_MAT_V(dists, j, i) = nv_euclidean2(means, j, data, i);
+	}
+	
+	for (j = 0; j < k - 1; ++j) {
+		float max_v = -FLT_MAX;
+		int max_i = -1;
+
+#ifdef _OPENMP
+#pragma omp parallel for num_threads(threads)
+#endif
+		for (i = 0; i < data->m; ++i) {
+			NV_MAT_V(dists, j, i) = nv_euclidean2(means, j, data, i);
+		}
+		for (i = 0; i < data->m; ++i) {
+			float min_dist = FLT_MAX;
+			int l;
+			for (l = 0; l <= j; ++l) {
+				if (min_dist > NV_MAT_V(dists, l, i)) {
+					min_dist = NV_MAT_V(dists, l, i);
+				}
+			}
+			if (min_dist > max_v) {
+				max_v = min_dist;
+				max_i = i;
+			}
+		}
+		nv_vector_copy(means, j + 1, data, max_i);
+	}
+	nv_matrix_free(&dists);
 }
 
 void
@@ -350,8 +398,10 @@ nv_kmeans(nv_matrix_t *means,  // k
 {
 	int ret;
 	long t = nv_clock();
+	
 	/* 初期値選択 */
 	nv_kmeans_init_pp(means, k, data, -1);
+	
 	if (nv_kmeans_progress_flag) {
 		printf("nv_kmeans: init, %ldms\n", nv_clock() - t);
 		fflush(stdout);

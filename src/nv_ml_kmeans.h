@@ -35,12 +35,14 @@ int nv_kmeans(nv_matrix_t *means,  /* k */
 			  const int k,
 			  const int max_epoch);
 
-void 
-nv_kmeans_init_pp(nv_matrix_t *means, int k,
+void nv_kmeans_init_pp(nv_matrix_t *means, int k,
 				  const nv_matrix_t *data, int tries);
 
-void 
-nv_kmeans_init_rand(nv_matrix_t *means, int k, const nv_matrix_t *data);
+void nv_kmeans_init_rand(nv_matrix_t *means, int k,
+						 const nv_matrix_t *data);
+
+void nv_kmeans_init_dist(nv_matrix_t *means, int k,
+						 const nv_matrix_t *data);
 
 int nv_kmeans_em(nv_matrix_t *means,  /* k */
 				 nv_matrix_t *count,  /* k */
