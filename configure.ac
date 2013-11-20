@@ -1,7 +1,7 @@
 #                                               -*- Autoconf -*-
 # Process this file with autoconf to produce a configure script.
 
-AC_PREREQ(2.65)
+AC_PREREQ(2.61)
 AC_INIT([nv],[2.1.1],[nagadomi@nurs.or.jp])
 NV_MAJOR=2
 NV_MINOR=1
