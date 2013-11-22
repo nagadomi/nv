@@ -26,6 +26,9 @@ extern "C" {
 #include <math.h>
 
 #define NV_PI        3.141593f     /** 円周率 */
+#define NV_PI_DIV2   1.570796f     /* NV_PI / 2.0 */
+#define NV_PI2_INV   1.591549E-01f /* 1.0f / (NV_PI * 2.0f) */
+
 #define NV_SQRT2     1.414214f     /** √2   */
 #define NV_SQRT2_INV 7.071068E-01f /** 1/√2 */
 

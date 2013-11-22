@@ -30,8 +30,6 @@
 #define NV_KEYPOINT_STAR_R(r) NV_ROUND_INT(r / 6.0f)
 
 #define NV_KEYPOINT_NOSET (FLT_MAX)
-#define NV_PI2_INV (1.0f / (NV_PI * 2.0f))
-
 #define NV_KEYPOINT_MIN_POINT_R  6       /* 検出される最小の半径(だった値...) */
 #define NV_KEYPOINT_SCALE_FACTOR 1.090508f/* 2^(1/8) 8ステップして2倍になる */
 #define NV_KEYPOINT_DESC_SCALE   2.0f     /* 記述子を計算する際の半径のスケール。
@@ -502,6 +500,37 @@ nv_keypoint_select(const nv_keypoint_ctx_t *ctx,
 	nv_matrix_free(&circle_x);
 	nv_free(nkeypoint_work);
 }
+// Cecil H. Hastings approximation atan2
+NV_INLINE float approximation_atan2f(float y, float x)
+{
+	float z;
+	if (x == 0.0f) {
+		if (y > 0.0f) {
+			return NV_PI;
+		}
+		if (y == 0.0f) {
+			return 0.0f;
+		}
+		return -NV_PI_DIV2;
+	}
+	z = y / x;
+	if (fabsf(z) < 1.0f) {
+		float theta = z / (1.0f + 0.28f * z * z);
+		if (x < 0.0f) {
+			if (y < 0.0f) {
+				return theta - NV_PI;
+			}
+			return theta + NV_PI;
+		}
+		return theta;
+	} else {
+		float theta = NV_PI_DIV2 - z / (0.28f + z * z);
+		if (y < 0.0f) {
+			return theta - NV_PI;
+		}
+		return theta;
+	}
+}
 
 static void
 nv_keypoint_hist(const nv_keypoint_ctx_t *ctx,
@@ -594,7 +623,7 @@ nv_keypoint_hist(const nv_keypoint_ctx_t *ctx,
 			NV_ASSERT(NV_MAT_V(memo, y + star_tilted_r, x - star_tilted_r) != NV_KEYPOINT_NOSET);
 			NV_ASSERT(NV_MAT_V(memo, y - star_tilted_r, x + star_tilted_r) != NV_KEYPOINT_NOSET);
 			
-#if NV_ENABLE_SSE /* あまり速くできないのでいらないかも */
+#if 0//NV_ENABLE_SSE /* あまり速くできないのでいらないかも */
 			{
 				__m128 a, b;
 				a = _mm_set_ps(
@@ -642,8 +671,8 @@ nv_keypoint_hist(const nv_keypoint_ctx_t *ctx,
 			magnitude[0] = sqrtf(d[0] * d[0] + d[2] * d[2]);
 			magnitude[1] = sqrtf(d[1] * d[1] + d[3] * d[3]);
 			
-			theta[0] = atan2f(d[2], d[0]) + pi_angle;
-			theta[1] = atan2f(d[3], d[1]) + pi_angle;
+			theta[0] = approximation_atan2f(d[2], d[0]) + pi_angle;
+			theta[1] = approximation_atan2f(d[3], d[1]) + pi_angle;
 			
 			if (theta[0] < 0.0f) {
 				theta[0] = NV_PI * 2.0f + theta[0];
