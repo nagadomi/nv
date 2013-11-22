@@ -180,7 +180,7 @@ nv_arow_train(nv_arow_t *arow,
 	} else {
 		int k;
 #ifdef _OPENMP
-#pragma omp	parallel for num_threads(nv_omp_procs())
+#pragma omp	parallel for
 #endif
 		for (k = 0; k < arow->k; ++k) {
 			nv_arow_train_at(arow, data, labels, k, r, max_epoch);

@@ -114,7 +114,7 @@ nv_pa_train(nv_pa_t *pa,
 	} else {
 		int k;
 #ifdef _OPENMP
-#pragma omp	parallel for num_threads(nv_omp_procs()) schedule(dynamic, 1)
+#pragma omp	parallel for schedule(dynamic, 1)
 #endif
 		for (k = 0; k < pa->k; ++k) {
 			nv_pa_train_at(pa, data, labels, k, c, max_epoch);

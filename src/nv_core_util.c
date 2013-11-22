@@ -95,6 +95,9 @@ nv_omp_set_procs(int n)
 {
 	if (n >= 0) {
 		g_omp_procs = n;
+#ifdef _OPENMP		
+		omp_set_num_threads(g_omp_procs);
+#endif		
 	}
 }
 
@@ -131,7 +134,7 @@ nv_omp_procs(void)
 				procs = omp_get_num_procs();
 			}
 		}
-		g_omp_procs = procs;
+		nv_omp_set_procs(procs);
 		
 		return g_omp_procs;
 	}
