@@ -65,7 +65,7 @@ nv_ip_gaussian.c \
 nv_ip_gray.c \
 nv_ip_integral.c \
 nv_ip_star_integral.c \
-nv_ip_keypoint.c \
+nv_ip_keypoint.cpp \
 nv_ip_laplacian.c \
 nv_ip_resize.c \
 nv_ip_star_integral_static.c \

@@ -25,8 +25,6 @@
 #include "nv_ml.h"
 #include <limits.h>
 
-#define BENCHMARK         0
-
 #define NV_KEYPOINT_STAR_R(r) NV_ROUND_INT(r / 6.0f)
 
 #define NV_KEYPOINT_NOSET (FLT_MAX)
@@ -129,9 +127,9 @@ nv_keypoint_ctx_free(nv_keypoint_ctx_t **ctx)
 	}
 }
 
-static NV_INLINE int
+static inline int
 nv_keypoint_edge(const nv_keypoint_ctx_t *ctx,
-				 nv_matrix_t *img, int offset, int ky, int kx)
+				 const nv_matrix_t *img, int offset, int ky, int kx)
 {
 	const int sy = ky - offset;
 	const int ey = ky + offset + 1;
@@ -169,7 +167,7 @@ nv_keypoint_memo_free(int key, void *data)
 	return 0;
 }
 
-static NV_INLINE float 
+static inline float 
 nv_keypoint_scale_diff(const nv_matrix_t *img_integral, 
 					   const nv_matrix_t *img_integral_tilted,
 					   int y, int x,
@@ -400,7 +398,7 @@ nv_keypoint_select(const nv_keypoint_ctx_t *ctx,
 
 			for (s = 1; s < el; ++s) {
 				int key = NV_MAT_VI(outer_r, 0, s);
-				nv_matrix_t *memobuf = nv_imap_find(memo, key);
+				nv_matrix_t *memobuf = (nv_matrix_t *)nv_imap_find(memo, key);
 				int nn, sy, sx, ey, ex;
 				float response = NV_MAT3D_V(grid_response, s, row_idx, col_idx);
 
@@ -500,22 +498,23 @@ nv_keypoint_select(const nv_keypoint_ctx_t *ctx,
 	nv_matrix_free(&circle_x);
 	nv_free(nkeypoint_work);
 }
-// Cecil H. Hastings approximation atan2
-NV_INLINE float approximation_atan2f(float y, float x)
+
+// based on Cecil H. Hastings approximation atan2
+static inline float
+approximation_atan2f(float y, float x)
 {
-	float z;
 	if (x == 0.0f) {
 		if (y > 0.0f) {
 			return NV_PI;
-		}
-		if (y == 0.0f) {
+		} else if (y == 0.0f) {
 			return 0.0f;
 		}
 		return -NV_PI_DIV2;
 	}
-	z = y / x;
-	if (fabsf(z) < 1.0f) {
-		float theta = z / (1.0f + 0.28f * z * z);
+	const float z = y / x;
+	const float z2 = z * z;
+	if (z2 < 1.0f) {
+		float theta = z / (1.0f + 0.28f * z2);
 		if (x < 0.0f) {
 			if (y < 0.0f) {
 				return theta - NV_PI;
@@ -524,7 +523,7 @@ NV_INLINE float approximation_atan2f(float y, float x)
 		}
 		return theta;
 	} else {
-		float theta = NV_PI_DIV2 - z / (0.28f + z * z);
+		float theta = NV_PI_DIV2 - z / (0.28f + z2);
 		if (y < 0.0f) {
 			return theta - NV_PI;
 		}
@@ -532,6 +531,7 @@ NV_INLINE float approximation_atan2f(float y, float x)
 	}
 }
 
+template<int HIST_N>
 static void
 nv_keypoint_hist(const nv_keypoint_ctx_t *ctx,
 				 nv_matrix_t *hist, int hist_m, 
@@ -544,21 +544,18 @@ nv_keypoint_hist(const nv_keypoint_ctx_t *ctx,
 	const int r = NV_ROUND_INT(f_r);
 	const int star_r = NV_KEYPOINT_STAR_R(f_r);
 	const int star_tilted_r = NV_ROUND_INT((float)star_r * NV_SQRT2_INV);
-	const int n = NV_KEYPOINT_HIST_SAMPLE;
-	const int n_div2 = n / 2;
 	const int sy = (ky - r) + star_r * 2;
 	const int ey = (ky + r) - star_r * 2;
 	const int sx = (kx - r) + star_r * 2;
 	const int ex = (kx + r) - star_r * 2;
-	const float step_scale = (ex - sx) / (float)n;
+	const float step_scale = (ex - sx) / (float)NV_KEYPOINT_HIST_SAMPLE;
 	const float r2 = (float)((ex - sx) / 2) * ((ex - sx) / 2);
 	int i, yi;
-	const int angle45 = NV_ROUND_INT((float)hist->n / 360.0f * 45.0f);
 	const float pi_angle = NV_PI - angle;
-	int *xx = nv_alloc_type(int, n);
-	float *fdist_x = nv_alloc_type(float, n);
+	int *xx = nv_alloc_type(int, NV_KEYPOINT_HIST_SAMPLE);
+	float *fdist_x = nv_alloc_type(float, NV_KEYPOINT_HIST_SAMPLE);
 	const nv_matrix_t *gauss_w = ctx->gauss_w;
-
+	
 	NV_ASSERT(ky + f_r < img_integral->rows-1);
 	NV_ASSERT(kx + f_r < img_integral->cols-1);
 	NV_ASSERT(ky - f_r >= 0);
@@ -570,7 +567,7 @@ nv_keypoint_hist(const nv_keypoint_ctx_t *ctx,
 	NV_ASSERT(ey < img_integral->rows -1);
 	NV_ASSERT(ex < img_integral->cols - 1);
 	
-	for (i = 0; i < n; ++i) {
+	for (i = 0; i < NV_KEYPOINT_HIST_SAMPLE; ++i) {
 		xx[i] = NV_ROUND_INT(((float)sx + step_scale * i));
 		fdist_x[i] = ((float)kx - xx[i]) * ((float)kx - xx[i]);
 		if (xx[i] > ex) {
@@ -580,36 +577,36 @@ nv_keypoint_hist(const nv_keypoint_ctx_t *ctx,
 	nv_vector_zero(hist, hist_m);
 
 	/* 特徴点のr近傍から勾配ヒストグラムを作成する. */
-	for (yi = 0; yi < n; ++yi) {
+	for (yi = 0; yi < NV_KEYPOINT_HIST_SAMPLE; ++yi) {
 		const float yp = ((float)sy + step_scale * yi);
 		int y = NV_ROUND_INT(yp);
 		const float yd = ((float)ky - y) * ((float)ky - y);
 		int xi;
+		const float *pn0 = &NV_MAT_V(memo, y, 0);
+		const float *pn1 = &NV_MAT_V(memo, y - star_r, 0);
+		const float *pn2 = &NV_MAT_V(memo, y + star_r, 0);
+		const float *pt1 = &NV_MAT_V(memo, y - star_tilted_r, 0);
+		const float *pt2 = &NV_MAT_V(memo, y + star_tilted_r, 0);
 
 		if (y >= ey) {
 			y = ey - 1;
 		}
-		for (xi = 0; xi < n; ++xi) {
-			int dist, x = xx[xi];
-			float fdist;
-			NV_ALIGNED(float, magnitude[4], 16);
-			NV_ALIGNED(float, d[4], 16);
-			NV_ALIGNED(float, theta[2], 16);
-			int bin[2];
-			
-			if (x == 0) {
-				break;
-			}
-			fdist = yd + fdist_x[xi];
+		for (xi = 0; xi < NV_KEYPOINT_HIST_SAMPLE; ++xi) {
+			float fdist = yd + fdist_x[xi];
 			if (fdist > r2) {
-				if (xi > n_div2) {
+				if (xi > NV_KEYPOINT_HIST_SAMPLE / 2) {
 					break;
 				} else {
 					continue;
 				}
 			}
-			dist = NV_ROUND_INT(sqrtf(fdist));
-
+			const int x = xx[xi];
+			NV_ALIGNED(float, magnitude[2], 32);
+			NV_ALIGNED(float, d[2], 32);
+			NV_ALIGNED(float, theta[2], 32);
+			int bin[2];
+			int dist = NV_ROUND_INT(sqrtf(fdist));
+			
 			/* (x, y)を中心とした■◆を重ねた8つの頂点から勾配の方向と強さを求める.
 			 * イラストなどは局所的な変化が激しいので8点から勾配を求め平均する.
 			 */
@@ -622,57 +619,17 @@ nv_keypoint_hist(const nv_keypoint_ctx_t *ctx,
 			NV_ASSERT(NV_MAT_V(memo, y - star_tilted_r, x - star_tilted_r) != NV_KEYPOINT_NOSET);
 			NV_ASSERT(NV_MAT_V(memo, y + star_tilted_r, x - star_tilted_r) != NV_KEYPOINT_NOSET);
 			NV_ASSERT(NV_MAT_V(memo, y - star_tilted_r, x + star_tilted_r) != NV_KEYPOINT_NOSET);
+
+			d[0] = pn0[x + star_r] - pn0[x - star_r];
+			d[1] = pn2[x] - pn1[x];
+			d[2] = pt2[x + star_tilted_r] - pt1[x - star_tilted_r];
+			d[3] = pt2[x - star_tilted_r] - pt1[x + star_tilted_r];
 			
-#if 0//NV_ENABLE_SSE /* あまり速くできないのでいらないかも */
-			{
-				__m128 a, b;
-				a = _mm_set_ps(
-					NV_MAT_V(memo, y + star_tilted_r, x - star_tilted_r),
-					NV_MAT_V(memo, y + star_r, x),
-					NV_MAT_V(memo, y + star_tilted_r, x + star_tilted_r),
-					NV_MAT_V(memo, y, x + star_r)
-					);
-				b = _mm_set_ps(
-					NV_MAT_V(memo, y - star_tilted_r, x + star_tilted_r),
-					NV_MAT_V(memo, y - star_r, x),
-					NV_MAT_V(memo, y - star_tilted_r, x - star_tilted_r),
-					NV_MAT_V(memo, y, x - star_r)
-					);
-				a = _mm_sub_ps(a, b);
-				b = _mm_mul_ps(a, a);
-				_mm_store_ps(magnitude, _mm_sqrt_ps(_mm_add_ps(b, _mm_movehl_ps(b, b))));
-				_mm_store_ps(d, a);
-				
-				theta[0] = atan2f(d[2], d[0]) + pi_angle;
-				if (theta[0] < 0.0f) {
-					theta[0] = NV_PI * 2.0f + theta[0];
-				}
-				theta[1] = atan2f(d[3], d[1]) + pi_angle;
-				if (theta[1] < 0.0f) {
-					theta[1] = NV_PI * 2.0f + theta[1];
-				}
-				bin[0] = NV_ROUND_INT(hist->n * theta[0] * NV_PI2_INV);
-				if (bin[0] >= hist->n) {
-					bin[0] = bin[0] - hist->n;
-				}
-				bin[1] = NV_ROUND_INT(hist->n * theta[1] * NV_PI2_INV) + angle45;
-				if (bin[1] >= hist->n) {
-					bin[1] = bin[1] - hist->n;
-				}
-			}
-#else
-			d[0] = NV_MAT_V(memo, y, x + star_r) - NV_MAT_V(memo, y, x - star_r);
-			d[1] = NV_MAT_V(memo, y + star_tilted_r, x + star_tilted_r) -
-				NV_MAT_V(memo, y - star_tilted_r, x - star_tilted_r);
-			d[2] = NV_MAT_V(memo, y + star_r, x) - NV_MAT_V(memo, y - star_r, x);
-			d[3] = NV_MAT_V(memo, y + star_tilted_r, x - star_tilted_r) -
-				NV_MAT_V(memo, y - star_tilted_r, x + star_tilted_r);
+			magnitude[0] = sqrtf(d[0] * d[0] + d[1] * d[1]);
+			magnitude[1] = sqrtf(d[2] * d[2] + d[3] * d[3]);
 			
-			magnitude[0] = sqrtf(d[0] * d[0] + d[2] * d[2]);
-			magnitude[1] = sqrtf(d[1] * d[1] + d[3] * d[3]);
-			
-			theta[0] = approximation_atan2f(d[2], d[0]) + pi_angle;
-			theta[1] = approximation_atan2f(d[3], d[1]) + pi_angle;
+			theta[0] = approximation_atan2f(d[1], d[0]) + pi_angle;
+			theta[1] = approximation_atan2f(d[3], d[2]) + pi_angle;
 			
 			if (theta[0] < 0.0f) {
 				theta[0] = NV_PI * 2.0f + theta[0];
@@ -681,19 +638,18 @@ nv_keypoint_hist(const nv_keypoint_ctx_t *ctx,
 				theta[1] = NV_PI * 2.0f + theta[1];
 			}
 			
-			bin[0] = NV_ROUND_INT(hist->n * theta[0] * NV_PI2_INV);
-			bin[1] = NV_ROUND_INT(hist->n * theta[1] * NV_PI2_INV) + angle45;
+			bin[0] = NV_ROUND_INT(HIST_N * NV_PI2_INV * theta[0]);
+			bin[1] = NV_ROUND_INT(HIST_N * NV_PI2_INV * theta[1]) + (HIST_N * 45 / 360);
 			
-			if (bin[0] >= hist->n) {
-				bin[0] = bin[0] - hist->n;
+			if (bin[0] >= HIST_N) {
+				bin[0] = bin[0] - HIST_N;
 			}
-			NV_ASSERT(bin[0] < hist->n);
+			NV_ASSERT(bin[0] < HIST_N);
 			
-			if (bin[1] >= hist->n) {
-				bin[1] = bin[1] - hist->n;
+			if (bin[1] >= HIST_N) {
+				bin[1] = bin[1] - HIST_N;
 			}
-#endif
-			NV_ASSERT(bin[1] < hist->n);
+			NV_ASSERT(bin[1] < HIST_N);
 			
 			NV_MAT_V(hist, hist_m, bin[0]) += magnitude[0] * NV_MAT_V(gauss_w, r, dist);
 			NV_MAT_V(hist, hist_m, bin[1]) += magnitude[1] * NV_MAT_V(gauss_w, r, dist);
@@ -790,7 +746,7 @@ nv_keypoint_orientation(const nv_keypoint_ctx_t *ctx,
 		NV_ASSERT(memobuf != NULL);
 
 		/* 勾配ヒストグラムのTOPを記述子の正規化方向とする. */
-		nv_keypoint_hist(ctx,
+		nv_keypoint_hist<NV_KEYPOINT_ORIENTATION_HIST>(ctx,
 						 hist, thread_idx, 
 						 NV_ROUND_INT(NV_MAT_V(keypoints, i, NV_KEYPOINT_Y_IDX)),
 						 NV_ROUND_INT(NV_MAT_V(keypoints, i, NV_KEYPOINT_X_IDX)),
@@ -890,7 +846,7 @@ nv_keypoint_gradient_histogram(const nv_keypoint_ctx_t *ctx,
 							   const nv_matrix_t *  integral_tilted,
 							   nv_matrix_t *  memo)
 {
-	NV_ALIGNED(static const float, circle_steps[8], 16) = {
+	NV_ALIGNED(static const float, circle_steps[8], 32) = {
 		0.0f,
 		NV_PI / 4.0f * 1.0f, NV_PI / 4.0f * 2.0f,
 		NV_PI / 4.0f * 3.0f, NV_PI / 4.0f * 4.0f,
@@ -937,7 +893,7 @@ nv_keypoint_gradient_histogram(const nv_keypoint_ctx_t *ctx,
 		if (theta > 2.0f * NV_PI) {
 			theta = (theta - 2.0f * NV_PI);
 		}
-		nv_keypoint_hist(
+		nv_keypoint_hist<8>(
 			ctx,
 			hist, 0, 
 			NV_ROUND_INT(desc_r * sinf(theta) + y),
@@ -951,7 +907,7 @@ nv_keypoint_gradient_histogram(const nv_keypoint_ctx_t *ctx,
 			   sizeof(float) * hist->n);
 	}
 	/* 中心 */
-	nv_keypoint_hist(
+	nv_keypoint_hist<8>(
 		ctx,
 		hist, 0, 
 		y, x, desc_r, angle,
@@ -1031,7 +987,7 @@ nv_keypoint_rectangle_feature(nv_matrix_t *  desc,
 							  const nv_matrix_t *  integral,
 							  const nv_matrix_t *  integral_tilted)
 {
-	NV_ALIGNED(static const float, circle_steps[8], 16) = {
+	NV_ALIGNED(static const float, circle_steps[8], 32) = {
 		0.0f,
 		NV_PI / 4.0f * 1.0f, NV_PI / 4.0f * 2.0f,
 		NV_PI / 4.0f * 3.0f, NV_PI / 4.0f * 4.0f,
@@ -1109,12 +1065,12 @@ nv_keypoint_detect(const nv_keypoint_ctx_t *ctx,
 	NV_ASSERT(keypoints->n >= NV_KEYPOINT_KEYPOINT_N);
 	
 	nv_matrix_zero(grid_response);
-	
+
 	/* 画素ごとに特徴点（候補）のスケールを探索する. */
 	nv_keypoint_scale_search(
 		ctx, grid_response,
 		integral, integral_tilted);
-
+	
 	/* 特徴点を選択する.  */
 	nv_keypoint_select(ctx,
 					   keypoints_tmp, nkeypoint, grid_response,
@@ -1129,7 +1085,6 @@ nv_keypoint_detect(const nv_keypoint_ctx_t *ctx,
 		nv_keypoint_orientation(
 			ctx, keypoints_tmp, nkeypoint,
 			integral, integral_tilted, memo);
-		
 		/* ソートしてlimitが少ない場合は下位を消す */
 		nv_keypoint_sort(keypoints, keypoints_tmp, *nkeypoint, limit);
 		if (*nkeypoint > limit) {
@@ -1206,13 +1161,10 @@ nv_keypoint_cpu(const nv_keypoint_ctx_t *ctx,
 								 integral,
 								 integral_tilted
 		);
-
 	nv_keypoint_detect(ctx, keypoints, &nkeypoint, integral, integral_tilted,
 					   keypoints->m, memo);
-
 	nv_keypoint_vector(ctx, desc, keypoints, nkeypoint,
 					   integral, integral_tilted, memo);
-	
 	nv_matrix_free(&integral);
 	nv_matrix_free(&integral_tilted);
 	nv_imap_foreach(memo, nv_keypoint_memo_free);
@@ -1363,7 +1315,7 @@ nv_keypoint_param_rectangle_feature_default(void)
 	static const nv_keypoint_param_t s_param = {
 		NV_KEYPOINT_THRESH,
 		NV_KEYPOINT_EDGE_THRESH,
-		NV_KEYPOINT_MIN_R,
+		NV_KEYPOINT_MIN_R * powf(NV_KEYPOINT_SCALE_FACTOR, 4),
 		NV_KEYPOINT_LEVEL,
 		NV_KEYPOINT_NN,
 		NV_KEYPOINT_DETECTOR_STAR,
@@ -1371,4 +1323,3 @@ nv_keypoint_param_rectangle_feature_default(void)
 	};
 	return &s_param;
 }
-
