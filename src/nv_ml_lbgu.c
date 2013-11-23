@@ -27,34 +27,6 @@ void nv_lbgu_progress(int onoff)
 	nv_lbgu_progress_flag = onoff;
 }
 
-static void
-nv_lbgu_init(nv_matrix_t *means, const nv_matrix_t *data)
-{
-	int exists;
-	nv_matrix_t *work = nv_matrix_alloc(means->n, 1);
-	int j, i;
-
-	for (j = 0; j < means->m; ++j) {
-		int idx = nv_rand_index(data->m);
-
-		exists = 0;
-		for (i = 0; i < j; ++i) {
-			nv_vector_sub(work, 0, means, i, data, idx);
-			if (nv_vector_sum(work, 0) == 0.0f) {
-				exists = 1;
-				break;
-			}
-		}
-		if (exists) {
-			--j;
-			continue;
-		}
-		nv_vector_copy(means, j, data, idx);
-	}
-
-	nv_matrix_free(&work);
-}
-
 /* LBG-U, 初期化+実行 */
 int 
 nv_lbgu(nv_matrix_t *means,  // k
@@ -68,7 +40,6 @@ nv_lbgu(nv_matrix_t *means,  // k
 	int ret;
 
 	nv_kmeans_init_pp(means, k, data, -1);
-	//nv_lbgu_init(means, data);
 	ret = nv_lbgu_em(means, count, labels, data, k, kmeans_max_epoch, max_epoch);
 
 	return ret;

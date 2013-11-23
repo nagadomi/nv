@@ -12,8 +12,7 @@ libnv-2.def
 
 lib_LTLIBRARIES = libnv.la
 libnv_la_LIBADD = 
-libnv_la_CFLAGS = -Wall \
--I$(srcdir)/3rd_party/sha1 -I$(srcdir)/3rd_party/mt -I$(srcdir)/3rd_party/avxintrin_emu
+libnv_la_CFLAGS = -I$(srcdir)/3rd_party/sha1 -I$(srcdir)/3rd_party/mt -I$(srcdir)/3rd_party/avxintrin_emu
 
 libnv_la_CXXFLAGS = $(libnv_la_CFLAGS)
 libnv_la_LDFLAGS = -no-undefined -version-number @NV_MAJOR@:@NV_MINOR@:@NV_REVISION@ -rpath "$(libdir)"

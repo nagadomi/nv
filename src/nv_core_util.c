@@ -22,7 +22,7 @@
 #include "nv_core_matrix.h"
 #include "nv_core_util.h"
 
-const static uint32_t bits_in_8bit[256] = {
+static const uint32_t bits_in_8bit[256] = {
 	0,1,1,2,1,2,2,3,1,2,2,3,2,3,3,4,
 	1,2,2,3,2,3,3,4,2,3,3,4,3,4,4,5,
 	1,2,2,3,2,3,3,4,2,3,3,4,3,4,4,5,

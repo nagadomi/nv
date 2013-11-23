@@ -130,8 +130,8 @@ nv_knn_ex(nv_knn_result_t *results, int n,
 	int i, imax;
 	int threads = nv_omp_procs();
 	nv_knn_topn_t topn;
-	float *dist_max = nv_alloc_type(float, threads);
-	nv_knn_topn_t *topn_temp = new nv_knn_topn_t[threads];
+	std::vector<float> dist_max(threads);
+	std::vector<nv_knn_topn_t> topn_temp(threads);
 	
 #ifdef _OPENMP
 #pragma omp parallel for num_threads(threads)
@@ -166,8 +166,6 @@ nv_knn_ex(nv_knn_result_t *results, int n,
 		results[i] = topn.top();
 		topn.pop();
 	}
-	delete [] topn_temp;
-	nv_free(dist_max);
 	
 	return imax;
 }

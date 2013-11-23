@@ -29,7 +29,8 @@ if test "" = "$LDFLAGS"; then
 fi
 
 CFLAGS=" $CFLAGS -DNV_DLL -DNV_INTERNAL -D__STDC_LIMIT_MACROS -D__STDC_FORMAT_MACROS "
-CFLAGS=" $CFLAGS -D_FORTIFY_SOURCE=2 -fstack-protector --param=ssp-buffer-size=4 -Wformat -Werror=format-security "
+CFLAGS=" $CFLAGS -Wall -Wextra -Wformat=2 -Werror=format-security -Wdisabled-optimization -Winline -Wno-unused-parameter "
+CFLAGS=" $CFLAGS -D_FORTIFY_SOURCE=2 -fstack-protector --param=ssp-buffer-size=4 "
 
 # Checks for programs.
 AC_PROG_CXX
@@ -69,7 +70,7 @@ AX_ARG_ENABLE(debug,
 	CFLAGS=" $CFLAGS -g -D_GLIBCXX_DEBUG -DGLIBCXX_FORCE_NEW "
     ],
     [nv_strict=0
-	CFLAGS="$CFLAGS -DNDEBUG -O3 -funroll-loops -ffast-math -g "])
+	CFLAGS="$CFLAGS -DNDEBUG -O3 -funroll-loops -ffast-math -g0 "])
 
 nv_native=0
 AX_ARG_ENABLE(native,
