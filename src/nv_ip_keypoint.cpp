@@ -56,6 +56,53 @@ struct nv_keypoint_ctx {
 	nv_matrix_t *gauss_w;
 };
 
+// based on Cecil H. Hastings approximation atan2
+static inline float
+approximate_atan2f(float y, float x)
+{
+	if (x == 0.0f) {
+		if (y > 0.0f) {
+			return NV_PI;
+		} else if (y == 0.0f) {
+			return 0.0f;
+		}
+		return -NV_PI_DIV2;
+	}
+	const float z = y / x;
+	const float z2 = z * z;
+	if (z2 < 1.0f) {
+		float theta = z / (1.0f + 0.28f * z2);
+		if (x < 0.0f) {
+			if (y < 0.0f) {
+				return theta - NV_PI;
+			}
+			return theta + NV_PI;
+		}
+		return theta;
+	} else {
+		float theta = NV_PI_DIV2 - z / (0.28f + z2);
+		if (y < 0.0f) {
+			return theta - NV_PI;
+		}
+		return theta;
+	}
+}
+typedef struct
+{
+	inline float operator()(float y, float x) const
+	{
+		return atan2f(y, x);
+	}
+} native_atan2_t;
+
+typedef struct
+{
+	inline float operator()(float y, float x) const
+	{
+		return approximate_atan2f(y, x);
+	}
+} approximate_atan2_t;
+
 /*
  * スケール空間のフィルタサイズを計算する.
  *
@@ -499,39 +546,7 @@ nv_keypoint_select(const nv_keypoint_ctx_t *ctx,
 	nv_free(nkeypoint_work);
 }
 
-// based on Cecil H. Hastings approximation atan2
-static inline float
-approximation_atan2f(float y, float x)
-{
-	if (x == 0.0f) {
-		if (y > 0.0f) {
-			return NV_PI;
-		} else if (y == 0.0f) {
-			return 0.0f;
-		}
-		return -NV_PI_DIV2;
-	}
-	const float z = y / x;
-	const float z2 = z * z;
-	if (z2 < 1.0f) {
-		float theta = z / (1.0f + 0.28f * z2);
-		if (x < 0.0f) {
-			if (y < 0.0f) {
-				return theta - NV_PI;
-			}
-			return theta + NV_PI;
-		}
-		return theta;
-	} else {
-		float theta = NV_PI_DIV2 - z / (0.28f + z2);
-		if (y < 0.0f) {
-			return theta - NV_PI;
-		}
-		return theta;
-	}
-}
-
-template<int HIST_N>
+template<int HIST_N, typename ATAN2>
 static void
 nv_keypoint_hist(const nv_keypoint_ctx_t *ctx,
 				 nv_matrix_t *hist, int hist_m, 
@@ -555,6 +570,7 @@ nv_keypoint_hist(const nv_keypoint_ctx_t *ctx,
 	int *xx = nv_alloc_type(int, NV_KEYPOINT_HIST_SAMPLE);
 	float *fdist_x = nv_alloc_type(float, NV_KEYPOINT_HIST_SAMPLE);
 	const nv_matrix_t *gauss_w = ctx->gauss_w;
+	const ATAN2 atan_func;
 	
 	NV_ASSERT(ky + f_r < img_integral->rows-1);
 	NV_ASSERT(kx + f_r < img_integral->cols-1);
@@ -628,8 +644,8 @@ nv_keypoint_hist(const nv_keypoint_ctx_t *ctx,
 			magnitude[0] = sqrtf(d[0] * d[0] + d[1] * d[1]);
 			magnitude[1] = sqrtf(d[2] * d[2] + d[3] * d[3]);
 			
-			theta[0] = approximation_atan2f(d[1], d[0]) + pi_angle;
-			theta[1] = approximation_atan2f(d[3], d[2]) + pi_angle;
+			theta[0] = atan_func(d[1], d[0]) + pi_angle;
+			theta[1] = atan_func(d[3], d[2]) + pi_angle;
 			
 			if (theta[0] < 0.0f) {
 				theta[0] = NV_PI * 2.0f + theta[0];
@@ -746,7 +762,7 @@ nv_keypoint_orientation(const nv_keypoint_ctx_t *ctx,
 		NV_ASSERT(memobuf != NULL);
 
 		/* 勾配ヒストグラムのTOPを記述子の正規化方向とする. */
-		nv_keypoint_hist<NV_KEYPOINT_ORIENTATION_HIST>(ctx,
+		nv_keypoint_hist<NV_KEYPOINT_ORIENTATION_HIST, native_atan2_t>(ctx,
 						 hist, thread_idx, 
 						 NV_ROUND_INT(NV_MAT_V(keypoints, i, NV_KEYPOINT_Y_IDX)),
 						 NV_ROUND_INT(NV_MAT_V(keypoints, i, NV_KEYPOINT_X_IDX)),
@@ -893,7 +909,7 @@ nv_keypoint_gradient_histogram(const nv_keypoint_ctx_t *ctx,
 		if (theta > 2.0f * NV_PI) {
 			theta = (theta - 2.0f * NV_PI);
 		}
-		nv_keypoint_hist<8>(
+		nv_keypoint_hist<8, approximate_atan2_t>(
 			ctx,
 			hist, 0, 
 			NV_ROUND_INT(desc_r * sinf(theta) + y),
@@ -907,7 +923,7 @@ nv_keypoint_gradient_histogram(const nv_keypoint_ctx_t *ctx,
 			   sizeof(float) * hist->n);
 	}
 	/* 中心 */
-	nv_keypoint_hist<8>(
+	nv_keypoint_hist<8, approximate_atan2_t>(
 		ctx,
 		hist, 0, 
 		y, x, desc_r, angle,
