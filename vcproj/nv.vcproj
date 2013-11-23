@@ -492,7 +492,7 @@
 					>
 				</File>
 				<File
-					RelativePath="..\src\nv_ip_keypoint.c"
+					RelativePath="..\src\nv_ip_keypoint.cpp"
 					>
 				</File>
 				<File
