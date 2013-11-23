@@ -747,14 +747,6 @@
 						>
 					</File>
 				</Filter>
-				<Filter
-					Name="sse_mathfun"
-					>
-					<File
-						RelativePath="..\src\3rd_party\sse_mathfun\sse_mathfun.cpp"
-						>
-					</File>
-				</Filter>
 			</Filter>
 		</Filter>
 		<Filter
@@ -803,10 +795,6 @@
 				</File>
 				<File
 					RelativePath="..\src\nv_num_simhash.h"
-					>
-				</File>
-				<File
-					RelativePath="..\src\nv_num_sse_mathfun.h"
 					>
 				</File>
 				<File

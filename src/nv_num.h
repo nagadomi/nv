@@ -20,7 +20,6 @@
 #ifndef NV_NUM_H
 #define NV_NUM_H
 
-#include "nv_num_sse_mathfun.h"
 #include "nv_num_vector.h"
 #include "nv_num_matrix.h"
 #include "nv_num_cov.h"

@@ -88,8 +88,7 @@ nv_io_kmeans_tree.c \
 nv_io_klr_tree.c \
 3rd_party/sha1/sha1.c \
 3rd_party/mt/mt19937-64.c \
-3rd_party/getopt/getopt.c \
-3rd_party/sse_mathfun/sse_mathfun.cpp
+3rd_party/getopt/getopt.c
 
 nodist_include_HEADERS = nv_config_auto.h
 include_HEADERS = \
@@ -119,7 +118,6 @@ nv_num_prime.h \
 nv_num.h \
 nv_num_distance.h \
 nv_num_eigen.h \
-nv_num_sse_mathfun.h \
 nv_num_knn.h \
 nv_ml_util.h \
 nv_ml_xmeans.h \
