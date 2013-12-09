@@ -21,7 +21,6 @@
 #define NV_UTIL_H
 
 #include "nv_util_sha1.h"
-#include "nv_util_sleep.h"
 #include "nv_util_clock.h"
 #include "nv_util_map.h"
 #include "nv_util_array.h"
