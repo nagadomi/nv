@@ -179,6 +179,23 @@ j番目のベクトルのL2ノルムを求めます。
 
 mat1のj1番目のベクトルとmat2のj2番目のベクトルの内積(ドット積)を求めます。
 
+### 計算スレッド数の設定
+
+環境変数 `OMP_NUM_THREADS` でスレッド数を指定できます。
+
+    export OMP_NUM_THREADS=8
+    make check
+    
+    export OMP_NUM_THREADS=1
+    make check
+
+### OpenCVのIplImageとの相互変換
+
+configureに`--enable-opencv`オプションを付けると`IplImage`と`nv_matrix_t`の相互変換関数がビルドされます。
+
+    IplImage *opencv_mat = nv_conv_nv2ipl(nv_mat);
+    nv_matrix_t *nv_mat = nv_conv_ipl2nv(opencv_mat);
+
 ### 他
 
 [src/tests](https://github.com/nagadomi/nv/tree/master/src/tests)の下に一部の大きめの処理のテストがあります。テストですが、使用サンプルみたいなものです。
