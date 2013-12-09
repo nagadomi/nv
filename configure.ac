@@ -94,19 +94,6 @@ AX_ARG_ENABLE(popcnt,
         AS_HELP_STRING([--enable-popcnt],[enable popcnt]), [no],
         [CFLAGS="$CFLAGS -mpopcnt -D__POPCNT__"],
         [])
-
-AX_ARG_ENABLE(profile-generate,
-        AS_HELP_STRING([--enable-profile-generate],[enable -fprofile-generate]), [no],
-        [CFLAGS=" $CFLAGS -fprofile-generate "
-        LDFLAGS=" $LDFLAGS -fprofile-generate "
-        ],
-        [])
-AX_ARG_ENABLE(profile-use,
-        AS_HELP_STRING([--enable-profile-use],[enable -fprofile-use]), [no],
-        [CFLAGS=" $CFLAGS -fprofile-use "
-        LDFLAGS=" $LDFLAGS -fprofile-use "
-        ],
-        [])
         
 #AX_ARG_ENABLE(opencv,
 #        AS_HELP_STRING([--enable-opencv],[ enable nv_conv_ipl2nv and nv_conv_nv2ipl.]), [no],
@@ -131,10 +118,11 @@ AX_ARG_ENABLE(opencv,
 	],
 	[]
 )
-
+nv_openmp=0
 AX_ARG_ENABLE(openmp,
         AS_HELP_STRING([--disable-openmp],[ disable OpenMP]), [yes],
-        [AC_CHECK_HEADERS(
+        [nv_openmp=1
+	AC_CHECK_HEADERS(
 		[omp.h],
 		[CFLAGS="$CFLAGS -fopenmp ";
 		AC_CHECK_LIB(gomp, omp_get_num_procs)],
@@ -153,6 +141,12 @@ AX_ARG_ENABLE(openssl,
 	],
 	[]
 )
+nv_builtin_sha1=1
+if test $nv_openssl = 1; then
+  nv_builtin_sha1=0
+else
+  nv_builtin_sha1=1
+fi
 
 nv_video=0
 AX_ARG_ENABLE(eiio,
@@ -164,23 +158,6 @@ AX_ARG_ENABLE(eiio,
                 AC_CHECK_LIB(eiio, eiio_video_open, [nv_video=1], [nv_video=0])
 	],
 	[nv_eiio=0]
-)
-
-AX_ARG_ENABLE(clock,
-        AS_HELP_STRING([--disable-clock],[ disable nv_clock]), [yes],
-	[nv_clock=1],
-	[nv_clock=0]
-)
-	
-AX_ARG_ENABLE(sleep,
-        AS_HELP_STRING([--disable-sleep],[ disable nv_sleep]), [yes],
-	[nv_sleep=1],
-	[nv_sleep=0])
-
-AX_ARG_ENABLE(avxemu,
-        AS_HELP_STRING([--enable-avxemu],[ enable avx emulation]), [no],
-	[nv_avxemu=1],
-	[nv_avxemu=0]
 )
 
 AC_ARG_WITH(pkgconfigdir,
@@ -235,15 +212,14 @@ CXXFLAGS=$CFLAGS
 
 AC_SUBST(nv_native)
 AC_SUBST(nv_sse2)
-AC_SUBST(nv_avxemu)
 AC_SUBST(nv_strict)
 AC_SUBST(nv_glibc_backtrace)
 AC_SUBST(nv_openssl)
 AC_SUBST(nv_eiio)
 AC_SUBST(nv_video)
+AC_SUBST(nv_builtin_sha1)
+AC_SUBST(nv_openmp)
 AC_SUBST(nv_opencv)
-AC_SUBST(nv_clock)
-AC_SUBST(nv_sleep)
 AC_SUBST(pkgconfigdir)
 AC_SUBST(NV_MAJOR)
 AC_SUBST(NV_MINOR)
@@ -260,3 +236,10 @@ Makefile
 ])
 
 AC_OUTPUT
+echo "libnv $NV_MAJOR.$NV_MINOR.$NV_REVISION:"
+echo "   Compiling with Native Instruction . : $nv_native"
+echo "   Compiling with OpenMP ............. : $nv_openmp"
+echo "   Compiling with Debug .............. : $nv_strict"
+echo "   Building with OpenCV support....... : $nv_opencv"
+echo "   Building with builtin SHA1 function : $nv_builtin_sha1"
+

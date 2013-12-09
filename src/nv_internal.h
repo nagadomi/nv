@@ -30,15 +30,4 @@
 #  endif
 #endif
 
-
-#if NV_ENABLE_AVX
-#else
-#  if NV_ENABLE_AVX_EMU
-#    define NV_ENABLE_AVX_EMU 1
-#    undef  NV_ENABLE_AVX
-#    define NV_ENABLE_AVX     1
-#    include "avxintrin_emu.h"
-#  endif
-#endif
-
 #endif

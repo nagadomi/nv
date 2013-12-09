@@ -715,10 +715,6 @@
 					RelativePath="..\src\nv_util_sha1.c"
 					>
 				</File>
-				<File
-					RelativePath="..\src\nv_util_sleep.c"
-					>
-				</File>
 			</Filter>
 			<Filter
 				Name="3rd_party"
@@ -1079,10 +1075,6 @@
 				</File>
 				<File
 					RelativePath="..\src\nv_util_sha1.h"
-					>
-				</File>
-				<File
-					RelativePath="..\src\nv_util_sleep.h"
 					>
 				</File>
 			</Filter>

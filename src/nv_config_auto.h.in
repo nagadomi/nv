@@ -19,12 +19,9 @@
 #ifndef NV_CONFIG_AUTO_H
 #define NV_CONFIG_AUTO_H
 
-#define NV_ENABLE_CLOCK  @nv_clock@
-#define NV_ENABLE_SLEEP  @nv_sleep@
 #define NV_ENABLE_VIDEO  @nv_video@
 #define NV_WITH_OPENCV   @nv_opencv@
 #define NV_WITH_EIIO     @nv_eiio@
-#define NV_ENABLE_AVX_EMU @nv_avxemu@
 #define NV_ENABLE_OPENSSL @nv_openssl@
 
 #define NV_ENABLE_STRICT          @nv_strict@

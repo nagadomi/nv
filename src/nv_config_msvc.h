@@ -21,12 +21,9 @@
 
 #pragma warning(disable:4819)
 
-#define NV_ENABLE_CLOCK  1
-#define NV_ENABLE_SLEEP  1
 #define NV_ENABLE_VIDEO  0
 #define NV_WITH_OPENCV   0
 #define NV_WITH_EIIO     1
-#define NV_ENABLE_AVX_EMU 0
 #define NV_ENABLE_OPENSSL 0
 #define NV_ENABLE_GLIBC_BACKTRACE 0
 

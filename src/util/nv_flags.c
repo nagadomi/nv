@@ -29,12 +29,6 @@ int main(void)
 #if NV_ENABLE_GLIBC_BACKTRACE
 	printf("glibc backtrace\n");
 #endif
-#if NV_ENABLE_CLOCK
-	printf("nv_clock\n");
-#endif
-#if NV_ENABLE_SLEEP
-	printf("nv_sleep\n");
-#endif
 #if NV_ENABLE_OPENSSL
 	printf("openssl\n");
 #endif
@@ -69,9 +63,6 @@ int main(void)
 #endif
 #if NV_ENABLE_AVX
 	printf("avx\n");
-#endif
-#if NV_ENABLE_AVX_EMU
-	printf("avx emu\n");
 #endif
 
 	return 0;
