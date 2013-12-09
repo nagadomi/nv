@@ -346,7 +346,6 @@ nv_simhash_knn
 nv_simhash_seed
 nv_sin_ps
 nv_sincos_ps
-nv_sleep
 nv_smap_alloc
 nv_smap_find
 nv_smap_foreach
