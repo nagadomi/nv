@@ -5,7 +5,7 @@ AC_PREREQ(2.61)
 AC_INIT([nv],[2.1.2],[nagadomi@nurs.or.jp])
 NV_MAJOR=2
 NV_MINOR=1
-NV_REVISION=1
+NV_REVISION=2
 AM_INIT_AUTOMAKE([foreign])
 AC_CONFIG_SRCDIR([src])
 AC_CONFIG_HEADER([src/config.h:src/config.h.in])
