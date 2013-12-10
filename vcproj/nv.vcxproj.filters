@@ -1,0 +1,520 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="src">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="src\nv_core">
+      <UniqueIdentifier>{51a072a8-1e2f-426e-a31b-0eac74c148ed}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\nv_ip">
+      <UniqueIdentifier>{8aaeb761-60a7-4c30-9bb5-50e47130b987}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\nv_io">
+      <UniqueIdentifier>{cd5c1a8d-abf9-46c1-b170-ba093f5e31a6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\nv_num">
+      <UniqueIdentifier>{72b7d0be-fd2c-4df0-820d-30768b336869}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\nv_ml">
+      <UniqueIdentifier>{d1ad2598-e1a2-42e4-b342-253e65ef1fe9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\nv_util">
+      <UniqueIdentifier>{4308740b-10b1-46b4-8016-deeafcc0b64b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\3rd_party">
+      <UniqueIdentifier>{6afe9f0a-c9fa-494f-bbe1-b0d1e57f31ea}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\3rd_party\sha1">
+      <UniqueIdentifier>{b68aa1aa-54c1-43e0-b410-1fac0fa2a517}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\3rd_party\mt">
+      <UniqueIdentifier>{bc549413-d88e-4c07-93f2-d35ff7ad8cc9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\3rd_party\getopt">
+      <UniqueIdentifier>{431c46ae-fee8-4ea5-a7f9-01d28fa59dd0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="include\nv_num">
+      <UniqueIdentifier>{faf7524f-6cef-4f84-84ef-9567b9e3608f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\nv_core">
+      <UniqueIdentifier>{4238a5f7-4b66-4d15-9c4d-76f7841450b1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\nv_io">
+      <UniqueIdentifier>{bd97fbd4-b830-4de6-a3a4-08b025ff8e25}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\nv_ip">
+      <UniqueIdentifier>{843337b8-0c0e-425d-8c68-fb065c10cc78}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\nv_ml">
+      <UniqueIdentifier>{482763ff-b600-45f5-a0c8-fa2b5178e7d8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\nv_util">
+      <UniqueIdentifier>{7622cd6a-0780-4fe8-8a82-63e9f2dceb56}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\3rd_party">
+      <UniqueIdentifier>{2396ddd3-375b-4744-8332-95f9cef8d0d7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\3rd_party\sha1">
+      <UniqueIdentifier>{5369d51f-c950-4b66-a13d-73bb0cd786c5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\3rd_party\mt">
+      <UniqueIdentifier>{3c097e9d-6e89-473f-bbb8-7f92965fa3f5}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\src\nv_core_alloc.c">
+      <Filter>src\nv_core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\nv_core_atomic.c">
+      <Filter>src\nv_core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\nv_core_matrix.c">
+      <Filter>src\nv_core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\nv_core_rand.c">
+      <Filter>src\nv_core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\nv_core_util.c">
+      <Filter>src\nv_core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\nv_portable.c">
+      <Filter>src\nv_core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\nv_ip_bgseg.c">
+      <Filter>src\nv_ip</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\nv_ip_ccv.c">
+      <Filter>src\nv_ip</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\nv_ip_euclidean_color.c">
+      <Filter>src\nv_ip</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\nv_ip_flip.c">
+      <Filter>src\nv_ip</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\nv_ip_gaussian.c">
+      <Filter>src\nv_ip</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\nv_ip_gray.c">
+      <Filter>src\nv_ip</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\nv_ip_hsv.c">
+      <Filter>src\nv_ip</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\nv_ip_integral.c">
+      <Filter>src\nv_ip</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\nv_ip_keypoint.cpp">
+      <Filter>src\nv_ip</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\nv_ip_laplacian.c">
+      <Filter>src\nv_ip</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\nv_ip_morphology.c">
+      <Filter>src\nv_ip</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\nv_ip_resize.c">
+      <Filter>src\nv_ip</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\nv_ip_shapecontext.c">
+      <Filter>src\nv_ip</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\nv_ip_star_integral.c">
+      <Filter>src\nv_ip</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\nv_ip_star_integral_static.c">
+      <Filter>src\nv_ip</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\nv_io_cov.c">
+      <Filter>src\nv_io</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\nv_io_image.c">
+      <Filter>src\nv_io</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\nv_io_ipl.c">
+      <Filter>src\nv_io</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\nv_io_klr_tree.c">
+      <Filter>src\nv_io</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\nv_io_kmeans_tree.c">
+      <Filter>src\nv_io</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\nv_io_lr.c">
+      <Filter>src\nv_io</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\nv_io_matrix.cpp">
+      <Filter>src\nv_io</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\nv_io_mlp.c">
+      <Filter>src\nv_io</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\nv_io_nb.c">
+      <Filter>src\nv_io</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\nv_io_stream.c">
+      <Filter>src\nv_io</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\nv_io_video.c">
+      <Filter>src\nv_io</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\nv_num_cov.c">
+      <Filter>src\nv_num</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\nv_num_distance.c">
+      <Filter>src\nv_num</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\nv_num_eigen.c">
+      <Filter>src\nv_num</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\nv_num_knn.cpp">
+      <Filter>src\nv_num</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\nv_num_matrix.c">
+      <Filter>src\nv_num</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\nv_num_munkres.c">
+      <Filter>src\nv_num</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\nv_num_prime_static.c">
+      <Filter>src\nv_num</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\nv_num_pstable.c">
+      <Filter>src\nv_num</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\nv_num_simhash.c">
+      <Filter>src\nv_num</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\nv_num_vector.c">
+      <Filter>src\nv_num</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\nv_ml_arow.c">
+      <Filter>src\nv_ml</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\nv_ml_gaussian.c">
+      <Filter>src\nv_ml</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\nv_ml_klr.c">
+      <Filter>src\nv_ml</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\nv_ml_klr_tree.c">
+      <Filter>src\nv_ml</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\nv_ml_kmeans.c">
+      <Filter>src\nv_ml</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\nv_ml_kmeans_tree.c">
+      <Filter>src\nv_ml</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\nv_ml_knb.c">
+      <Filter>src\nv_ml</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\nv_ml_lbgu.c">
+      <Filter>src\nv_ml</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\nv_ml_lmca.c">
+      <Filter>src\nv_ml</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\nv_ml_lr.c">
+      <Filter>src\nv_ml</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\nv_ml_mlp.c">
+      <Filter>src\nv_ml</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\nv_ml_mlp3.c">
+      <Filter>src\nv_ml</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\nv_ml_nb.c">
+      <Filter>src\nv_ml</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\nv_ml_pa.c">
+      <Filter>src\nv_ml</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\nv_ml_pca_kmeans_tree.c">
+      <Filter>src\nv_ml</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\nv_ml_plsi.c">
+      <Filter>src\nv_ml</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\nv_ml_som.c">
+      <Filter>src\nv_ml</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\nv_ml_util.c">
+      <Filter>src\nv_ml</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\nv_ml_xmeans.c">
+      <Filter>src\nv_ml</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\nv_util_2d_index.cpp">
+      <Filter>src\nv_util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\nv_util_array.cpp">
+      <Filter>src\nv_util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\nv_util_clock.c">
+      <Filter>src\nv_util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\nv_util_map.cpp">
+      <Filter>src\nv_util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\nv_util_sha1.c">
+      <Filter>src\nv_util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\3rd_party\sha1\sha1.c">
+      <Filter>src\3rd_party\sha1</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\3rd_party\mt\mt19937-64.c">
+      <Filter>src\3rd_party\mt</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\3rd_party\getopt\getopt.c">
+      <Filter>src\3rd_party\getopt</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\src\nv_num.h">
+      <Filter>include\nv_num</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\nv_num_cov.h">
+      <Filter>include\nv_num</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\nv_num_distance.h">
+      <Filter>include\nv_num</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\nv_num_eigen.h">
+      <Filter>include\nv_num</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\nv_num_knn.h">
+      <Filter>include\nv_num</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\nv_num_matrix.h">
+      <Filter>include\nv_num</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\nv_num_munkres.h">
+      <Filter>include\nv_num</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\nv_num_prime.h">
+      <Filter>include\nv_num</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\nv_num_pstable.h">
+      <Filter>include\nv_num</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\nv_num_simhash.h">
+      <Filter>include\nv_num</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\nv_num_vector.h">
+      <Filter>include\nv_num</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\nv_config.h">
+      <Filter>include\nv_core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\nv_config_msvc.h">
+      <Filter>include\nv_core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\nv_core.h">
+      <Filter>include\nv_core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\nv_core_alloc.h">
+      <Filter>include\nv_core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\nv_core_atomic.h">
+      <Filter>include\nv_core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\nv_core_matrix.h">
+      <Filter>include\nv_core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\nv_core_rand.h">
+      <Filter>include\nv_core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\nv_core_util.h">
+      <Filter>include\nv_core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\nv_internal.h">
+      <Filter>include\nv_core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\nv_portable.h">
+      <Filter>include\nv_core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\nv_io.h">
+      <Filter>include\nv_io</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\nv_io_cov.h">
+      <Filter>include\nv_io</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\nv_io_image.h">
+      <Filter>include\nv_io</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\nv_io_ipl.h">
+      <Filter>include\nv_io</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\nv_io_klr_tree.h">
+      <Filter>include\nv_io</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\nv_io_kmeans_tree.h">
+      <Filter>include\nv_io</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\nv_io_lr.h">
+      <Filter>include\nv_io</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\nv_io_matrix.h">
+      <Filter>include\nv_io</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\nv_io_mlp.h">
+      <Filter>include\nv_io</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\nv_io_nb.h">
+      <Filter>include\nv_io</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\nv_io_stream.h">
+      <Filter>include\nv_io</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\nv_io_video.h">
+      <Filter>include\nv_io</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\nv_ip.h">
+      <Filter>include\nv_ip</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\nv_ip_bgseg.h">
+      <Filter>include\nv_ip</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\nv_ip_ccv.h">
+      <Filter>include\nv_ip</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\nv_ip_euclidean_color.h">
+      <Filter>include\nv_ip</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\nv_ip_flip.h">
+      <Filter>include\nv_ip</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\nv_ip_gaussian.h">
+      <Filter>include\nv_ip</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\nv_ip_gray.h">
+      <Filter>include\nv_ip</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\nv_ip_hsv.h">
+      <Filter>include\nv_ip</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\nv_ip_integral.h">
+      <Filter>include\nv_ip</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\nv_ip_keypoint.h">
+      <Filter>include\nv_ip</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\nv_ip_laplacian.h">
+      <Filter>include\nv_ip</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\nv_ip_morphology.h">
+      <Filter>include\nv_ip</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\nv_ip_resize.h">
+      <Filter>include\nv_ip</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\nv_ip_shapecontext.h">
+      <Filter>include\nv_ip</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\nv_ip_star_integral.h">
+      <Filter>include\nv_ip</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\nv_ip_star_integral_static.h">
+      <Filter>include\nv_ip</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\nv_ml.h">
+      <Filter>include\nv_ml</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\nv_ml_arow.h">
+      <Filter>include\nv_ml</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\nv_ml_gaussian.h">
+      <Filter>include\nv_ml</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\nv_ml_klr.h">
+      <Filter>include\nv_ml</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\nv_ml_klr_tree.h">
+      <Filter>include\nv_ml</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\nv_ml_kmeans.h">
+      <Filter>include\nv_ml</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\nv_ml_kmeans_tree.h">
+      <Filter>include\nv_ml</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\nv_ml_knb.h">
+      <Filter>include\nv_ml</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\nv_ml_lbgu.h">
+      <Filter>include\nv_ml</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\nv_ml_lmca.h">
+      <Filter>include\nv_ml</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\nv_ml_lr.h">
+      <Filter>include\nv_ml</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\nv_ml_mlp.h">
+      <Filter>include\nv_ml</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\nv_ml_mlp3.h">
+      <Filter>include\nv_ml</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\nv_ml_nb.h">
+      <Filter>include\nv_ml</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\nv_ml_pa.h">
+      <Filter>include\nv_ml</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\nv_ml_pca_kmeans_tree.h">
+      <Filter>include\nv_ml</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\nv_ml_plsi.h">
+      <Filter>include\nv_ml</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\nv_ml_som.h">
+      <Filter>include\nv_ml</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\nv_ml_util.h">
+      <Filter>include\nv_ml</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\nv_ml_xmeans.h">
+      <Filter>include\nv_ml</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\nv_util.h">
+      <Filter>include\nv_util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\nv_util_2d_index.h">
+      <Filter>include\nv_util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\nv_util_array.h">
+      <Filter>include\nv_util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\nv_util_clock.h">
+      <Filter>include\nv_util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\nv_util_getopt.h">
+      <Filter>include\nv_util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\nv_util_map.h">
+      <Filter>include\nv_util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\nv_util_sha1.h">
+      <Filter>include\nv_util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\3rd_party\sha1\sha.h">
+      <Filter>include\3rd_party\sha1</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\3rd_party\mt\mt64.h">
+      <Filter>include\3rd_party\mt</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\src\libnv-2.def">
+      <Filter>src</Filter>
+    </None>
+  </ItemGroup>
+</Project>
