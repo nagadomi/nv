@@ -618,7 +618,7 @@ nv_keypoint_hist(const nv_keypoint_ctx_t *ctx,
 			}
 			const int x = xx[xi];
 			NV_ALIGNED(float, magnitude[2], 32);
-			NV_ALIGNED(float, d[2], 32);
+			NV_ALIGNED(float, d[4], 32);
 			NV_ALIGNED(float, theta[2], 32);
 			int bin[2];
 			int dist = NV_ROUND_INT(sqrtf(fdist));
