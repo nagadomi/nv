@@ -59,12 +59,12 @@ nv_2d_index_insert(nv_2d_index_t *index, int y, int x, void *data)
 		nv_y_t yv;
 		nv_x_t xv;
 		xv.data = data;
-		yv.x.insert(std::make_pair<int, nv_x_t>(x, xv));
-		index->geo.insert(std::make_pair<int, nv_y_t>(y, yv));
+		yv.x.insert(std::make_pair(x, xv));
+		index->geo.insert(std::make_pair(y, yv));
 	} else {
 		nv_x_t xv;
 		xv.data = data;
-		it->second.x.insert(std::make_pair<int, nv_x_t>(x, xv));
+		it->second.x.insert(std::make_pair(x, xv));
 	}
 }
 
