@@ -54,7 +54,6 @@ nv_color_hsv2bgr
 nv_color_hsv2bgr_scalar
 nv_contrast
 nv_contrast_sigmoid
-nv_cos_ps
 nv_cosine
 nv_cov
 nv_cov_alloc
@@ -75,7 +74,6 @@ nv_enable_sse2_math
 nv_erode
 nv_euclidean
 nv_euclidean2
-nv_exp_ps
 nv_flip_x
 nv_flip_y
 nv_float_find_index
@@ -190,7 +188,6 @@ nv_load_mlp_text
 nv_load_nb
 nv_localtime_r
 nv_log2
-nv_log_ps
 nv_lr_alloc
 nv_lr_dump_c
 nv_lr_free
@@ -344,9 +341,6 @@ nv_simhash_free
 nv_simhash_hash
 nv_simhash_knn
 nv_simhash_seed
-nv_sin_ps
-nv_sincos_ps
-nv_sleep
 nv_smap_alloc
 nv_smap_find
 nv_smap_foreach

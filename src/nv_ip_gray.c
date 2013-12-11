@@ -29,7 +29,7 @@ nv_gray(nv_matrix_t *gray, const nv_matrix_t *bgr)
 	NV_ASSERT(bgr->n == 3 && gray->n == 1 && gray->m == bgr->m);
 
 #ifdef _OPENMP
-#pragma omp parallel for num_threads(nv_omp_procs())
+#pragma omp parallel for
 #endif
 	for (m = 0; m < gray->m; ++m) {
 		// bgr->v 0-255

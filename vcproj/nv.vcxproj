@@ -1,0 +1,420 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Static Release|Win32">
+      <Configuration>Static Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Static Release|x64">
+      <Configuration>Static Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{E89FCFFF-09B8-4E72-8A7D-767DB534AAC3}</ProjectGuid>
+    <RootNamespace>nv</RootNamespace>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Static Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <PlatformToolset>v120</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <PlatformToolset>v120</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <PlatformToolset>v120</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Static Release|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <PlatformToolset>v120</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <PlatformToolset>v120</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <PlatformToolset>v120</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Static Release|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Static Release|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>12.0.21005.1</_ProjectFileVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <OutDir>$(SolutionDir)$(Configuration)\</OutDir>
+    <IntDir>$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <OutDir>$(SolutionDir)$(Configuration)\</OutDir>
+    <IntDir>$(Configuration)\</IntDir>
+    <LinkIncremental />
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(Platform)\$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(Platform)\$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Static Release|x64'">
+    <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(Platform)\$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\src\;$(ProjectDir)..\src\3rd_party\msinttypes;$(ProjectDir)..\src\3rd_party\sha1;$(ProjectDir)..\src\3rd_party\mt;$(ProjectDir)..\src\3rd_party;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>NV_INTERNAL;_CRT_SECURE_NO_WARNINGS;__STDC_FORMAT_MACROS;__STDC_LIMIT_MACROS;__SSE__;__SSE2__;__SSE3__;__SSE4_1__;__SSE4_2__;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MinimalRebuild>true</MinimalRebuild>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
+      <FloatingPointModel>Fast</FloatingPointModel>
+      <FloatingPointExceptions>false</FloatingPointExceptions>
+      <OpenMPSupport>false</OpenMPSupport>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+      <AdditionalOptions>/FS %(AdditionalOptions)</AdditionalOptions>
+      <InlineFunctionExpansion>Disabled</InlineFunctionExpansion>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+    </ClCompile>
+    <Lib>
+      <AdditionalDependencies>libeiio-0.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <OutputFile>$(OutDir)libnv-2.lib</OutputFile>
+      <ModuleDefinitionFile />
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <Optimization>MaxSpeed</Optimization>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <FavorSizeOrSpeed>Neither</FavorSizeOrSpeed>
+      <OmitFramePointers>false</OmitFramePointers>
+      <EnableFiberSafeOptimizations>false</EnableFiberSafeOptimizations>
+      <WholeProgramOptimization>true</WholeProgramOptimization>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\src;$(ProjectDir)..\src\3rd_party\msinttypes;$(ProjectDir)..\src\3rd_party\sha1;$(ProjectDir)..\src\3rd_party\mt;$(ProjectDir)..\src\3rd_party;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>NV_INTERNAL;NV_DLL;_CRT_SECURE_NO_WARNINGS;NDEBUG;__STDC_FORMAT_MACROS;__STDC_LIMIT_MACROS;__SSE__;__SSE2__;__SSE3__;__SSE4_1__;__SSE4_2__;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <StructMemberAlignment>Default</StructMemberAlignment>
+      <BufferSecurityCheck>true</BufferSecurityCheck>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
+      <FloatingPointModel>Fast</FloatingPointModel>
+      <OpenMPSupport>true</OpenMPSupport>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <CallingConvention>Cdecl</CallingConvention>
+      <CompileAs>Default</CompileAs>
+      <AdditionalOptions>/FS %(AdditionalOptions)</AdditionalOptions>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>libeiio-0.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <OutputFile>$(OutDir)libnv-2.dll</OutputFile>
+      <ModuleDefinitionFile>$(ProjectDir)..\src\libnv-2.def</ModuleDefinitionFile>
+      <LargeAddressAware>true</LargeAddressAware>
+      <LinkTimeCodeGeneration />
+      <EntryPointSymbol />
+      <ImportLibrary>$(TargetDir)libnv-2.lib</ImportLibrary>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Midl>
+      <TargetEnvironment>X64</TargetEnvironment>
+    </Midl>
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\src;$(ProjectDir)..\src\3rd_party\msinttypes%3b$(ProjectDir)..\src\3rd_party\sha1%3b$(ProjectDir)..\src\3rd_party\mt;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>NV_INTERNAL;_CRT_SECURE_NO_WARNINGS;__SSE__;__SSE2__;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MinimalRebuild>true</MinimalRebuild>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
+      <FloatingPointModel>Fast</FloatingPointModel>
+      <FloatingPointExceptions>false</FloatingPointExceptions>
+      <OpenMPSupport>false</OpenMPSupport>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>libeiio-0.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <OutputFile>$(OutDir)lib$(ProjectName)-2.dll</OutputFile>
+      <ModuleDefinitionFile>$(SolutionDir)..\src\libnv-2.def</ModuleDefinitionFile>
+      <TargetMachine>MachineX64</TargetMachine>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Midl>
+      <TargetEnvironment>X64</TargetEnvironment>
+    </Midl>
+    <ClCompile>
+      <Optimization>MaxSpeed</Optimization>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+      <OmitFramePointers>false</OmitFramePointers>
+      <EnableFiberSafeOptimizations>false</EnableFiberSafeOptimizations>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\src;$(ProjectDir)..\src\3rd_party\msinttypes;$(ProjectDir)..\src\3rd_party\sha1;$(ProjectDir)..\src\3rd_party\mt;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>NV_INTERNAL;_CRT_SECURE_NO_WARNINGS;NDEBUG;__SSE__;__SSE2__;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <StructMemberAlignment>Default</StructMemberAlignment>
+      <BufferSecurityCheck>true</BufferSecurityCheck>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
+      <FloatingPointModel>Fast</FloatingPointModel>
+      <OpenMPSupport>true</OpenMPSupport>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <CallingConvention>Cdecl</CallingConvention>
+      <CompileAs>Default</CompileAs>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>libeiio-0.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <OutputFile>$(OutDir)lib$(ProjectName)-2.dll</OutputFile>
+      <ModuleDefinitionFile>$(SolutionDir)..\src\libnv-2.def</ModuleDefinitionFile>
+      <TargetMachine>MachineX64</TargetMachine>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Static Release|x64'">
+    <Midl>
+      <TargetEnvironment>X64</TargetEnvironment>
+    </Midl>
+    <ClCompile>
+      <Optimization>MaxSpeed</Optimization>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+      <OmitFramePointers>false</OmitFramePointers>
+      <EnableFiberSafeOptimizations>false</EnableFiberSafeOptimizations>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\src;$(ProjectDir)..\src\3rd_party\msinttypes;$(ProjectDir)..\src\3rd_party\sha1;$(ProjectDir)..\src\3rd_party\mt;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>NV_INTERNAL;_CRT_SECURE_NO_WARNINGS;NDEBUG;__SSE__;__SSE2__;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <StructMemberAlignment>Default</StructMemberAlignment>
+      <BufferSecurityCheck>true</BufferSecurityCheck>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
+      <FloatingPointModel>Fast</FloatingPointModel>
+      <OpenMPSupport>true</OpenMPSupport>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <CallingConvention>Cdecl</CallingConvention>
+      <CompileAs>Default</CompileAs>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>libeiio-0.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <OutputFile>$(OutDir)lib$(ProjectName)-2.dll</OutputFile>
+      <ModuleDefinitionFile>$(SolutionDir)..\src\libnv-2.def</ModuleDefinitionFile>
+      <TargetMachine>MachineX64</TargetMachine>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="..\src\nv_core_alloc.c" />
+    <ClCompile Include="..\src\nv_core_atomic.c" />
+    <ClCompile Include="..\src\nv_core_matrix.c" />
+    <ClCompile Include="..\src\nv_core_rand.c" />
+    <ClCompile Include="..\src\nv_core_util.c" />
+    <ClCompile Include="..\src\nv_portable.c" />
+    <ClCompile Include="..\src\nv_ip_bgseg.c" />
+    <ClCompile Include="..\src\nv_ip_ccv.c" />
+    <ClCompile Include="..\src\nv_ip_euclidean_color.c" />
+    <ClCompile Include="..\src\nv_ip_flip.c" />
+    <ClCompile Include="..\src\nv_ip_gaussian.c" />
+    <ClCompile Include="..\src\nv_ip_gray.c" />
+    <ClCompile Include="..\src\nv_ip_hsv.c" />
+    <ClCompile Include="..\src\nv_ip_integral.c" />
+    <ClCompile Include="..\src\nv_ip_keypoint.cpp" />
+    <ClCompile Include="..\src\nv_ip_laplacian.c" />
+    <ClCompile Include="..\src\nv_ip_morphology.c" />
+    <ClCompile Include="..\src\nv_ip_resize.c" />
+    <ClCompile Include="..\src\nv_ip_shapecontext.c" />
+    <ClCompile Include="..\src\nv_ip_star_integral.c" />
+    <ClCompile Include="..\src\nv_ip_star_integral_static.c" />
+    <ClCompile Include="..\src\nv_io_cov.c" />
+    <ClCompile Include="..\src\nv_io_image.c" />
+    <ClCompile Include="..\src\nv_io_ipl.c" />
+    <ClCompile Include="..\src\nv_io_klr_tree.c" />
+    <ClCompile Include="..\src\nv_io_kmeans_tree.c" />
+    <ClCompile Include="..\src\nv_io_lr.c" />
+    <ClCompile Include="..\src\nv_io_matrix.cpp" />
+    <ClCompile Include="..\src\nv_io_mlp.c" />
+    <ClCompile Include="..\src\nv_io_nb.c" />
+    <ClCompile Include="..\src\nv_io_stream.c" />
+    <ClCompile Include="..\src\nv_io_video.c" />
+    <ClCompile Include="..\src\nv_num_cov.c" />
+    <ClCompile Include="..\src\nv_num_distance.c" />
+    <ClCompile Include="..\src\nv_num_eigen.c" />
+    <ClCompile Include="..\src\nv_num_knn.cpp" />
+    <ClCompile Include="..\src\nv_num_matrix.c" />
+    <ClCompile Include="..\src\nv_num_munkres.c" />
+    <ClCompile Include="..\src\nv_num_prime_static.c" />
+    <ClCompile Include="..\src\nv_num_pstable.c" />
+    <ClCompile Include="..\src\nv_num_simhash.c" />
+    <ClCompile Include="..\src\nv_num_vector.c" />
+    <ClCompile Include="..\src\nv_ml_arow.c" />
+    <ClCompile Include="..\src\nv_ml_gaussian.c" />
+    <ClCompile Include="..\src\nv_ml_klr.c" />
+    <ClCompile Include="..\src\nv_ml_klr_tree.c" />
+    <ClCompile Include="..\src\nv_ml_kmeans.c" />
+    <ClCompile Include="..\src\nv_ml_kmeans_tree.c" />
+    <ClCompile Include="..\src\nv_ml_knb.c" />
+    <ClCompile Include="..\src\nv_ml_lbgu.c" />
+    <ClCompile Include="..\src\nv_ml_lmca.c" />
+    <ClCompile Include="..\src\nv_ml_lr.c" />
+    <ClCompile Include="..\src\nv_ml_mlp.c" />
+    <ClCompile Include="..\src\nv_ml_mlp3.c" />
+    <ClCompile Include="..\src\nv_ml_nb.c" />
+    <ClCompile Include="..\src\nv_ml_pa.c" />
+    <ClCompile Include="..\src\nv_ml_pca_kmeans_tree.c" />
+    <ClCompile Include="..\src\nv_ml_plsi.c" />
+    <ClCompile Include="..\src\nv_ml_som.c" />
+    <ClCompile Include="..\src\nv_ml_util.c" />
+    <ClCompile Include="..\src\nv_ml_xmeans.c" />
+    <ClCompile Include="..\src\nv_util_2d_index.cpp" />
+    <ClCompile Include="..\src\nv_util_array.cpp" />
+    <ClCompile Include="..\src\nv_util_clock.c" />
+    <ClCompile Include="..\src\nv_util_map.cpp" />
+    <ClCompile Include="..\src\nv_util_sha1.c" />
+    <ClCompile Include="..\src\3rd_party\sha1\sha1.c" />
+    <ClCompile Include="..\src\3rd_party\mt\mt19937-64.c" />
+    <ClCompile Include="..\src\3rd_party\getopt\getopt.c" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\src\nv_num.h" />
+    <ClInclude Include="..\src\nv_num_cov.h" />
+    <ClInclude Include="..\src\nv_num_distance.h" />
+    <ClInclude Include="..\src\nv_num_eigen.h" />
+    <ClInclude Include="..\src\nv_num_knn.h" />
+    <ClInclude Include="..\src\nv_num_matrix.h" />
+    <ClInclude Include="..\src\nv_num_munkres.h" />
+    <ClInclude Include="..\src\nv_num_prime.h" />
+    <ClInclude Include="..\src\nv_num_pstable.h" />
+    <ClInclude Include="..\src\nv_num_simhash.h" />
+    <ClInclude Include="..\src\nv_num_vector.h" />
+    <ClInclude Include="..\src\nv_config.h" />
+    <ClInclude Include="..\src\nv_config_msvc.h" />
+    <ClInclude Include="..\src\nv_core.h" />
+    <ClInclude Include="..\src\nv_core_alloc.h" />
+    <ClInclude Include="..\src\nv_core_atomic.h" />
+    <ClInclude Include="..\src\nv_core_matrix.h" />
+    <ClInclude Include="..\src\nv_core_rand.h" />
+    <ClInclude Include="..\src\nv_core_util.h" />
+    <ClInclude Include="..\src\nv_internal.h" />
+    <ClInclude Include="..\src\nv_portable.h" />
+    <ClInclude Include="..\src\nv_io.h" />
+    <ClInclude Include="..\src\nv_io_cov.h" />
+    <ClInclude Include="..\src\nv_io_image.h" />
+    <ClInclude Include="..\src\nv_io_ipl.h" />
+    <ClInclude Include="..\src\nv_io_klr_tree.h" />
+    <ClInclude Include="..\src\nv_io_kmeans_tree.h" />
+    <ClInclude Include="..\src\nv_io_lr.h" />
+    <ClInclude Include="..\src\nv_io_matrix.h" />
+    <ClInclude Include="..\src\nv_io_mlp.h" />
+    <ClInclude Include="..\src\nv_io_nb.h" />
+    <ClInclude Include="..\src\nv_io_stream.h" />
+    <ClInclude Include="..\src\nv_io_video.h" />
+    <ClInclude Include="..\src\nv_ip.h" />
+    <ClInclude Include="..\src\nv_ip_bgseg.h" />
+    <ClInclude Include="..\src\nv_ip_ccv.h" />
+    <ClInclude Include="..\src\nv_ip_euclidean_color.h" />
+    <ClInclude Include="..\src\nv_ip_flip.h" />
+    <ClInclude Include="..\src\nv_ip_gaussian.h" />
+    <ClInclude Include="..\src\nv_ip_gray.h" />
+    <ClInclude Include="..\src\nv_ip_hsv.h" />
+    <ClInclude Include="..\src\nv_ip_integral.h" />
+    <ClInclude Include="..\src\nv_ip_keypoint.h" />
+    <ClInclude Include="..\src\nv_ip_laplacian.h" />
+    <ClInclude Include="..\src\nv_ip_morphology.h" />
+    <ClInclude Include="..\src\nv_ip_resize.h" />
+    <ClInclude Include="..\src\nv_ip_shapecontext.h" />
+    <ClInclude Include="..\src\nv_ip_star_integral.h" />
+    <ClInclude Include="..\src\nv_ip_star_integral_static.h" />
+    <ClInclude Include="..\src\nv_ml.h" />
+    <ClInclude Include="..\src\nv_ml_arow.h" />
+    <ClInclude Include="..\src\nv_ml_gaussian.h" />
+    <ClInclude Include="..\src\nv_ml_klr.h" />
+    <ClInclude Include="..\src\nv_ml_klr_tree.h" />
+    <ClInclude Include="..\src\nv_ml_kmeans.h" />
+    <ClInclude Include="..\src\nv_ml_kmeans_tree.h" />
+    <ClInclude Include="..\src\nv_ml_knb.h" />
+    <ClInclude Include="..\src\nv_ml_lbgu.h" />
+    <ClInclude Include="..\src\nv_ml_lmca.h" />
+    <ClInclude Include="..\src\nv_ml_lr.h" />
+    <ClInclude Include="..\src\nv_ml_mlp.h" />
+    <ClInclude Include="..\src\nv_ml_mlp3.h" />
+    <ClInclude Include="..\src\nv_ml_nb.h" />
+    <ClInclude Include="..\src\nv_ml_pa.h" />
+    <ClInclude Include="..\src\nv_ml_pca_kmeans_tree.h" />
+    <ClInclude Include="..\src\nv_ml_plsi.h" />
+    <ClInclude Include="..\src\nv_ml_som.h" />
+    <ClInclude Include="..\src\nv_ml_util.h" />
+    <ClInclude Include="..\src\nv_ml_xmeans.h" />
+    <ClInclude Include="..\src\nv_util.h" />
+    <ClInclude Include="..\src\nv_util_2d_index.h" />
+    <ClInclude Include="..\src\nv_util_array.h" />
+    <ClInclude Include="..\src\nv_util_clock.h" />
+    <ClInclude Include="..\src\nv_util_getopt.h" />
+    <ClInclude Include="..\src\nv_util_map.h" />
+    <ClInclude Include="..\src\nv_util_sha1.h" />
+    <ClInclude Include="..\src\3rd_party\sha1\sha.h" />
+    <ClInclude Include="..\src\3rd_party\mt\mt64.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\src\libnv-2.def" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

@@ -60,7 +60,7 @@ nv_purity(int cluster_k,
 	NV_ASSERT(cluster_labels->m == correct_labels->m);
 	
 	for (i = 0; i < cluster_k; ++i) {
-		int max_i, max_v = -1;
+		int max_v = -1;
 		int nr = 0;
 		
 		memset(nir, 0, sizeof(int) * correct_k);
@@ -74,7 +74,6 @@ nv_purity(int cluster_k,
 		for (j = 0; j < correct_k; ++j) {
 			if (max_v < nir[j]) {
 				max_v = nir[j];
-				max_i = j;
 			}
 		}
 		if (nr > 0) {

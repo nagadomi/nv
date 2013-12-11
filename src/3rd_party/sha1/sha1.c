@@ -74,7 +74,7 @@ typedef union _BYTE64QUAD16 {
 } BYTE64QUAD16;
 
 /* Hash a single 512-bit block. This is the core of the algorithm. */
-static NV_INLINE void
+static void
 sha1_transform(sha1_quadbyte *state, const sha1_byte *buffer)
 {
 	BYTE64QUAD16 workspace;

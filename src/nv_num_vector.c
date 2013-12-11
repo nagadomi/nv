@@ -30,9 +30,6 @@ nv_vector_sqrt(nv_matrix_t *vec0, int m0,
 	
 	NV_ASSERT(vec0->n == vec1->n);
 	
-#ifdef _OPENMP
-//#pragma omp parallel for
-#endif
 	for (i = 0; i < vec0->n; ++i) {
 		NV_MAT_V(vec0, m0, i) = sqrtf(NV_MAT_V(vec1, m1, i));
 	}
@@ -45,9 +42,6 @@ nv_vector_not10(nv_matrix_t *vec0, int m0,
 	int i;
 
 	NV_ASSERT(vec0->n == vec1->n);
-#ifdef _OPENMP
-//#pragma omp parallel for
-#endif
 	for (i = 0; i < vec0->n; ++i) {
 		if (NV_MAT_V(vec1, m1, i) != 0.0f) {
 			NV_MAT_V(vec0, m0, i) = 0.0f;
@@ -66,9 +60,6 @@ nv_vector_pows(nv_matrix_t *vec0, int m0,
 
 	NV_ASSERT(vec1->n == vec1->n);
 	
-#ifdef _OPENMP
-//#pragma omp parallel for
-#endif
 	for (n = 0; n < vec0->n; ++n) {
 		NV_MAT_V(vec0, m0, n) = powf(NV_MAT_V(vec1, m1, n), x);
 	}
@@ -89,9 +80,6 @@ nv_vector_in_range10(nv_matrix_t *dst,
 
 	NV_ASSERT(dst->n == lower->n && upper->n == dst->n);
 
-#ifdef _OPENMP
-//#pragma omp parallel for
-#endif
 	for (i = 0; i < vec->n; ++i) {
 		if (NV_MAT_V(lower, lj, i) <= NV_MAT_V(vec, vj, i) &&
 			NV_MAT_V(vec, vj, i) <= NV_MAT_V(upper, uj, i))
@@ -114,9 +102,6 @@ nv_vector_subsm(nv_matrix_t *vec0, int m0,
 
 	NV_ASSERT(vec1->n == vec0->n);
 	
-#ifdef _OPENMP
-//#pragma omp parallel for
-#endif
 	for (i = 0; i < vec1->n; ++i) {
 		if (NV_MAT_V(mask, m2, i) != 0.0f) {
 			NV_MAT_V(vec0, m0, i) = NV_MAT_V(vec1, m1, i) - v;
@@ -137,9 +122,6 @@ nv_vector_subs(nv_matrix_t *vec0, int m0,
 		int n;
 		int pk_lp = (vec1->n & 0xfffffffc);
 		vv = _mm_set1_ps(v);
-#ifdef _OPENMP
-//#pragma omp parallel for
-#endif
 		for (n = 0; n < pk_lp; n += 4) {
 			__m128 x = _mm_load_ps(&NV_MAT_V(vec1, m1, n));
 			x = _mm_sub_ps(x, vv);
@@ -187,9 +169,6 @@ nv_vector_sub(nv_matrix_t *vec0, int m0,
 		int n;
 		int pk_lp = (vec1->n & 0xfffffffc);
 
-#ifdef _OPENMP
-//#pragma omp parallel for
-#endif
 		for (n = 0; n < pk_lp; n += 4) {
 			__m128 x = _mm_load_ps(&NV_MAT_V(vec1, m1, n));
 			x = _mm_sub_ps(x, *(const __m128 *)&NV_MAT_V(vec2, m2, n));
@@ -224,9 +203,6 @@ nv_vector_adds(nv_matrix_t *vec0, int m0,
 		
 		vv = _mm_set1_ps(v);
 
-#ifdef _OPENMP
-//#pragma omp parallel for
-#endif
 		for (n = 0; n < pk_lp; n += 4) {
 			__m128 x = _mm_load_ps(&NV_MAT_V(vec1, m1, n));
 			_mm_store_ps(&NV_MAT_V(vec0, m0, n),
@@ -275,9 +251,6 @@ nv_vector_add(nv_matrix_t *vec0, int m0,
 		int n;
 		int pk_lp = (vec1->n & 0xfffffffc);
 
-#ifdef _OPENMP
-//#pragma omp parallel for
-#endif
 		for (n = 0; n < pk_lp; n += 4) {
 			__m128 x = _mm_load_ps(&NV_MAT_V(vec1, m1, n));
 			_mm_store_ps(&NV_MAT_V(vec0, m0, n),
@@ -325,9 +298,6 @@ nv_vector_mul(nv_matrix_t *vec0, int m0,
 		int n;
 		int pk_lp = (vec1->n & 0xfffffffc);
 
-#ifdef _OPENMP
-//#pragma omp parallel for
-#endif
 		for (n = 0; n < pk_lp; n += 4) {
 			__m128 x = _mm_load_ps(&NV_MAT_V(vec1, m1, n));
 			_mm_store_ps(&NV_MAT_V(vec0, m0, n),
@@ -357,19 +327,23 @@ nv_vector_dot(const nv_matrix_t *vec1, int m1,
 	
 #if NV_ENABLE_AVX
 	{
-		NV_ALIGNED(float, mm[8], 32);
-		__m256 x, u;
+		__m256 x, u, h;
+		__m128 a;
 		int n;
 		int pk_lp = (vec1->n & 0xfffffff8);
-		float dp = 0.0f;
-		
+		NV_ALIGNED(float, dp, 32);
+
 		u = _mm256_setzero_ps();
 		for (n = 0; n < pk_lp; n += 8) {
 			x = _mm256_load_ps(&NV_MAT_V(vec2, m2, n));
-			u = _mm256_add_ps(u, _mm256_mul_ps(x, *(__m256 *)&NV_MAT_V(vec1, m1, n)));
+			h = _mm256_load_ps(&NV_MAT_V(vec1, m1, n));
+			x = _mm256_mul_ps(x, h);
+			h = _mm256_hadd_ps(x, x);
+			u = _mm256_add_ps(u, h);
 		}
-		_mm256_store_ps(mm, u);
-		dp = mm[0] + mm[1] + mm[2] + mm[3] + mm[4] + mm[5] + mm[6] + mm[7];
+		u = _mm256_hadd_ps(u, u);
+		a = _mm_add_ps(_mm256_extractf128_ps(u, 0), _mm256_extractf128_ps(u, 1));
+		_mm_store_ss(&dp, a);
 		for (n = pk_lp; n < vec1->n; ++n) {
 			dp += NV_MAT_V(vec1, m1, n) * NV_MAT_V(vec2, m2, n);
 		}
@@ -378,24 +352,22 @@ nv_vector_dot(const nv_matrix_t *vec1, int m1,
 	}
 #elif NV_ENABLE_SSE2
 	{
-		NV_ALIGNED(float, mm[4], 16);
 		__m128 x, u;
 		int n;
 		int pk_lp = (vec1->n & 0xfffffffc);
-		float dp = 0.0f;
-
+		NV_ALIGNED(float, dp, 16);
+		NV_ALIGNED(float, mm[4], 16);
 		u = _mm_setzero_ps();
 		for (n = 0; n < pk_lp; n += 4) {
 			x = _mm_load_ps(&NV_MAT_V(vec2, m2, n));
 			u = _mm_add_ps(u,
-				_mm_mul_ps(x, *(__m128 *)&NV_MAT_V(vec1, m1, n)));
+						   _mm_mul_ps(x, *(__m128 *)&NV_MAT_V(vec1, m1, n)));
 		}
 		_mm_store_ps(mm, u);
 		dp = mm[0] + mm[1] + mm[2] + mm[3];
 		for (n = pk_lp; n < vec1->n; ++n) {
 			dp += NV_MAT_V(vec1, m1, n) * NV_MAT_V(vec2, m2, n);
 		}
-  
 		return dp;
 	}
 #else
@@ -483,7 +455,6 @@ nv_vector_max_ex(const nv_matrix_t *v, int m)
 	
 	return ret;
 }
-
 
 int 
 nv_vector_max_n(const nv_matrix_t *v, int m)
@@ -779,14 +750,56 @@ nv_vector_normalize_L1(nv_matrix_t *v, int vm)
 void 
 nv_vector_normalize_L2(nv_matrix_t *v, int vm)
 {
-#if NV_ENABLE_SSE2
+#if NV_ENABLE_AVX
+	{
+		const int i_lp = (v->n & 0xfffffff8);
+		__m256 x, u, h;
+		__m128 a;
+		int i;
+		NV_ALIGNED(float, dp, 32);
+		u = _mm256_setzero_ps();
+		for (i = 0; i < i_lp; i += 8) {
+			x = _mm256_load_ps(&NV_MAT_V(v, vm, i));
+			x = _mm256_mul_ps(x, x);
+			h = _mm256_hadd_ps(x, x);
+			u = _mm256_add_ps(u, h);
+		}
+		u = _mm256_hadd_ps(u, u);
+		a = _mm_add_ps(_mm256_extractf128_ps(u, 0), _mm256_extractf128_ps(u, 1));
+		_mm_store_ss(&dp, a);
+		for (i = i_lp; i < v->n; ++i) {
+			dp += NV_MAT_V(v, vm, i) * NV_MAT_V(v, vm, i);
+		}
+		if (dp > 0.0f) {
+			float scale = 1.0f / sqrtf(dp);
+			x = _mm256_set1_ps(scale);
+			for (i = 0; i < i_lp; i += 8) {
+				_mm256_store_ps(&NV_MAT_V(v, vm, i),
+								_mm256_mul_ps(*(const __m256*)&NV_MAT_V(v, vm, i), x));
+			}
+			for (i = i_lp; i < v->n; ++i) {
+				NV_MAT_V(v, vm, i) *= scale;
+			}
+		}
+	}
+#elif NV_ENABLE_SSE
 	{
 		const int i_lp = (v->n & 0xfffffffc);
 		__m128 x, u;
-		NV_ALIGNED(float, mm[4], 16);
 		int i;
-		float dp;
-		
+		NV_ALIGNED(float, dp, 16);
+#if NV_ENABLE_SSE3
+		u = _mm_setzero_ps();
+		for (i = 0; i < i_lp; i += 4) {
+			x = _mm_load_ps(&NV_MAT_V(v, vm, i));
+			x = _mm_mul_ps(x, x);
+			x = _mm_hadd_ps(x, x);
+			u = _mm_add_ps(u, x);
+		}
+		u = _mm_hadd_ps(u, u);
+		_mm_store_ss(&dp, u);
+#else
+		NV_ALIGNED(float, mm[4], 16);
 		u = _mm_setzero_ps();
 		for (i = 0; i < i_lp; i += 4) {
 			x = _mm_load_ps(&NV_MAT_V(v, vm, i));
@@ -794,17 +807,19 @@ nv_vector_normalize_L2(nv_matrix_t *v, int vm)
 		}
 		_mm_store_ps(mm, u);
 		dp = mm[0] + mm[1] + mm[2] + mm[3];
+#endif
 		for (i = i_lp; i < v->n; ++i) {
 			dp += NV_MAT_V(v, vm, i) * NV_MAT_V(v, vm, i);
 		}
 		if (dp > 0.0f) {
-			x = _mm_set1_ps(1.0f / sqrtf(dp));
+			float scale = 1.0f / sqrtf(dp);
+			x = _mm_set1_ps(scale);
 			for (i = 0; i < i_lp; i += 4) {
 				_mm_store_ps(&NV_MAT_V(v, vm, i),
 							 _mm_mul_ps(*(const __m128*)&NV_MAT_V(v, vm, i), x));
 			}
 			for (i = i_lp; i < v->n; ++i) {
-				NV_MAT_V(v, vm, i) *= dp;
+				NV_MAT_V(v, vm, i) *= scale;
 			}
 		}
 	}
@@ -839,63 +854,15 @@ nv_vector_normalize_all_L1(nv_matrix_t *mat)
 void 
 nv_vector_normalize_all_L2(nv_matrix_t *mat)
 {
-#if NV_ENABLE_SSE2
-	{
-		int j;
-		const int i_lp = (mat->n & 0xfffffffc);
-		
+	int j;
+	
 #ifdef _OPENMP
-		int threads = nv_omp_procs();
-#pragma omp parallel for num_threads(threads)
+#pragma omp parallel for num_threads(1)
 #endif
-		for (j = 0; j < mat->m; ++j) {
-			__m128 x, u;
-			NV_ALIGNED(float, mm[4], 16);
-			int i;
-			float dp;
-			
-			u = _mm_setzero_ps();
-			for (i = 0; i < i_lp; i += 4) {
-				x = _mm_load_ps(&NV_MAT_V(mat, j, i));
-				x = _mm_mul_ps(x, x);
-				u = _mm_add_ps(u, x);
-			}
-			_mm_store_ps(mm, u);
-			dp = mm[0] + mm[1] + mm[2] + mm[3];
-			
-			for (i = i_lp; i < mat->n; ++i) {
-				dp += NV_MAT_V(mat, j, i) * NV_MAT_V(mat, j, i);
-			}
-			if (dp > 0.0f) {
-				x = _mm_set1_ps(1.0f / sqrtf(dp));
-				for (i = 0; i < i_lp; i += 4) {
-					_mm_store_ps(&NV_MAT_V(mat, j, i),
-								 _mm_mul_ps(*(const __m128*)&NV_MAT_V(mat, j, i), x));
-				}
-				for (i = i_lp; i < mat->n; ++i) {
-					NV_MAT_V(mat, j, i) *= dp;
-				}
-			}
-		}
+	for (j = 0; j < mat->m; ++j) {
+		nv_vector_normalize_L2(mat, j);
 	}
-#else
-	{
-		int j;
-#ifdef _OPENMP
-		int threads = nv_omp_procs();
-#pragma omp parallel for num_threads(threads)
-#endif
-		for (j = 0; j < mat->m; ++j) {
-			float norm = nv_vector_norm(mat, j);
-			if (norm > 0.0f) {
-				float scale = 1.0f / norm;
-				nv_vector_muls(mat, j, mat, j, scale);
-			}
-		}
-	}
-#endif
 }
-
 
 void 
 nv_vector_normalize_maxmin(nv_matrix_t *v, int vm, float min_v, float max_v)

@@ -6,14 +6,12 @@ nv_config_msvc.h \
 3rd_party/msinttypes/stdint.h \
 3rd_party/sha1/sha.h \
 3rd_party/mt/mt64.h \
-3rd_party/avxintrin_emu/avxintrin_emu.h \
 nv.pc.in \
 libnv-2.def
 
 lib_LTLIBRARIES = libnv.la
 libnv_la_LIBADD = 
-libnv_la_CFLAGS = -Wall \
--I$(srcdir)/3rd_party/sha1 -I$(srcdir)/3rd_party/mt -I$(srcdir)/3rd_party/avxintrin_emu
+libnv_la_CFLAGS = -I$(srcdir)/3rd_party/sha1 -I$(srcdir)/3rd_party/mt
 
 libnv_la_CXXFLAGS = $(libnv_la_CFLAGS)
 libnv_la_LDFLAGS = -no-undefined -version-number @NV_MAJOR@:@NV_MINOR@:@NV_REVISION@ -rpath "$(libdir)"
@@ -27,7 +25,6 @@ nv_core_matrix.c \
 nv_core_rand.c \
 nv_util_map.cpp \
 nv_util_sha1.c \
-nv_util_sleep.c \
 nv_util_clock.c \
 nv_util_2d_index.cpp \
 nv_util_array.cpp \
@@ -65,7 +62,7 @@ nv_ip_gaussian.c \
 nv_ip_gray.c \
 nv_ip_integral.c \
 nv_ip_star_integral.c \
-nv_ip_keypoint.c \
+nv_ip_keypoint.cpp \
 nv_ip_laplacian.c \
 nv_ip_resize.c \
 nv_ip_star_integral_static.c \
@@ -89,8 +86,7 @@ nv_io_kmeans_tree.c \
 nv_io_klr_tree.c \
 3rd_party/sha1/sha1.c \
 3rd_party/mt/mt19937-64.c \
-3rd_party/getopt/getopt.c \
-3rd_party/sse_mathfun/sse_mathfun.cpp
+3rd_party/getopt/getopt.c
 
 nodist_include_HEADERS = nv_config_auto.h
 include_HEADERS = \
@@ -106,7 +102,6 @@ nv_util.h \
 nv_util_map.h \
 nv_util_clock.h \
 nv_util_sha1.h \
-nv_util_sleep.h \
 nv_util_getopt.h \
 nv_util_2d_index.h \
 nv_util_array.h \
@@ -120,7 +115,6 @@ nv_num_prime.h \
 nv_num.h \
 nv_num_distance.h \
 nv_num_eigen.h \
-nv_num_sse_mathfun.h \
 nv_num_knn.h \
 nv_ml_util.h \
 nv_ml_xmeans.h \

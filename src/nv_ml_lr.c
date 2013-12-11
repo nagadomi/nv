@@ -337,6 +337,15 @@ nv_lr_predict_label(const nv_lr_t *lr,
 
 	return label;
 }
+#if NV_ENABLE_SSE2
+static NV_INLINE __m128
+nv_exp_ps(__m128 x)
+{
+	NV_ALIGNED(float, mm[4], 16);
+	_mm_store_ps(mm, x);
+	return _mm_set_ps(expf(mm[3]),expf(mm[2]), expf(mm[1]), expf(mm[0]));
+}
+#endif
 
 nv_int_float_t
 nv_lr_predict_label_and_probability(const nv_lr_t *lr,

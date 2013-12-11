@@ -199,7 +199,7 @@ nv_kmeans_tree_train(nv_kmeans_tree_t *tree,
 		} else {
 			int i;
 #ifdef _OPENMP
-#pragma omp parallel for num_threads(nv_omp_procs())
+#pragma omp parallel for
 #endif			
 			for (i = 0; i < data->m; ++i) {
 				labels[i] = nv_kmeans_tree_predict_label_ex(tree, y, data, i, NV_KMEANS_TREE_TOPN);
@@ -309,7 +309,7 @@ nv_kmeans_tree_inherit_train(nv_kmeans_tree_t *tree,
 		} else {
 			int i;
 #ifdef _OPENMP
-#pragma omp parallel for num_threads(nv_omp_procs())
+#pragma omp parallel for
 #endif 
 			for (i = 0; i < data->m; ++i) {
 				labels[i] = nv_kmeans_tree_predict_label_ex(tree, y, data, i, NV_KMEANS_TREE_TOPN);

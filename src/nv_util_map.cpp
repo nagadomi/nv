@@ -53,7 +53,7 @@ nv_imap_free(nv_imap_t **imap)
 void 
 nv_imap_insert(nv_imap_t *imap, int key, void *data)
 {
-	imap->map.insert(std::make_pair<int, void *>(key, data));
+	imap->map.insert(std::make_pair(key, data));
 }
 
 void *
@@ -139,7 +139,7 @@ nv_smap_free(nv_smap_t **smap)
 void 
 nv_smap_insert(nv_smap_t *smap, const char *key, void *data)
 {
-	smap->map.insert(std::make_pair<std::string, void *>(key, data));
+	smap->map.insert(std::make_pair(key, data));
 }
 
 void *
@@ -181,7 +181,7 @@ nv_smap_string_insert(nv_smap_t *smap, const char *key, const char *string_data)
 		nv_free(old_data);
 	}
 	strcpy(new_string, string_data);
-	smap->map.insert(std::make_pair<std::string, void *>(key, new_string));
+	smap->map.insert(std::make_pair(key, new_string));
 }
 
 static int

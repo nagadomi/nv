@@ -56,24 +56,27 @@ float nv_cosine(const nv_matrix_t *vec1, int m1, const nv_matrix_t *vec2, int m2
 /* ユークリッド距離^2 */
 float nv_euclidean2(const nv_matrix_t *vec1, int m1, const nv_matrix_t *vec2, int m2)
 {
-	float dist = 0.0f;
-
+	NV_ALIGNED(float, dist, 32);
+	
 	NV_ASSERT(vec1->n == vec2->n);
 #if NV_ENABLE_AVX
 	{
-		NV_ALIGNED(float, mm[8], 32);
-		__m256 x, u;
+		__m256 x, u, h;
+		__m128 a;
 		int n;
 		int pk_lp = (vec1->n & 0xfffffff8);
-
-		u = _mm256_set1_ps(0.0f);
+		
+		u = _mm256_setzero_ps();
 		for (n = 0; n < pk_lp; n += 8) {
 			x = _mm256_load_ps(&NV_MAT_V(vec2, m2, n));
-			x = _mm256_sub_ps(x, *(const __m256 *)&NV_MAT_V(vec1, m1, n));
-			u = _mm256_add_ps(u, _mm256_mul_ps(x, x));
+			h = _mm256_sub_ps(x, *(const __m256*)&NV_MAT_V(vec1, m1, n));
+			x = _mm256_mul_ps(h, h);
+			h = _mm256_hadd_ps(x, x);
+			u = _mm256_add_ps(u, h);
 		}
-		_mm256_store_ps(mm, u);
-		dist = mm[0] + mm[1] + mm[2] + mm[3] + mm[4] + mm[5] + mm[6] + mm[7];
+		u = _mm256_hadd_ps(u, u);
+		a = _mm_add_ps(_mm256_extractf128_ps(u, 0), _mm256_extractf128_ps(u, 1));
+		_mm_store_ss(&dist, a);
 		for (n = pk_lp; n < vec1->n; ++n) {
 			const float d = NV_MAT_V(vec1, m1, n) - NV_MAT_V(vec2, m2, n);			
 			dist += d * d;
@@ -81,12 +84,11 @@ float nv_euclidean2(const nv_matrix_t *vec1, int m1, const nv_matrix_t *vec2, in
 	}
 #elif NV_ENABLE_SSE2
 	{
-		NV_ALIGNED(float, mm[4], 16);
 		__m128 x, u;
 		int n;
 		int pk_lp = (vec1->n & 0xfffffffc);
-
-		u = _mm_set1_ps(0.0f);
+		NV_ALIGNED(float, mm[4], 16);
+		u = _mm_setzero_ps();
 		for (n = 0; n < pk_lp; n += 4) {
 			x = _mm_sub_ps(_mm_load_ps(&NV_MAT_V(vec2, m2, n)),
 						   *(const __m128 *)&NV_MAT_V(vec1, m1, n));
@@ -94,6 +96,7 @@ float nv_euclidean2(const nv_matrix_t *vec1, int m1, const nv_matrix_t *vec2, in
 		}
 		_mm_store_ps(mm, u);
 		dist = mm[0] + mm[1] + mm[2] + mm[3];
+
 		for (n = pk_lp; n < vec1->n; ++n) {
 			const float d = NV_MAT_V(vec1, m1, n) - NV_MAT_V(vec2, m2, n);
 			dist += d * d;
@@ -102,6 +105,7 @@ float nv_euclidean2(const nv_matrix_t *vec1, int m1, const nv_matrix_t *vec2, in
 #else
 	{
 		int n;
+		dist = 0.0f;
 		for (n = 0; n < vec1->n; ++n) {
 			const float d = NV_MAT_V(vec1, m1, n) - NV_MAT_V(vec2, m2, n);			
 			dist += d * d;

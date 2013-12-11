@@ -150,7 +150,6 @@ nv_load_kmeans_tree_bin(const char *filename)
 	if (fp == NULL) {
 		perror(filename);
 		nv_free(tree);
-		fclose(fp);
 		return NULL;
 	}
 	n = 0;

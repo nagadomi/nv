@@ -19,7 +19,6 @@
 
 #ifndef NV_UTIL_CLOCK_H
 #define NV_UTIL_CLOCK_H
-#if NV_ENABLE_CLOCK
 
 #include "nv_core.h"
 
@@ -33,7 +32,6 @@ unsigned long nv_clock(void);
 }
 #endif
 
-#endif
 #endif
 
 

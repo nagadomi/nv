@@ -1,0 +1,92 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="src">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="include">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\src\tests\nv_test.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\tests\nv_test_arow.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\tests\nv_test_eigen.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\tests\nv_test_io.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\tests\nv_test_keypoint.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\tests\nv_test_klr.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\tests\nv_test_klr_tree.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\tests\nv_test_kmeans.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\tests\nv_test_kmeans_tree.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\tests\nv_test_knb.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\tests\nv_test_knn.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\tests\nv_test_knn2.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\tests\nv_test_knn_lmca.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\tests\nv_test_knn_pca.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\tests\nv_test_lbgu.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\tests\nv_test_lr.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\tests\nv_test_mlp.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\tests\nv_test_munkres.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\tests\nv_test_nb.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\tests\nv_test_pa.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\tests\nv_test_pca_kmeans_tree.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\tests\nv_test_plsi.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\tests\nv_test_serialize.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\tests\nv_test_sha1.c">
+      <Filter>src</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\src\tests\nv_test.h">
+      <Filter>include</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>

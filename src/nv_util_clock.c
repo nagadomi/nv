@@ -21,8 +21,6 @@
 
 /* tick toc */
 
-#if NV_ENABLE_CLOCK
-
 #if NV_POSIX
 #  include <time.h>
 #  include <sys/time.h>
@@ -44,6 +42,3 @@ nv_clock(void)
 	return (unsigned long)GetTickCount();
 #endif
 }
-
-
-#endif
