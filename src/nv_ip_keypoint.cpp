@@ -570,7 +570,7 @@ nv_keypoint_hist(const nv_keypoint_ctx_t *ctx,
 	int *xx = nv_alloc_type(int, NV_KEYPOINT_HIST_SAMPLE);
 	float *fdist_x = nv_alloc_type(float, NV_KEYPOINT_HIST_SAMPLE);
 	const nv_matrix_t *gauss_w = ctx->gauss_w;
-	const ATAN2 atan_func;
+	ATAN2 atan_func;
 	
 	NV_ASSERT(ky + f_r < img_integral->rows-1);
 	NV_ASSERT(kx + f_r < img_integral->cols-1);
