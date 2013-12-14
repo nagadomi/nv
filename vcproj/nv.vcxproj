@@ -112,8 +112,8 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>$(ProjectDir)..\src\;$(ProjectDir)..\src\3rd_party\msinttypes;$(ProjectDir)..\src\3rd_party\sha1;$(ProjectDir)..\src\3rd_party\mt;$(ProjectDir)..\src\3rd_party;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>NV_INTERNAL;_CRT_SECURE_NO_WARNINGS;__STDC_FORMAT_MACROS;__STDC_LIMIT_MACROS;__SSE__;__SSE2__;__SSE3__;__SSE4_1__;__SSE4_2__;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\src\;$(ProjectDir)..\src\3rd_party\sha1;$(ProjectDir)..\src\3rd_party\mt;$(ProjectDir)..\src\3rd_party;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>NV_INTERNAL;_CRT_SECURE_NO_WARNINGS;__STDC_FORMAT_MACROS;__STDC_LIMIT_MACROS;__SSE__;__SSE2__;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>true</MinimalRebuild>
       <ExceptionHandling>Sync</ExceptionHandling>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
@@ -143,8 +143,8 @@
       <OmitFramePointers>false</OmitFramePointers>
       <EnableFiberSafeOptimizations>false</EnableFiberSafeOptimizations>
       <WholeProgramOptimization>true</WholeProgramOptimization>
-      <AdditionalIncludeDirectories>$(ProjectDir)..\src;$(ProjectDir)..\src\3rd_party\msinttypes;$(ProjectDir)..\src\3rd_party\sha1;$(ProjectDir)..\src\3rd_party\mt;$(ProjectDir)..\src\3rd_party;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>NV_INTERNAL;NV_DLL;_CRT_SECURE_NO_WARNINGS;NDEBUG;__STDC_FORMAT_MACROS;__STDC_LIMIT_MACROS;__SSE__;__SSE2__;__SSE3__;__SSE4_1__;__SSE4_2__;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\src;$(ProjectDir)..\src\3rd_party\sha1;$(ProjectDir)..\src\3rd_party\mt;$(ProjectDir)..\src\3rd_party;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>NV_INTERNAL;NV_DLL;_CRT_SECURE_NO_WARNINGS;NDEBUG;__STDC_FORMAT_MACROS;__STDC_LIMIT_MACROS;__SSE__;__SSE2__;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ExceptionHandling>Sync</ExceptionHandling>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <StructMemberAlignment>Default</StructMemberAlignment>

@@ -1,9 +1,6 @@
 EXTRA_DIST = \
 nv_internal.h \
 nv_config_msvc.h \
-3rd_party/msinttypes/changelog.txt \
-3rd_party/msinttypes/inttypes.h \
-3rd_party/msinttypes/stdint.h \
 3rd_party/sha1/sha.h \
 3rd_party/mt/mt64.h \
 nv.pc.in \
