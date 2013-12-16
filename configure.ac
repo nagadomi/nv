@@ -58,14 +58,15 @@ AC_CHECK_HEADERS([float.h inttypes.h limits.h stdlib.h string.h sys/time.h unist
 
 AC_CHECK_LIB(m, main)
 AC_CHECK_LIB(ssp, main)
-AC_CHECK_LIB(stdc++, main)
-
+AC_LANG_PUSH([C++])
+  AC_CHECK_LIB(stdc++, main)
+AC_LANG_POP([C++])
 nv_glibc_backtrace=0
 
 AC_CHECK_HEADERS([execinfo.h], [AC_CHECK_FUNCS(backtrace backtrace_symbols_fd,[nv_glibc_backtrace=1;CFLAGS="$CFLAGS -rdynamic "])])
 
 AX_ARG_ENABLE(debug,
-        AS_HELP_STRING([--enable-debug],[enable assert -g and boundary check.]), [no],
+        AS_HELP_STRING([--enable-debug],[enable debug symbol and assertion.]), [no],
 	[nv_strict=1
 	CFLAGS=" $CFLAGS -g -D_GLIBCXX_DEBUG -DGLIBCXX_FORCE_NEW "
     ],
