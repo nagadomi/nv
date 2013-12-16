@@ -15,18 +15,11 @@ AC_SUBST(CFLAGS)
 AC_SUBST(CXXFLAGS)
 AC_SUBST(CPPFLAGS)
 AC_SUBST(LDFLAGS)
-if test "" = "$CFLAGS"; then
-    CFLAGS=" "
-fi
-if test "" = "$CXXFLAGS"; then
-    CXXFLAGS=" "
-fi
-if test "" = "$CPPFLAGS"; then
-    CPPFLAGS=" "
-fi
-if test "" = "$LDFLAGS"; then
-    LDFLAGS=" "
-fi
+
+CFLAGS="$CFLAGS "
+CXXFLAGS="$CXXFLAGS "
+LDFLAGS="$LDFLAGS "
+CPPFLAGS="$CPPFLAGS "
 
 CFLAGS=" $CFLAGS -DNV_DLL -DNV_INTERNAL -D__STDC_LIMIT_MACROS -D__STDC_FORMAT_MACROS "
 CFLAGS=" $CFLAGS -Wall -Wextra -Wformat=2 -Werror=format-security -Wdisabled-optimization -Wno-unused-parameter "
@@ -57,13 +50,41 @@ AC_CHECK_HEADERS([float.h inttypes.h limits.h stdlib.h string.h sys/time.h unist
 # Checks for typedefs, structures, and compiler characteristics.
 
 AC_CHECK_LIB(m, main)
-AC_CHECK_LIB(ssp, main)
-AC_LANG_PUSH([C++])
-  AC_CHECK_LIB(stdc++, main)
-AC_LANG_POP([C++])
-nv_glibc_backtrace=0
 
-AC_CHECK_HEADERS([execinfo.h], [AC_CHECK_FUNCS(backtrace backtrace_symbols_fd,[nv_glibc_backtrace=1;CFLAGS="$CFLAGS -rdynamic "])])
+nv_glibc_backtrace=0
+AC_CHECK_HEADERS([execinfo.h], [AC_CHECK_FUNCS(backtrace backtrace_symbols_fd,[nv_glibc_backtrace=1])])
+
+AC_CANONICAL_HOST
+case $host in
+  *-*-mingw* | *-*-cygwin*)
+    AC_CHECK_LIB(ssp, main)
+    AC_LANG_PUSH([C++])
+      AC_CHECK_LIB(stdc++, main)
+    AC_LANG_POP([C++])
+    CFLAGS=" $CFLAGS -mstackrealign -mthreads "
+    LDFLAGS=" $LDFLAGS -Wl,-no-undefined -Wl,--export-all-symbols -Wl,--stack,10485760 "
+    if test nv_glibc_backtrace = 1; then
+       CFLAGS=" $CFLAGS -rdynamic "
+    fi
+    ;;
+  *-linux*)
+    LDFLAGS=" $LDFLAGS -Wl,-z,relro "
+    if test nv_glibc_backtrace = 1; then
+       CFLAGS="$CFLAGS -rdynamic "
+    fi
+    ;;
+  *freebsd*)
+    AC_CHECK_LIB(ssp, main)
+    if test nv_glibc_backtrace = 1; then
+       CFLAGS="$CFLAGS -rdynamic "
+    fi
+    ;;
+  *apple-darwin*)
+    AC_CHECK_LIB(ssp, main)
+    ;;
+  *)
+    ;;
+esac
 
 AX_ARG_ENABLE(debug,
         AS_HELP_STRING([--enable-debug],[enable debug symbol and assertion.]), [no],
@@ -191,19 +212,6 @@ AC_FUNC_MEMCMP
 AC_FUNC_VPRINTF
 AC_CHECK_FUNCS([gettimeofday memset strchr])
 
-# host
-AC_CANONICAL_HOST
-case $host in
-  *-*-mingw* | *-*-cygwin*)
-    CFLAGS="$CFLAGS -mstackrealign -mthreads "
-    LDFLAGS="$LDFLAGS -Wl,-no-undefined -Wl,--export-all-symbols -Wl,--stack,10485760 "
-    ;;
-  *-linux*)
-    LDFLAGS=" $LDFLAGS -Wl,-z,relro "
-    ;;
-  *)
-    ;;
-esac
 CXXFLAGS=$CFLAGS
 
 AC_SUBST(nv_arch)
