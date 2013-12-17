@@ -2,11 +2,11 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.61)
-AC_INIT([nv],[2.1.3],[nagadomi@nurs.or.jp])
+AC_INIT([nv],[2.1.4],[nagadomi@nurs.or.jp])
 NV_MAJOR=2
 NV_MINOR=1
-NV_REVISION=3
-AM_INIT_AUTOMAKE([foreign])
+NV_REVISION=4
+AM_INIT_AUTOMAKE([foreign subdir-objects])
 AC_CONFIG_SRCDIR([src])
 AC_CONFIG_HEADER([src/config.h:src/config.h.in])
 AC_CONFIG_MACRO_DIR([m4])
@@ -15,18 +15,11 @@ AC_SUBST(CFLAGS)
 AC_SUBST(CXXFLAGS)
 AC_SUBST(CPPFLAGS)
 AC_SUBST(LDFLAGS)
-if test "" = "$CFLAGS"; then
-    CFLAGS=" "
-fi
-if test "" = "$CXXFLAGS"; then
-    CXXFLAGS=" "
-fi
-if test "" = "$CPPFLAGS"; then
-    CPPFLAGS=" "
-fi
-if test "" = "$LDFLAGS"; then
-    LDFLAGS=" "
-fi
+
+CFLAGS="$CFLAGS "
+CXXFLAGS="$CXXFLAGS "
+LDFLAGS="$LDFLAGS "
+CPPFLAGS="$CPPFLAGS "
 
 CFLAGS=" $CFLAGS -DNV_DLL -DNV_INTERNAL -D__STDC_LIMIT_MACROS -D__STDC_FORMAT_MACROS "
 CFLAGS=" $CFLAGS -Wall -Wextra -Wformat=2 -Werror=format-security -Wdisabled-optimization -Wno-unused-parameter "
@@ -57,33 +50,63 @@ AC_CHECK_HEADERS([float.h inttypes.h limits.h stdlib.h string.h sys/time.h unist
 # Checks for typedefs, structures, and compiler characteristics.
 
 AC_CHECK_LIB(m, main)
-AC_CHECK_LIB(ssp, main)
 AC_CHECK_LIB(stdc++, main)
 
 nv_glibc_backtrace=0
+AC_CHECK_HEADERS([execinfo.h], [AC_CHECK_FUNCS(backtrace backtrace_symbols_fd,[nv_glibc_backtrace=1])])
 
-AC_CHECK_HEADERS([execinfo.h], [AC_CHECK_FUNCS(backtrace backtrace_symbols_fd,[nv_glibc_backtrace=1;CFLAGS="$CFLAGS -rdynamic "])])
+AC_CANONICAL_HOST
+case $host in
+  *-*-mingw* | *-*-cygwin*)
+    AC_CHECK_LIB(ssp, main)
+    CFLAGS=" $CFLAGS -mstackrealign -mthreads "
+    LDFLAGS=" $LDFLAGS -Wl,-no-undefined -Wl,--export-all-symbols -Wl,--stack,10485760 "
+    ;;
+  *-linux*)
+    LDFLAGS=" $LDFLAGS -Wl,-z,relro "
+    if test $nv_glibc_backtrace = 1; then
+       CFLAGS="$CFLAGS -rdynamic "
+    fi
+    ;;
+  *freebsd*)
+    AC_CHECK_LIB(ssp, main)
+    if test $nv_glibc_backtrace = 1; then
+       CFLAGS="$CFLAGS -rdynamic "
+    fi
+    ;;
+  *apple-darwin*)
+    AC_CHECK_LIB(ssp, main)
+    ;;
+  *)
+    ;;
+esac
 
 AX_ARG_ENABLE(debug,
-        AS_HELP_STRING([--enable-debug],[enable assert -g and boundary check.]), [no],
+        AS_HELP_STRING([--enable-debug],[enable debug symbol and assertion.]), [no],
 	[nv_strict=1
 	CFLAGS=" $CFLAGS -g -D_GLIBCXX_DEBUG -DGLIBCXX_FORCE_NEW "
     ],
     [nv_strict=0
 	CFLAGS="$CFLAGS -DNDEBUG -O3 -funroll-loops -ffast-math -g0 "])
 
-nv_native=0
-AX_ARG_ENABLE(native,
-        AS_HELP_STRING([--disable-native],[disable -march=native]), [yes],
-        [nv_native=1
-	CFLAGS=" $CFLAGS -march=native "],
-        [])
-	
-nv_sse2=0	
-AX_ARG_ENABLE(sse2,
-        AS_HELP_STRING([--disable-sse2],[disable -msse2]), [yes],
-        [nv_sse2=1],
-        [])
+nv_arch=native
+AC_ARG_WITH(arch,
+	AS_HELP_STRING([--with-arch],
+	[processor architecture. native/generic. (default is native)]),
+	[nv_arch=${withval}],
+	[])
+case $nv_arch in
+  yes|"")
+    nv_arch=native
+    ;;
+  no)
+    nv_arch=generic
+    ;;
+esac
+if test "$nv_arch" != "generic"; then
+   CFLAGS=" $CFLAGS -march=$nv_arch "
+   AC_MSG_NOTICE(adding -march=$nv_arch)
+fi
 
 AX_ARG_ENABLE(ml-test,
         AS_HELP_STRING([--disable-ml-test],[disable machine learning tests]), [yes],
@@ -184,34 +207,9 @@ AC_FUNC_MEMCMP
 AC_FUNC_VPRINTF
 AC_CHECK_FUNCS([gettimeofday memset strchr])
 
-# host
-AC_CANONICAL_HOST
-case $host in
-  *-*-mingw* | *-*-cygwin*)
-    CFLAGS="$CFLAGS -mstackrealign -mthreads "
-    LDFLAGS="$LDFLAGS -Wl,-no-undefined -Wl,--export-all-symbols -Wl,--stack,10485760 "
-    ;;
-  *-linux*)
-    LDFLAGS=" $LDFLAGS -Wl,-z,relro "
-    ;;
-  *)
-    ;;
-esac
-case $host in
-  i?86-*)
-    if test $nv_sse2 = 1 -a $nv_native != 1; then
-      echo "Note: set -msse2 flag. (--enable-sse2)"
-      CFLAGS=" $CFLAGS -msse -msse2 "
-    fi
-    ;;
-  *)
-    ;;
-esac
-
 CXXFLAGS=$CFLAGS
 
-AC_SUBST(nv_native)
-AC_SUBST(nv_sse2)
+AC_SUBST(nv_arch)
 AC_SUBST(nv_strict)
 AC_SUBST(nv_glibc_backtrace)
 AC_SUBST(nv_openssl)
@@ -237,7 +235,7 @@ Makefile
 
 AC_OUTPUT
 echo "libnv $NV_MAJOR.$NV_MINOR.$NV_REVISION:"
-echo "   Compiling with Native Instruction . : $nv_native"
+echo "   Processor Architecture ............ : $nv_arch"
 echo "   Compiling with OpenMP ............. : $nv_openmp"
 echo "   Compiling with Debug .............. : $nv_strict"
 echo "   Building with OpenCV support....... : $nv_opencv"
