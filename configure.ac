@@ -50,6 +50,9 @@ AC_CHECK_HEADERS([float.h inttypes.h limits.h stdlib.h string.h sys/time.h unist
 # Checks for typedefs, structures, and compiler characteristics.
 
 AC_CHECK_LIB(m, main)
+AC_LANG_PUSH([C++])
+  AC_CHECK_LIB(stdc++, main)
+AC_LANG_POP([C++])
 
 nv_glibc_backtrace=0
 AC_CHECK_HEADERS([execinfo.h], [AC_CHECK_FUNCS(backtrace backtrace_symbols_fd,[nv_glibc_backtrace=1])])
@@ -58,9 +61,6 @@ AC_CANONICAL_HOST
 case $host in
   *-*-mingw* | *-*-cygwin*)
     AC_CHECK_LIB(ssp, main)
-    AC_LANG_PUSH([C++])
-      AC_CHECK_LIB(stdc++, main)
-    AC_LANG_POP([C++])
     CFLAGS=" $CFLAGS -mstackrealign -mthreads "
     LDFLAGS=" $LDFLAGS -Wl,-no-undefined -Wl,--export-all-symbols -Wl,--stack,10485760 "
     ;;
