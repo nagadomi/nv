@@ -63,19 +63,16 @@ case $host in
     AC_LANG_POP([C++])
     CFLAGS=" $CFLAGS -mstackrealign -mthreads "
     LDFLAGS=" $LDFLAGS -Wl,-no-undefined -Wl,--export-all-symbols -Wl,--stack,10485760 "
-    if test nv_glibc_backtrace = 1; then
-       CFLAGS=" $CFLAGS -rdynamic "
-    fi
     ;;
   *-linux*)
     LDFLAGS=" $LDFLAGS -Wl,-z,relro "
-    if test nv_glibc_backtrace = 1; then
+    if test $nv_glibc_backtrace = 1; then
        CFLAGS="$CFLAGS -rdynamic "
     fi
     ;;
   *freebsd*)
     AC_CHECK_LIB(ssp, main)
-    if test nv_glibc_backtrace = 1; then
+    if test $nv_glibc_backtrace = 1; then
        CFLAGS="$CFLAGS -rdynamic "
     fi
     ;;
