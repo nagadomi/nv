@@ -94,6 +94,8 @@ int nv_vector_maxnorm_m(const nv_matrix_t *v);
 int nv_vector_maxsum_m(const nv_matrix_t *v);
 
 float nv_vector_sum(const nv_matrix_t *v, int m);
+float nv_vector_mean(const nv_matrix_t *v, int m);
+float nv_vector_var(const nv_matrix_t *v, int m);	
 
 void nv_vector_rand(nv_matrix_t *v, int vm);
 void nv_vector_nrand(nv_matrix_t *v, int vm, float u, float s);

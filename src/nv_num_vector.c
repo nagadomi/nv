@@ -652,6 +652,24 @@ nv_vector_sum(const nv_matrix_t *v, int m)
 	return sum;
 }
 
+float
+nv_vector_mean(const nv_matrix_t *v, int m)
+{
+	return nv_vector_sum(v, m) / v->n;
+}
+
+float
+nv_vector_var(const nv_matrix_t *v, int m)
+{
+	float mean = nv_vector_mean(v, m);
+	float var = 0.0f;
+	int i;
+	for (i = 0; i < v->n; ++i) {
+		var += mean - NV_MAT_V(v, m, i);
+	}
+	return var / v->n;
+}
+
 int 
 nv_vector_maxsum_m(const nv_matrix_t *v)
 {
