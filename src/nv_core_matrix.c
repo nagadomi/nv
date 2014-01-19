@@ -320,6 +320,7 @@ nv_matrix_m(nv_matrix_t *mat, int m)
 		}
 	}
 	mat->m = m;
+	mat->list_step = (int64_t)mat->step * mat->m;	
 }
 
 void 
