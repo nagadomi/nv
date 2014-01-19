@@ -317,6 +317,53 @@ nv_vector_mul(nv_matrix_t *vec0, int m0,
 #endif
 }
 
+void 
+nv_vector_div(nv_matrix_t *vec0, int m0,
+			  const nv_matrix_t *vec1, int m1,
+			  const nv_matrix_t *vec2, int m2)
+{
+	NV_ASSERT(vec1->n == vec2->n);
+	NV_ASSERT(vec2->n == vec0->n);
+	
+#if NV_ENABLE_AVX
+	{
+		__m256 x;
+		int n;
+		int pk_lp = (vec1->n & 0xfffffff8);
+		
+		for (n = 0; n < pk_lp; n += 8) {
+			x = _mm256_load_ps(&NV_MAT_V(vec1, m1, n));
+			_mm256_store_ps(&NV_MAT_V(vec0, m0, n),
+							_mm256_div_ps(x, *(const __m256 *)&NV_MAT_V(vec2, m2, n)));
+		}
+		for (n = pk_lp; n < vec1->n; ++n) {
+			NV_MAT_V(vec0, m0, n) = NV_MAT_V(vec1, m1, n) / NV_MAT_V(vec2, m2, n);
+		}
+	}
+#elif NV_ENABLE_SSE2
+	{
+		int n;
+		int pk_lp = (vec1->n & 0xfffffffc);
+
+		for (n = 0; n < pk_lp; n += 4) {
+			__m128 x = _mm_load_ps(&NV_MAT_V(vec1, m1, n));
+			_mm_store_ps(&NV_MAT_V(vec0, m0, n),
+						 _mm_div_ps(x, *(const __m128 *)&NV_MAT_V(vec2, m2, n)));
+		}
+		for (n = pk_lp; n < vec1->n; ++n) {
+			NV_MAT_V(vec0, m0, n) = NV_MAT_V(vec1, m1, n) / NV_MAT_V(vec2, m2, n);
+		}
+	}
+#else
+	{
+		int n;
+		for (n = 0; n < vec1->n; ++n) {
+			NV_MAT_V(vec0, m0, n) = NV_MAT_V(vec1, m1, n) / NV_MAT_V(vec2, m2, n);
+		}
+	}
+#endif
+}
+
 
 
 float 
@@ -945,6 +992,50 @@ nv_vector_muls(nv_matrix_t *a, int am, const nv_matrix_t *x, int xm, float v)
 		int n;
 		for (n = 0; n < x->n; ++n) {
 			NV_MAT_V(a, am, n) = NV_MAT_V(x, xm, n) * v;
+		}
+	}
+#endif
+}
+
+void 
+nv_vector_divs(nv_matrix_t *a, int am, const nv_matrix_t *x, int xm, float v)
+{
+	NV_ASSERT(a->n >= x->n);
+#if NV_ENABLE_AVX
+	{
+		__m256 vv;
+		int n;
+		int pk_lp = (x->n & 0xfffffff8);
+
+		vv = _mm256_set1_ps(v);
+		for (n = 0; n < pk_lp; n += 8) {
+			_mm256_store_ps(&NV_MAT_V(a, am, n),
+							_mm256_div_ps(vv, *(const __m256 *)&NV_MAT_V(x, xm, n)));
+		}
+		for (n = pk_lp; n < x->n; ++n) {
+			NV_MAT_V(a, am, n) = NV_MAT_V(x, xm, n) / v;
+		}
+	}
+#elif NV_ENABLE_SSE2
+	{
+		__m128 vv;
+		int n;
+		int pk_lp = (x->n & 0xfffffffc);
+
+		vv = _mm_set1_ps(v);
+		for (n = 0; n < pk_lp; n += 4) {
+			_mm_store_ps(&NV_MAT_V(a, am, n),
+						 _mm_div_ps(vv, *(const __m128 *)&NV_MAT_V(x, xm, n)));
+		}
+		for (n = pk_lp; n < x->n; ++n) {
+			NV_MAT_V(a, am, n) = NV_MAT_V(x, xm, n) / v;
+		}
+	}
+#else
+	{
+		int n;
+		for (n = 0; n < x->n; ++n) {
+			NV_MAT_V(a, am, n) = NV_MAT_V(x, xm, n) / v;
 		}
 	}
 #endif

@@ -72,12 +72,15 @@ nv_vector_add(nv_matrix_t *vec0, int m0,
 			  const nv_matrix_t *vec1, int m1,
 			  const nv_matrix_t *vec2, int m2);
 	
-//#define nv_vector_muls(v1, j1, v2, j2, v) nv_vector_mul(v1, j1, v2, j2, v)
-
 void 
 nv_vector_mul(nv_matrix_t *vec0, int m0,
 			  const nv_matrix_t *vec1, int m1,
 			  const nv_matrix_t *vec2, int m2);
+void 
+nv_vector_div(nv_matrix_t *vec0, int m0,
+			  const nv_matrix_t *vec1, int m1,
+			  const nv_matrix_t *vec2, int m2);
+	
 	
 float nv_vector_dot(const nv_matrix_t *vec1, int m1, const nv_matrix_t *vec2, int m2);
 float nv_vector_norm(const nv_matrix_t *v, int m);
@@ -107,6 +110,7 @@ void nv_vector_normalize_L2(nv_matrix_t *v, int vm);
 
 void nv_vector_normalize_maxmin(nv_matrix_t *v, int vm, float min_v, float max_v);
 void nv_vector_muls(nv_matrix_t *a, int am, const nv_matrix_t *x, int xm, float v);
+void nv_vector_divs(nv_matrix_t *a, int am, const nv_matrix_t *x, int xm, float v);	
 void nv_vector_inv(nv_matrix_t *a, int am, const nv_matrix_t *x, int xm);
 int64_t nv_float_nonzero_index(const float *v, int64_t s, int64_t e);
 int64_t nv_float_find_index(const float *v, int64_t s, int64_t e, float key);
