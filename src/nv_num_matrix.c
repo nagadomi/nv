@@ -87,53 +87,60 @@ nv_matrix_mulv(nv_matrix_t *y, int yj,
 	}
 }
 
-void nv_matrix_mul(nv_matrix_t *y,
-				   const nv_matrix_t *a_,
-				   nv_matrix_tr_t a_tr,
-				   const nv_matrix_t *b_,
-				   nv_matrix_tr_t b_tr)
+/* TODO: できるだけ転置せずにベクトル命令で効率化 */
+static void
+matrix_mul(nv_matrix_t *y,
+		   const nv_matrix_t *a,
+		   const nv_matrix_t *b)
 {
-	int i;
-	if ((a_tr == NV_MAT_TR && b_tr == NV_MAT_TR)) {
-		const nv_matrix_t *a = a_;
-		nv_matrix_t *b = nv_matrix_tr(b_);
-#ifdef _OPENMP
-#pragma omp parallel for
-#endif
-		for (i = 0; i < y->m; ++i) {
-			nv_matrix_mulv(y, i, a, NV_MAT_TR, b, i);
+    int m = a->m;
+    int n = a->n;
+    int p = b->n;
+	int i, j, k;
+	
+	NV_ASSERT(a->n == b->m);
+	NV_ASSERT(y->n == a->n);
+	NV_ASSERT(y->m == a->m);
+	NV_ASSERT(y->n == b->n);
+
+	nv_matrix_zero(y);
+	
+	for(i = 0; i < m; i++){
+		for(j = 0; j < p; j++){
+			for(k = 0; k < n; k++){
+				NV_MAT_V(y, i, j) += NV_MAT_V(a, i, k) * NV_MAT_V(b, k, j);
+			}
 		}
+	}
+}
+
+void
+nv_matrix_mul(nv_matrix_t *y,
+			  const nv_matrix_t *a_,
+			  nv_matrix_tr_t a_tr,
+			  const nv_matrix_t *b_,
+			  nv_matrix_tr_t b_tr)
+{
+	if ((a_tr == NV_MAT_TR && b_tr == NV_MAT_TR)) {
+		nv_matrix_t *a = nv_matrix_tr(a_);
+		nv_matrix_t *b = nv_matrix_tr(b_);
+		matrix_mul(y, a, b);
+		nv_matrix_free(&a);
 		nv_matrix_free(&b);
 	} else if (a_tr == NV_MAT_NOTR && b_tr == NV_MAT_NOTR) {
-		nv_matrix_t *a = nv_matrix_tr(a_);
-		const nv_matrix_t *b = b_;
-#ifdef _OPENMP
-#pragma omp parallel for
-#endif
-		for (i = 0; i < y->m; ++i) {
-			nv_matrix_mulv(y, i, a, NV_MAT_TR, b, i);
-		}
-		nv_matrix_free(&a);
-	} else if (a_tr == NV_MAT_NOTR && b_tr == NV_MAT_TR) {
 		const nv_matrix_t *a = a_;
 		const nv_matrix_t *b = b_;
-#ifdef _OPENMP
-#pragma omp parallel for
-#endif
-		for (i = 0; i < y->m; ++i) {
-			nv_matrix_mulv(y, i, a, NV_MAT_TR, b, i);
-		}
+		matrix_mul(y, a, b);
+	} else if (a_tr == NV_MAT_NOTR && b_tr == NV_MAT_TR) {
+		const nv_matrix_t *a = a_;
+		nv_matrix_t *b = nv_matrix_tr(b_);
+		matrix_mul(y, a, b);
+		nv_matrix_free(&b);
 	} else if (a_tr == NV_MAT_TR && b_tr == NV_MAT_NOTR) {
 		nv_matrix_t *a = nv_matrix_tr(a_);
-		nv_matrix_t *b = nv_matrix_tr(a_);
-#ifdef _OPENMP
-#pragma omp parallel for
-#endif
-		for (i = 0; i < y->m; ++i) {
-			nv_matrix_mulv(y, i, a, NV_MAT_TR, b, i);
-		}
+		const nv_matrix_t *b = b_;
+		matrix_mul(y, a, b);
 		nv_matrix_free(&a);
-		nv_matrix_free(&b);		
 	}
 }
 
@@ -260,4 +267,30 @@ nv_matrix_var_ex(nv_matrix_t *y, int y_j,
 	
 	nv_matrix_free(&tmp);
 	nv_matrix_free(&sub);
+}
+
+void
+nv_matrix_normalize_shift(nv_matrix_t *mat, float min_v, float max_v)
+{
+	float mat_min = FLT_MAX;
+	float mat_max = -FLT_MAX;
+	int i;
+	float scale;
+	
+	for (i = 0; i < mat->m; ++i) {
+		float vec_max = nv_vector_max(mat, i);
+		float vec_min = nv_vector_min(mat, i);
+		if (mat_max < vec_max) {
+			mat_max = vec_max;
+		}
+		if (mat_min > vec_min) {
+			mat_min = vec_min;
+		}
+	}
+	scale = (max_v - min_v) / (mat_max - mat_min);
+	for (i = 0; i < mat->m; ++i) {
+		nv_vector_subs(mat, i, mat, i, mat_min);
+		nv_vector_muls(mat, i, mat, i, scale);
+		nv_vector_adds(mat, i, mat, i, min_v);
+	}
 }

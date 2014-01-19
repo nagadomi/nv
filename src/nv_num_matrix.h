@@ -35,7 +35,8 @@ void nv_matrix_var(nv_matrix_t *y, int y_j, const nv_matrix_t *data);
 void nv_matrix_mean(nv_matrix_t *y, int y_j, const nv_matrix_t *data); 
 void nv_matrix_var_ex(nv_matrix_t *y, int y_j, const nv_matrix_t *data,
 					  const nv_matrix_t *mean, int mean_j);
-
+void nv_matrix_normalize_shift(nv_matrix_t *mat, float min_v, float max_v);
+	
 typedef enum {
 	NV_MAT_TR,
 	NV_MAT_NOTR
