@@ -33,6 +33,7 @@ typedef struct
 	int input;
 	int hidden;
 	int output;
+	float dropout;
 	nv_matrix_t *input_w;
 	nv_matrix_t *hidden_w;
 	nv_matrix_t *input_bias;
@@ -50,18 +51,19 @@ void nv_mlp_init_rand(nv_mlp_t *mlp);
 void nv_mlp_init_nonnegative(nv_mlp_t *mlp);
 void nv_mlp_init_kmeans(nv_mlp_t *mlp, const nv_matrix_t *data);
 void nv_mlp_gaussian_init(nv_mlp_t *mlp, float var, int height, int width, int zdim);
+
+void nv_mlp_dropout(nv_mlp_t *mlp, float dropout);
 void nv_mlp_make_t(nv_matrix_t *t, const nv_matrix_t *label);
 float nv_mlp_train_ex(nv_mlp_t *mlp,
 					 const nv_matrix_t *data, const nv_matrix_t *label,
-					 const nv_matrix_t *ir, const nv_matrix_t *hr, int train_thresh,
+					 const nv_matrix_t *ir, const nv_matrix_t *hr,
 					 int start_epoch, int end_epoch, int max_epoch);
 float nv_mlp_train_lex(nv_mlp_t *mlp,
-					 const nv_matrix_t *data,
-					 const nv_matrix_t *label,
-					 const nv_matrix_t *t,
-					 const nv_matrix_t *ir, const nv_matrix_t *hr,
-					 int train_thresh,
-					 int start_epoch, int end_epoch, int max_epoch);
+					   const nv_matrix_t *data,
+					   const nv_matrix_t *label,
+					   const nv_matrix_t *t,
+					   const nv_matrix_t *ir, const nv_matrix_t *hr,
+					   int start_epoch, int end_epoch, int max_epoch);
 float nv_mlp_train(nv_mlp_t *mlp, const nv_matrix_t *data, const nv_matrix_t *label, int epoch);
 
 int nv_mlp_predict_label(const nv_mlp_t *mlp, const nv_matrix_t *x, int xm);
