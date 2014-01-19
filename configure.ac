@@ -2,10 +2,10 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.61)
-AC_INIT([nv],[2.1.4],[nagadomi@nurs.or.jp])
+AC_INIT([nv],[2.2.0],[nagadomi@nurs.or.jp])
 NV_MAJOR=2
-NV_MINOR=1
-NV_REVISION=4
+NV_MINOR=2
+NV_REVISION=0
 AM_INIT_AUTOMAKE([foreign subdir-objects])
 AC_CONFIG_SRCDIR([src])
 AC_CONFIG_HEADER([src/config.h:src/config.h.in])
