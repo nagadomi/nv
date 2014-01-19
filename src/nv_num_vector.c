@@ -665,9 +665,9 @@ nv_vector_var(const nv_matrix_t *v, int m)
 	float var = 0.0f;
 	int i;
 	for (i = 0; i < v->n; ++i) {
-		var += mean - NV_MAT_V(v, m, i);
+		var += (mean - NV_MAT_V(v, m, i)) * (mean - NV_MAT_V(v, m, i));
 	}
-	return var / v->n;
+	return v->n > 1 ? (var / (v->n - 1)) : var;
 }
 
 int 
