@@ -1010,7 +1010,7 @@ nv_vector_divs(nv_matrix_t *a, int am, const nv_matrix_t *x, int xm, float v)
 		vv = _mm256_set1_ps(v);
 		for (n = 0; n < pk_lp; n += 8) {
 			_mm256_store_ps(&NV_MAT_V(a, am, n),
-							_mm256_div_ps(vv, *(const __m256 *)&NV_MAT_V(x, xm, n)));
+							_mm256_div_ps(*(const __m256 *)&NV_MAT_V(x, xm, n), vv));
 		}
 		for (n = pk_lp; n < x->n; ++n) {
 			NV_MAT_V(a, am, n) = NV_MAT_V(x, xm, n) / v;
@@ -1025,7 +1025,7 @@ nv_vector_divs(nv_matrix_t *a, int am, const nv_matrix_t *x, int xm, float v)
 		vv = _mm_set1_ps(v);
 		for (n = 0; n < pk_lp; n += 4) {
 			_mm_store_ps(&NV_MAT_V(a, am, n),
-						 _mm_div_ps(vv, *(const __m128 *)&NV_MAT_V(x, xm, n)));
+						 _mm_div_ps(*(const __m128 *)&NV_MAT_V(x, xm, n), vv));
 		}
 		for (n = pk_lp; n < x->n; ++n) {
 			NV_MAT_V(a, am, n) = NV_MAT_V(x, xm, n) / v;
