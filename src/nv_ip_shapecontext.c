@@ -75,7 +75,7 @@ static float tangent_angle(float r,
 	info = nv_eigen_sym(cov->eigen_vec, cov->eigen_val, cov->cov, 50);
 	NV_MAT_V(test_val, 0, 0) = 0.0f;
 	NV_MAT_V(test_val, 0, 1) = 1.0f;
-	nv_gemv(test_ret, 0, NV_MAT_TR, cov->eigen_vec, test_val, 0);
+	nv_matrix_mulvv(test_ret, 0, cov->eigen_vec, NV_MAT_TR, test_val, 0);
 
 	y = NV_MAT_V(test_ret, 0, 0);
 	x = NV_MAT_V(test_ret, 0, 1);

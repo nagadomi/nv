@@ -28,8 +28,6 @@ extern "C" {
 
 nv_matrix_t *nv_matrix_tr(const nv_matrix_t *mat);
 nv_matrix_t *nv_matrix3d_tr(const nv_matrix_t *mat);
-
-void nv_matrix_normalize_maxmin(nv_matrix_t *mat, int mat_n, float min_v, float max_v);
 void nv_matrix_muls(nv_matrix_t *y, const nv_matrix_t *a, float scale);
 void nv_matrix_add(nv_matrix_t *y, const nv_matrix_t *a, const nv_matrix_t *b);
 
@@ -38,12 +36,27 @@ typedef enum {
 	NV_MAT_NOTR
 } nv_matrix_tr_t;
 
-void nv_gemv(nv_matrix_t *y, int ym,
-			 nv_matrix_tr_t a_tran,
-			 const nv_matrix_t *a,
-			 const nv_matrix_t *x,
-			 int xm);
+// y = A * x
+// y = A' * x
+void nv_matrix_mulv(nv_matrix_t *y, int ym,
+					const nv_matrix_t *a,
+					nv_matrix_tr_t a_tr,
+					const nv_matrix_t *x,
+					int xm);
 
+// Y = A  * X
+// Y = A  * X'
+// Y = A' * X
+// Y = A' * X'
+void nv_matrix_mul(nv_matrix_t *y,
+				   const nv_matrix_t *a,
+				   nv_matrix_tr_t a_tr,
+				   const nv_matrix_t *b,
+				   nv_matrix_tr_t b_tr);
+void nv_matrix_diag(nv_matrix_t *diag,
+					nv_matrix_t *vec,
+					int vec_j);
+	
 #ifdef __cplusplus
 }
 #endif

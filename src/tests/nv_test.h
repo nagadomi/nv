@@ -77,7 +77,7 @@ void nv_test_knn_2pass_lmca(const nv_matrix_t *train_data,
 							const nv_matrix_t *train_labels,
 							const nv_matrix_t *test_data,
 							const nv_matrix_t *test_labels);
-void
-nv_test_eigen(void);
+void nv_test_eigen(void);
+void nv_test_matrix(void);
 
 #endif

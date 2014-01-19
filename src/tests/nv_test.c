@@ -41,6 +41,7 @@ int main(void)
 	nv_test_io();
 	nv_test_serialize();
 	nv_test_eigen();
+	nv_test_matrix();
 	nv_test_keypoint();
 	
 	nv_test_knn_pca(train_data, train_labels, test_data, test_labels);

@@ -24,7 +24,8 @@ nv_test_sha1.c \
 nv_test_knn2.c \
 nv_test_knn_pca.c \
 nv_test_knn_lmca.c \
-nv_test_eigen.c
+nv_test_eigen.c \
+nv_test_matrix.c
 
 nv_test_CFLAGS= -Wall \
 -I$(srcdir)/../ -I$(srcdir)/../3rd_party/sha1 -I$(srcdir)/../3rd_party/mt -I$(srcdir)/../3rd_party/avxintrin_emu \
