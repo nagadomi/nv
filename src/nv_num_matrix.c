@@ -183,3 +183,81 @@ nv_matrix_diag(nv_matrix_t *diag,
 		NV_MAT_V(diag, i, i) = NV_MAT_V(vec, vec_j, i);
 	}
 }
+
+void
+nv_matrix_mean(nv_matrix_t *y, int y_j, const nv_matrix_t *data)
+{
+	int procs = nv_omp_procs();
+	float scale = 1.0f / data->m;
+	nv_matrix_t *tmp = nv_matrix_alloc(data->n, procs);
+	nv_matrix_t *scale_vec = nv_matrix_alloc(data->n, procs);
+	int j, i;
+
+	NV_ASSERT(data->n == y->n);	
+	
+	nv_matrix_zero(tmp);
+#ifdef _OPENMP
+#pragma omp parallel for num_threads(procs)
+#endif
+	for (j = 0; j < data->m; ++j) {
+		int thread_id = nv_omp_thread_id();
+		nv_vector_muls(scale_vec, thread_id, data, j, scale);
+		nv_vector_add(tmp, thread_id, tmp, thread_id, scale_vec, thread_id);
+	}
+	nv_vector_zero(y, y_j);
+	for (i = 0; i < procs; ++i) {
+		nv_vector_add(y, y_j, y, y_j, tmp, i);
+	}
+	
+	nv_matrix_free(&tmp);
+	nv_matrix_free(&scale_vec);
+}
+	
+void
+nv_matrix_var(nv_matrix_t *y, int y_j,
+			  const nv_matrix_t *data)
+{
+	nv_matrix_t *mean = nv_matrix_alloc(data->n, 1);
+	
+	NV_ASSERT(data->n == y->n);
+	
+	nv_matrix_mean(mean, 0, data);
+	nv_matrix_var_ex(y, y_j, data, mean, 0);
+	nv_matrix_free(&mean);
+}
+
+void
+nv_matrix_var_ex(nv_matrix_t *y, int y_j,
+				 const nv_matrix_t *data,
+				 const nv_matrix_t *mean,
+				 int mean_j)
+{
+	int procs = nv_omp_procs();
+	nv_matrix_t *tmp = nv_matrix_alloc(data->n, procs);
+	nv_matrix_t *sub = nv_matrix_alloc(data->n, procs);
+	float scale = (data->m > 1) ? (1.0f / (data->m - 1)) : data->m;
+	int i, j;
+	
+	NV_ASSERT(data->n == y->n);
+	NV_ASSERT(mean->n == y->n);	
+	
+	nv_matrix_zero(tmp);
+	nv_vector_zero(y, y_j);
+	
+#ifdef _OPENMP
+#pragma omp parallel for num_threads(procs)
+#endif		
+	for (j = 0; j < data->m; ++j) {
+		int thread_id = nv_omp_thread_id();
+		nv_vector_sub(sub, thread_id, mean, mean_j, data, j);
+		nv_vector_mul(sub, thread_id, sub, thread_id, sub, thread_id);
+		nv_vector_muls(sub, thread_id, sub, thread_id, scale);
+		nv_vector_add(tmp, thread_id, tmp, thread_id, sub, thread_id);
+	}
+	for (i = 0; i < procs; ++i) {
+		nv_vector_add(y, y_j, y, y_j, tmp, i);
+	}
+	
+	nv_matrix_free(&tmp);
+	nv_matrix_free(&sub);
+}
