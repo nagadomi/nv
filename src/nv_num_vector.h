@@ -76,6 +76,12 @@ void
 nv_vector_mul(nv_matrix_t *vec0, int m0,
 			  const nv_matrix_t *vec1, int m1,
 			  const nv_matrix_t *vec2, int m2);
+
+void 
+nv_vector_mulmtr(nv_matrix_t *vec0, int m0,
+				 const nv_matrix_t *vec1, int m1,
+				 const nv_matrix_t *mat);
+
 void 
 nv_vector_div(nv_matrix_t *vec0, int m0,
 			  const nv_matrix_t *vec1, int m1,
@@ -108,7 +114,7 @@ void nv_vector_normalize_L1(nv_matrix_t *v, int vm);
 void nv_vector_normalize_L2(nv_matrix_t *v, int vm);
 #define nv_vector_normalize(v, vm) nv_vector_normalize_L2((v), (vm))
 
-void nv_vector_normalize_maxmin(nv_matrix_t *v, int vm, float min_v, float max_v);
+void nv_vector_normalize_shift(nv_matrix_t *v, int vm, float min_v, float max_v);
 void nv_vector_muls(nv_matrix_t *a, int am, const nv_matrix_t *x, int xm, float v);
 void nv_vector_divs(nv_matrix_t *a, int am, const nv_matrix_t *x, int xm, float v);	
 void nv_vector_inv(nv_matrix_t *a, int am, const nv_matrix_t *x, int xm);

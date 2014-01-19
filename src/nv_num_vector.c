@@ -930,7 +930,7 @@ nv_vector_normalize_all_L2(nv_matrix_t *mat)
 }
 
 void 
-nv_vector_normalize_maxmin(nv_matrix_t *v, int vm, float min_v, float max_v)
+nv_vector_normalize_shift(nv_matrix_t *v, int vm, float min_v, float max_v)
 {
 	int n;
 	float cur_max_v = -FLT_MAX;
@@ -1245,4 +1245,21 @@ nv_float_find_index(const float *v, int64_t s, int64_t e, float key)
 		return -1;
 	}
 #endif
+}
+
+
+void 
+nv_vector_mulmtr(nv_matrix_t *vec0, int m0,
+				 const nv_matrix_t *vec1, int m1,
+				 const nv_matrix_t *mat)
+{
+	int i;
+	
+	NV_ASSERT(vec0->n == vec1->n);
+	NV_ASSERT(vec1->n == mat->n);
+	NV_ASSERT(vec0->n == mat->m);
+	
+	for (i = 0; i < mat->m; ++i) {
+		NV_MAT_V(vec0, m0, i) = nv_vector_dot(vec1, m1, mat, i);
+	}
 }
