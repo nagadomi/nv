@@ -127,7 +127,9 @@ nv_int_float_t nv_vector_min_ex(const nv_matrix_t *v, int m);
 
 void nv_vector_normalize_all_L1(nv_matrix_t *mat);
 void nv_vector_normalize_all_L2(nv_matrix_t *mat);
+
 #define nv_vector_normalize_all(mat) nv_vector_normalize_all_L2(mat)
+#define nv_vector_absmax(v, m) NV_MAX(fabsf(nv_vector_max(v, m)), fabsf(nv_vector_min(v, m)))
 
 #ifdef __cplusplus
 }
