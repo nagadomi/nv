@@ -59,8 +59,6 @@ nv_cov_eigen_ex(nv_cov_t *cov, const nv_matrix_t *data,
 				int eigen_n, int max_epoch)
 {
 	nv_cov(cov->cov, cov->u, data);
-	nv_matrix_zero(cov->eigen_vec);
-	nv_matrix_zero(cov->eigen_val);
 	nv_eigen(cov->eigen_vec, cov->eigen_val, cov->cov, eigen_n, max_epoch);
 	cov->data_m = data->m;
 }
