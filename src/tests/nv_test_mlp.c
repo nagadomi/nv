@@ -23,7 +23,7 @@
 #include "nv_ml.h"
 #include "nv_test.h"
 
-#define HIDDEN_UNIT 128
+#define HIDDEN_UNIT 320
 
 void
 nv_test_mlp(const nv_matrix_t *train_data,
@@ -44,14 +44,13 @@ nv_test_mlp(const nv_matrix_t *train_data,
 		   train_data->n);
 
 	nv_mlp_progress(1);
-	nv_mlp_dropout(mlp, 0.0f);
 	nv_mlp_gaussian_init(mlp, 1.0f, (int)sqrtf(train_data->n), (int)sqrtf(train_data->n), 1);
 	nv_matrix_fill(ir, 0.2f);
 	nv_matrix_fill(hr, 0.1f);
-	nv_mlp_train_ex(mlp, train_data, train_labels, ir, hr, 0, 250, 300);
+	nv_mlp_train_ex(mlp, train_data, train_labels, ir, hr, 0, 90, 100);
 	nv_matrix_fill(ir, 0.01f);
 	nv_matrix_fill(hr, 0.01f);
-	nv_mlp_train_ex(mlp, train_data, train_labels, ir, hr, 250, 300, 300);
+	nv_mlp_train_ex(mlp, train_data, train_labels, ir, hr, 90, 100, 100);
 	
 	ok = 0;
 	for (i = 0; i < test_data->m; ++i) {
