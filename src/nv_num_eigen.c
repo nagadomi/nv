@@ -147,8 +147,9 @@ nv_eigen_sym(nv_matrix_t *eigen_vec,
 			 const nv_matrix_t *smat,
 			 int max_epoch)
 {
-	int i, nrot, converge;
+	int i, converge;
 	const int n = smat->n;
+	const float n2_inv = 1.0f / (n * n);
 	nv_matrix_t *b, *z;
 	nv_matrix_t *v = eigen_vec;
 	nv_matrix_t *d = eigen_val;
@@ -178,7 +179,6 @@ nv_eigen_sym(nv_matrix_t *eigen_vec,
 		NV_MAT_V(b, i, 0) = NV_MAT_V(d, i, 0) = NV_MAT_V(a, i, i);
 	}
 
-	nrot = 0;
 	converge = 0;
 	for (i = 0; i < max_epoch; ++i) {
 		/* 収束判定 */
@@ -186,11 +186,11 @@ nv_eigen_sym(nv_matrix_t *eigen_vec,
 		float tresh;
 		int ip;
                 
+#ifdef _OPENMP
+#pragma omp parallel for reduction(+:sm) schedule(dynamic, 16)
+#endif
 		for (ip = 0; ip < n - 1; ++ip) {
 			int iq;
-#ifdef _OPENMP
-#pragma omp parallel for reduction(+:sm)
-#endif
 			for (iq = ip + 1; iq < n; ++iq) {
 				sm += fabsf(NV_MAT_V(a, ip, iq));
 			}
@@ -199,8 +199,8 @@ nv_eigen_sym(nv_matrix_t *eigen_vec,
 			converge = 1;
 			break;
 		}
-		tresh = (i > 3)  ? 0.0f: (0.2f * sm / (n * n));
-
+		tresh = (i > 3)  ? 0.0f: (0.2f * sm * n2_inv);
+		
 		/* 上三角成分(対角成分含まず)が0になるように回転していく */
 		for (ip = 0; ip < n - 1; ++ip) {
 			int iq;
@@ -210,7 +210,7 @@ nv_eigen_sym(nv_matrix_t *eigen_vec,
 					NV_MAT_V(a, ip, iq) = 0.0f;
 				} else if (fabs(NV_MAT_V(a, ip, iq)) > tresh) {
 					float t, h, theta, c, s, tau;
-                                        
+					
 					h = NV_MAT_V(d, iq, 0) - NV_MAT_V(d, ip, 0);
 					if (g <= FLT_EPSILON) {
 						t = NV_MAT_V(a, ip, iq) / h;
@@ -231,7 +231,7 @@ nv_eigen_sym(nv_matrix_t *eigen_vec,
 					NV_MAT_V(d, iq, 0) += h;
 					NV_MAT_V(a, ip, iq) = 0.0f;
 #ifdef _OPENMP
-#pragma omp parallel sections num_threads(2)
+#pragma omp parallel sections
 #endif
 					{                                        
 #ifdef _OPENMP
@@ -271,7 +271,6 @@ nv_eigen_sym(nv_matrix_t *eigen_vec,
 							}
 						}
 					}
-					++nrot;
 				} else {
 					/* 飛ばす */
 				}
