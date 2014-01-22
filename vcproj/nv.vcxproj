@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -279,7 +279,6 @@
     <ClCompile Include="..\src\nv_ip_laplacian.c" />
     <ClCompile Include="..\src\nv_ip_morphology.c" />
     <ClCompile Include="..\src\nv_ip_resize.c" />
-    <ClCompile Include="..\src\nv_ip_shapecontext.c" />
     <ClCompile Include="..\src\nv_ip_star_integral.c" />
     <ClCompile Include="..\src\nv_ip_star_integral_static.c" />
     <ClCompile Include="..\src\nv_io_cov.c" />
@@ -300,8 +299,6 @@
     <ClCompile Include="..\src\nv_num_matrix.c" />
     <ClCompile Include="..\src\nv_num_munkres.c" />
     <ClCompile Include="..\src\nv_num_prime_static.c" />
-    <ClCompile Include="..\src\nv_num_pstable.c" />
-    <ClCompile Include="..\src\nv_num_simhash.c" />
     <ClCompile Include="..\src\nv_num_vector.c" />
     <ClCompile Include="..\src\nv_ml_arow.c" />
     <ClCompile Include="..\src\nv_ml_gaussian.c" />
@@ -314,9 +311,7 @@
     <ClCompile Include="..\src\nv_ml_lmca.c" />
     <ClCompile Include="..\src\nv_ml_lr.c" />
     <ClCompile Include="..\src\nv_ml_mlp.c" />
-    <ClCompile Include="..\src\nv_ml_mlp3.c" />
     <ClCompile Include="..\src\nv_ml_nb.c" />
-    <ClCompile Include="..\src\nv_ml_pa.c" />
     <ClCompile Include="..\src\nv_ml_pca_kmeans_tree.c" />
     <ClCompile Include="..\src\nv_ml_plsi.c" />
     <ClCompile Include="..\src\nv_ml_som.c" />
@@ -340,8 +335,6 @@
     <ClInclude Include="..\src\nv_num_matrix.h" />
     <ClInclude Include="..\src\nv_num_munkres.h" />
     <ClInclude Include="..\src\nv_num_prime.h" />
-    <ClInclude Include="..\src\nv_num_pstable.h" />
-    <ClInclude Include="..\src\nv_num_simhash.h" />
     <ClInclude Include="..\src\nv_num_vector.h" />
     <ClInclude Include="..\src\nv_config.h" />
     <ClInclude Include="..\src\nv_config_msvc.h" />
@@ -378,7 +371,6 @@
     <ClInclude Include="..\src\nv_ip_laplacian.h" />
     <ClInclude Include="..\src\nv_ip_morphology.h" />
     <ClInclude Include="..\src\nv_ip_resize.h" />
-    <ClInclude Include="..\src\nv_ip_shapecontext.h" />
     <ClInclude Include="..\src\nv_ip_star_integral.h" />
     <ClInclude Include="..\src\nv_ip_star_integral_static.h" />
     <ClInclude Include="..\src\nv_ml.h" />
@@ -393,9 +385,7 @@
     <ClInclude Include="..\src\nv_ml_lmca.h" />
     <ClInclude Include="..\src\nv_ml_lr.h" />
     <ClInclude Include="..\src\nv_ml_mlp.h" />
-    <ClInclude Include="..\src\nv_ml_mlp3.h" />
     <ClInclude Include="..\src\nv_ml_nb.h" />
-    <ClInclude Include="..\src\nv_ml_pa.h" />
     <ClInclude Include="..\src\nv_ml_pca_kmeans_tree.h" />
     <ClInclude Include="..\src\nv_ml_plsi.h" />
     <ClInclude Include="..\src\nv_ml_som.h" />
