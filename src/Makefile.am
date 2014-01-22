@@ -28,12 +28,9 @@ nv_util_array.cpp \
 nv_num_cov.c \
 nv_num_vector.c \
 nv_num_munkres.c \
-nv_num_simhash.c \
 nv_num_matrix.c \
-nv_num_pstable.c \
 nv_num_distance.c \
 nv_num_eigen.c \
-nv_num_pstable.c \
 nv_num_prime_static.c \
 nv_num_knn.cpp \
 nv_ml_util.c \
@@ -41,10 +38,8 @@ nv_ml_xmeans.c \
 nv_ml_kmeans.c \
 nv_ml_lr.c \
 nv_ml_arow.c \
-nv_ml_pa.c \
 nv_ml_nb.c \
 nv_ml_lbgu.c \
-nv_ml_mlp3.c \
 nv_ml_plsi.c \
 nv_ml_gaussian.c \
 nv_ml_klr.c \
@@ -63,7 +58,6 @@ nv_ip_keypoint.cpp \
 nv_ip_laplacian.c \
 nv_ip_resize.c \
 nv_ip_star_integral_static.c \
-nv_ip_shapecontext.c \
 nv_ip_flip.c \
 nv_ip_euclidean_color.c \
 nv_ip_hsv.c \
@@ -106,9 +100,7 @@ nv_util_array.h \
 nv_num_cov.h \
 nv_num_vector.h \
 nv_num_munkres.h \
-nv_num_simhash.h \
 nv_num_matrix.h \
-nv_num_pstable.h \
 nv_num_prime.h \
 nv_num.h \
 nv_num_distance.h \
@@ -119,10 +111,8 @@ nv_ml_xmeans.h \
 nv_ml_kmeans.h \
 nv_ml_lr.h \
 nv_ml_arow.h \
-nv_ml_pa.h \
 nv_ml_nb.h \
 nv_ml_lbgu.h \
-nv_ml_mlp3.h \
 nv_ml_plsi.h \
 nv_ml_gaussian.h \
 nv_ml_klr.h \
@@ -144,7 +134,6 @@ nv_ip_resize.h \
 nv_ip_flip.h \
 nv_ip.h \
 nv_ip_star_integral_static.h \
-nv_ip_shapecontext.h \
 nv_ip_euclidean_color.h \
 nv_ip_hsv.h \
 nv_ip_ccv.h \

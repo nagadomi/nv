@@ -53,7 +53,6 @@ int main(void)
 	
 	nv_test_lr(train_data, train_labels, test_data, test_labels);
 	nv_test_arow(train_data, train_labels, test_data, test_labels);
-	nv_test_pa(train_data, train_labels, test_data, test_labels);
 	nv_test_mlp(train_data, train_labels, test_data, test_labels);
 	nv_test_nb(train_data, train_labels, test_data, test_labels);
 	

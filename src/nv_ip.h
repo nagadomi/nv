@@ -43,7 +43,6 @@ extern "C" {
 #include "nv_ip_star_integral.h"
 #include "nv_ip_star_integral_static.h"
 #include "nv_ip_keypoint.h"
-#include "nv_ip_shapecontext.h"
 #include "nv_ip_resize.h"
 #include "nv_ip_flip.h"
 

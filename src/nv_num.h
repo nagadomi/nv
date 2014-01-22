@@ -25,8 +25,6 @@
 #include "nv_num_cov.h"
 #include "nv_num_eigen.h"
 #include "nv_num_distance.h"
-#include "nv_num_pstable.h"
-#include "nv_num_simhash.h"
 #include "nv_num_munkres.h"
 #include "nv_num_prime.h"
 #include "nv_num_knn.h"
