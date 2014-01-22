@@ -78,6 +78,7 @@ nv_io_nb.c \
 nv_io_cov.c \
 nv_io_matrix.cpp \
 nv_io_image.c \
+nv_io_libsvm.c \
 nv_io_video.c \
 nv_io_kmeans_tree.c \
 nv_io_klr_tree.c \
@@ -156,6 +157,7 @@ nv_io_lr.h \
 nv_io_nb.h \
 nv_io_cov.h \
 nv_io_matrix.h \
+nv_io_libsvm.h \
 nv_io.h \
 nv_io_image.h \
 nv_io_video.h \

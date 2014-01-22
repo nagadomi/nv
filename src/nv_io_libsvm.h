@@ -1,7 +1,7 @@
 /*
  * This file is part of libnv.
  *
- * Copyright (C) 2008-2012 nagadomi@nurs.or.jp
+ * Copyright (C) 2014 nagadomi@nurs.or.jp
  * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,23 +17,20 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef NV_IO_H
-#define NV_IO_H
+#ifndef NV_IO_LIBSVM_H
+#define NV_IO_LIBSVM_H
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 #include "nv_core.h"
-#if NV_WITH_OPENCV
-#include "nv_io_ipl.h"
+
+int nv_save_libsvm_fp(FILE *fp, const nv_matrix_t *data, const nv_matrix_t *labels);
+int nv_save_libsvm(const char *file, const nv_matrix_t *data, const nv_matrix_t *labels);
+
+#ifdef __cplusplus
+}
 #endif
-#include "nv_io_matrix.h"
-#include "nv_io_image.h"
-#include "nv_io_stream.h"
-#include "nv_io_mlp.h"
-#include "nv_io_cov.h"
-#include "nv_io_nb.h"
-#include "nv_io_lr.h"
-#include "nv_io_video.h"
-#include "nv_io_kmeans_tree.h"
-#include "nv_io_klr_tree.h"
-#include "nv_io_libsvm.h"
 
 #endif
