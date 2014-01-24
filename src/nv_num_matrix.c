@@ -77,6 +77,7 @@ nv_matrix_mulv(nv_matrix_t *y, int yj,
 			}
 			nv_matrix_free(&a2);
 		} else {
+			nv_vector_zero(y, yj);
 			for (i = 0; i < a->m; ++i) {
 				int j;
 				for (j = 0; j < a->n; ++j) {
@@ -177,8 +178,8 @@ nv_matrix_add(nv_matrix_t *y, const nv_matrix_t *a, const nv_matrix_t *b)
 
 void
 nv_matrix_diag(nv_matrix_t *diag,
-					nv_matrix_t *vec,
-					int vec_j)
+			   nv_matrix_t *vec,
+			   int vec_j)
 {
 	int i;
 	
