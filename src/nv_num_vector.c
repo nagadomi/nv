@@ -700,21 +700,26 @@ nv_vector_sum(const nv_matrix_t *v, int m)
 }
 
 float
-nv_vector_mean(const nv_matrix_t *v, int m)
+nv_vector_mean(const nv_matrix_t *x, int j)
 {
-	return nv_vector_sum(v, m) / v->n;
+	return nv_vector_sum(x, j) / x->n;
 }
 
 float
-nv_vector_var(const nv_matrix_t *v, int m)
+nv_vector_var(const nv_matrix_t *x, int j)
 {
-	float mean = nv_vector_mean(v, m);
+	return nv_vector_var_ex(x, j, nv_vector_mean(x, j));
+}
+
+float
+nv_vector_var_ex(const nv_matrix_t *x, int j, float mean)
+{
 	float var = 0.0f;
 	int i;
-	for (i = 0; i < v->n; ++i) {
-		var += (mean - NV_MAT_V(v, m, i)) * (mean - NV_MAT_V(v, m, i));
+	for (i = 0; i < x->n; ++i) {
+		var += (mean - NV_MAT_V(x, j, i)) * (mean - NV_MAT_V(x, j, i));
 	}
-	return v->n > 1 ? (var / (v->n - 1)) : var;
+	return x->n > 1 ? (var / (x->n - 1)) : var;
 }
 
 int 
