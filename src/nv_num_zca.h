@@ -1,7 +1,7 @@
 /*
  * This file is part of libnv.
  *
- * Copyright (C) 2008-2012 nagadomi@nurs.or.jp
+ * Copyright (C) 2014 nagadomi@nurs.or.jp
  * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,28 +17,28 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef NV_NUM_H
-#define NV_NUM_H
-
-#include "nv_num_vector.h"
-#include "nv_num_matrix.h"
-#include "nv_num_cov.h"
-#include "nv_num_eigen.h"
-#include "nv_num_distance.h"
-#include "nv_num_munkres.h"
-#include "nv_num_prime.h"
-#include "nv_num_knn.h"
-#include "nv_num_standardize.h"
-#include "nv_num_zca.h"
+#ifndef NV_NUM_ZCA_H
+#define NV_NUM_ZCA_H
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
+void nv_zca_train(nv_matrix_t *mean, int mean_j,
+				  nv_matrix_t *u,
+				  const nv_matrix_t *a,
+				  float epsilon);
+
+void nv_zca_whitening(nv_matrix_t *x, int x_j,
+					  const nv_matrix_t *mean, int mean_j,
+					  const nv_matrix_t *u);
+
+void nv_zca_whitening_all(nv_matrix_t *a,
+						  const nv_matrix_t *mean, int mean_j,
+						  const nv_matrix_t *u);
+
 #ifdef __cplusplus
 }
 #endif
-
-
 
 #endif

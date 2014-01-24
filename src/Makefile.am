@@ -30,6 +30,7 @@ nv_num_vector.c \
 nv_num_munkres.c \
 nv_num_matrix.c \
 nv_num_standardize.c \
+nv_num_zca.c \
 nv_num_distance.c \
 nv_num_eigen.c \
 nv_num_prime_static.c \
@@ -103,6 +104,7 @@ nv_num_vector.h \
 nv_num_munkres.h \
 nv_num_matrix.h \
 nv_num_standardize.h \
+nv_num_zca.h \
 nv_num_prime.h \
 nv_num.h \
 nv_num_distance.h \
