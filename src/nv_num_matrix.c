@@ -177,6 +177,21 @@ nv_matrix_add(nv_matrix_t *y, const nv_matrix_t *a, const nv_matrix_t *b)
 }
 
 void
+nv_matrix_sub(nv_matrix_t *y, const nv_matrix_t *a, const nv_matrix_t *b)
+{
+	int i;
+	NV_ASSERT(y->m == a->m && y->m == b->m);
+	NV_ASSERT(y->n == a->n && y->n == b->n);
+	
+#ifdef _OPENMP
+#pragma omp parallel for
+#endif
+	for (i = 0; i < y->m; ++i) {
+		nv_vector_sub(y, i, a, i, b, i);
+	}
+}
+
+void
 nv_matrix_diag(nv_matrix_t *diag,
 			   nv_matrix_t *vec,
 			   int vec_j)
