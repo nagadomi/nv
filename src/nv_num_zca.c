@@ -32,11 +32,21 @@ nv_zca_train(nv_matrix_t *mean, int mean_j,
 			 const nv_matrix_t *a,
 			 float epsilon)
 {
+	nv_zca_train_ex(mean, mean_j, u, a, epsilon, a->n, 1);
+}
+
+void
+nv_zca_train_ex(nv_matrix_t *mean, int mean_j,
+				nv_matrix_t *u,
+				const nv_matrix_t *a,
+				float epsilon,
+				int npca,
+				int keep_space)
+{
 	nv_cov_t *cov = nv_cov_alloc(a->n);
 	nv_matrix_t *d = nv_matrix_alloc(a->n, a->n);
 	nv_matrix_t *v = nv_matrix_alloc(a->n, a->n);
 	nv_matrix_t *eig;
-	nv_matrix_t *tr;
 	int i;
 
 	// [V,D] = eig(cov(A))
@@ -44,18 +54,28 @@ nv_zca_train(nv_matrix_t *mean, int mean_j,
 	nv_matrix_zero(d);
 	nv_cov_eigen(cov, a);
 	for (i = 0; i < d->n; ++i) {
-		NV_MAT_V(d, i, i) = sqrtf(1.0f / (NV_MAT_V(cov->eigen_val, i, 0) + epsilon));
+		if (i < npca) {
+			NV_MAT_V(d, i, i) = sqrtf(1.0f / (NV_MAT_V(cov->eigen_val, i, 0) + epsilon));
+		}
 	}
 	eig = nv_matrix_tr(cov->eigen_vec);
 	nv_matrix_mul(v, eig, NV_MAT_NOTR, d, NV_MAT_NOTR);
-	nv_matrix_mul(u, v, NV_MAT_NOTR, eig, NV_MAT_TR);
-	tr = nv_matrix_tr(u);
-	nv_matrix_copy_all(u, tr);
+	if (keep_space) {
+		nv_matrix_t *tr;
+		nv_matrix_mul(u, v, NV_MAT_NOTR, eig, NV_MAT_TR);
+		tr = nv_matrix_tr(u);
+		nv_matrix_copy_all(u, tr);
+		nv_matrix_free(&tr);
+	} else {
+		nv_matrix_t *tr;
+		tr = nv_matrix_tr(v);
+		nv_matrix_copy_all(u, tr);
+		nv_matrix_free(&tr);
+	}
 	nv_vector_copy(mean, mean_j, cov->u, 0);
 	
 	nv_matrix_free(&eig);
 	nv_matrix_free(&d);
-	nv_matrix_free(&tr);
 	nv_matrix_free(&v);
 }
 

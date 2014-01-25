@@ -29,6 +29,13 @@ void nv_zca_train(nv_matrix_t *mean, int mean_j,
 				  const nv_matrix_t *a,
 				  float epsilon);
 
+void nv_zca_train_ex(nv_matrix_t *mean, int mean_j,
+					 nv_matrix_t *u,
+					 const nv_matrix_t *a,
+					 float epsilon,
+					 int npca,
+					 int keep_space);
+
 void nv_zca_whitening(nv_matrix_t *x, int x_j,
 					  const nv_matrix_t *mean, int mean_j,
 					  const nv_matrix_t *u);
