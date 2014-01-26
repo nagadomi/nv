@@ -927,7 +927,7 @@ nv_vector_normalize_all_L2(nv_matrix_t *mat)
 	int j;
 	
 #ifdef _OPENMP
-#pragma omp parallel for num_threads(1)
+#pragma omp parallel for
 #endif
 	for (j = 0; j < mat->m; ++j) {
 		nv_vector_normalize_L2(mat, j);
