@@ -68,28 +68,15 @@ int nv_mlp_predict_label(const nv_mlp_t *mlp, const nv_matrix_t *x, int xm);
 float nv_mlp_predict(const nv_mlp_t *mlp, const nv_matrix_t *x, int xm, int cls);
 float nv_mlp_bagging_predict(const nv_mlp_t **mlp, int nmlp, 
 							 const nv_matrix_t *x, int xm, int cls);
-double nv_mlp_predict_d(const nv_mlp_t *mlp,
-					   const nv_matrix_t *x, int xm, int cls);
-double nv_mlp_bagging_predict_d(const nv_mlp_t **mlp, int nmlp, 
-							   const nv_matrix_t *x, int xm, int cls);
 
-void nv_mlp_train_regression(
-					 nv_mlp_t *mlp,
-					 const nv_matrix_t *data,
-					 const nv_matrix_t *t,
-					 float ir, float hr,
-					 int start_epoch, int max_epoch);
+void nv_mlp_train_regression(nv_mlp_t *mlp, const nv_matrix_t *data,
+							 const nv_matrix_t *t, float ir, float hr, int start_epoch, int max_epoch);
 void nv_mlp_regression(const nv_mlp_t *mlp, const nv_matrix_t *x, int xm, nv_matrix_t *out, int om);
 
 void nv_mlp_hidden_vector(const nv_mlp_t *mlp, 
 						  const nv_matrix_t *x, int xm, nv_matrix_t *out, int om);
 
 void nv_mlp_dump_c(FILE *out, const nv_mlp_t *mlp, const char *name, int static_variable);
-
-
-void 
-nv_mlp_parts_init(nv_mlp_t *mlp, int r, int height, int width, int zdim);
-
 
 #ifdef __cplusplus
 }
