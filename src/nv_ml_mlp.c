@@ -367,8 +367,8 @@ nv_mlp_train_ex(nv_mlp_t *mlp,
 }
 
 static void
-nv_mlp_show_train_validation(const nv_mlp_t *mlp,
-							 const nv_matrix_t *data, const nv_matrix_t *label)
+nv_mlp_train_accuracy(const nv_mlp_t *mlp,
+					  const nv_matrix_t *data, const nv_matrix_t *label)
 {
 	int i;
 	int output = mlp->output;
@@ -577,7 +577,7 @@ nv_mlp_train_lex(nv_mlp_t *mlp,
 				   count, 
 				nv_clock() - tm);
 			if (nv_mlp_progress_flag >= 2) {
-				nv_mlp_show_train_validation(mlp, data, label);
+				nv_mlp_train_accuracy(mlp, data, label);
 			}
 			fflush(stdout);
 		}
