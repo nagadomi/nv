@@ -94,18 +94,22 @@ void nv_cov(nv_matrix_t *cov,
 	/* 分散共分散行列 */
 	nv_matrix_zero(cov);
 
+	for (m = 0; m < cov->m; ++m) {
+		nv_matrix_t *dum = nv_matrix_alloc(data->m, 1);
+		int j, n;
+		const float um = NV_MAT_V(u, 0, m);
+#ifdef _OPENMP
+#pragma omp parallel for
+#endif
+		for (j = 0; j < data->m; ++j) {
+			NV_MAT_V(dum, 0, j) = (NV_MAT_V(data, j, m) - um) * factor;
+		}
 #ifdef _OPENMP
 #pragma omp parallel for schedule(dynamic, 1)
 #endif
-	for (m = 0; m < cov->m; ++m) {
-		nv_matrix_t *dum = nv_matrix_alloc(data->m, 1);
-		int i, n;
-		const float um = NV_MAT_V(u, 0, m);
-		for (i = 0; i < data->m; ++i) {
-			NV_MAT_V(dum, 0, i) = (NV_MAT_V(data, i, m) - um) * factor;
-		}
 		for (n = m; n < cov->n; ++n) {
 			float v = 0.0f;
+			int i;
 			const float un = NV_MAT_V(u, 0, n);
 			for (i = 0; i < data->m; ++i) {
 				v += (NV_MAT_V(data, i, n) - un) * NV_MAT_V(dum, 0, i);
