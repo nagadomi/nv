@@ -99,50 +99,29 @@ void nv_mlp_dump_c(FILE *out, const nv_mlp_t *mlp, const char *name, int static_
 
 int nv_mlp_predict_label(const nv_mlp_t *mlp, const nv_matrix_t *x, int xm)
 {
-	int m, n;
+	int m;
 	int l = -1;
-	float mp = -FLT_MAX, y;
-
+	float mp = -FLT_MAX;
 	nv_matrix_t *input_y = nv_matrix_alloc(mlp->input_w->m, 1);
-	nv_matrix_t *output_y = nv_matrix_alloc(mlp->output, 1);
 	float dropout_scale = 1.0f - mlp->dropout;
 
 #ifdef _OPENMP
-#pragma omp parallel for private(y) 
+#pragma omp parallel for
 #endif
 	for (m = 0; m < mlp->hidden; ++m) {
-		y = NV_MAT_V(mlp->input_bias, m, 0);
+		float y = NV_MAT_V(mlp->input_bias, m, 0);
 		y += nv_vector_dot(x, xm, mlp->input_w, m);
 		NV_MAT_V(input_y, 0, m) = nv_mlp_sigmoid(y) * dropout_scale;
 	}
-
 	for (m = 0; m < mlp->output; ++m) {
-		y = NV_MAT_V(mlp->hidden_bias, m, 0);
+		float y = NV_MAT_V(mlp->hidden_bias, m, 0);
 		y += nv_vector_dot(input_y, 0, mlp->hidden_w, m);
-		NV_MAT_V(output_y, 0, m) = nv_mlp_sigmoid(y);
-	}
-
-	l = -1; // nega
-	if (output_y->n == 1) {
-		if (NV_MAT_V(output_y, 0, 0) > 0.5f) {
-			l = 0;
-		} else {
-			l = 1;
-		}
-	} else {
-		for (n = 0; n < output_y->n; ++n) {
-			if (mp < NV_MAT_V(output_y, 0, n)
-//				&& NV_MAT_V(output_y, 0, n) > 0.5f
-				) 
-			{
-				mp = NV_MAT_V(output_y, 0, n);
-				l = n;
-			}
+		if (mp < y) {
+			l = m;
+			mp = y;
 		}
 	}
-
 	nv_matrix_free(&input_y);
-	nv_matrix_free(&output_y);
 
 	return l;
 }
@@ -301,15 +280,17 @@ void nv_mlp_hidden_vector(const nv_mlp_t *mlp,
 /* training */
 
 #define NV_MLP_MAX_EPOCH 2000
-#define NV_MLP_IR 0.01f
-#define NV_MLP_HR 0.0001f
+#define NV_MLP_IR 0.001f
+#define NV_MLP_HR 0.001f
 #define NV_MLP_L2 0.0001f
 #define NV_MLP_FOLOS_W 0.0001f
+#define NV_MLP_BATCH_SIZE 32
 
 /* 初期化 */
 
-/* グリッド上にランダムなガウス分布を作って初期化する. これが一番いい.  */
-void nv_mlp_gaussian_init(nv_mlp_t *mlp, float var, int height, int width, int zdim)
+/* グリッド上にランダムなガウス分布を作って初期化する.  */
+void
+nv_mlp_gaussian_init(nv_mlp_t *mlp, float var, int height, int width, int zdim)
 {
 	int m, n, x, y, z;
 	nv_matrix_t *input_gaussian = nv_matrix_alloc(mlp->input, mlp->hidden);
@@ -352,113 +333,46 @@ void nv_mlp_gaussian_init(nv_mlp_t *mlp, float var, int height, int width, int z
 	nv_matrix_free(&input_gaussian);
 }
 
-void 
-nv_mlp_parts_init(nv_mlp_t *mlp, int r, int height, int width, int zdim)
+/* 乱数で初期化  */
+void
+nv_mlp_init_rand(nv_mlp_t *mlp, const nv_matrix_t *data)
 {
-	int m, n, x, y, z;
-
-	for (m = 0; m < mlp->input_w->m; ++m) {
-		float center_y = nv_rand() * (height - 1);
-		float center_x = nv_rand() * (width - 1);
-
-		for (y = 0; y < height; ++y) {
-			for (x = 0; x < width; ++x) {
-				if (sqrtf((center_y - y) * (center_y - y) + (center_x - x) * (center_x - x)) > r) {
-					for (z = 0; z < zdim; ++z) {
-						NV_MAT_V(mlp->input_w, m, y * width * zdim + x * zdim + z) = 0.0f;
-					}
-				} else {
-					for (z = 0; z < zdim; ++z) {
-						NV_MAT_V(mlp->input_w, m, y * width * zdim + x * zdim + z) = nv_rand() - 0.5f;
-					}
-				}
-			}
-		}
-	}
-	for (m = 0; m < mlp->input_w->m; ++m) {
-		NV_MAT_V(mlp->input_bias, m, 0) = nv_rand() - 0.5f;
-	}
-	for (m = 0; m < mlp->hidden_w->m; ++m) {
-		for (n = 0; n < mlp->hidden_w->n; ++n) {
-			NV_MAT_V(mlp->hidden_w, m, n) = nv_rand() - 0.5f;
-		}
-		NV_MAT_V(mlp->hidden_bias, m, 0) = nv_rand() - 0.5f;
-	}
-}
-
-
-void nv_mlp_init_nonnegative(nv_mlp_t *mlp)
-{
-	int m, n;
-
-	for (m = 0; m < mlp->input_w->m; ++m) {
-		for (n = 0; n < mlp->input_w->n; ++n) {
-			NV_MAT_V(mlp->input_w, m, n) = nv_rand();
-		}
-		nv_vector_normalize_L2(mlp->input_w, m);
-		NV_MAT_V(mlp->input_bias, m, 0) = -nv_rand();
-	}
-
-	for (m = 0; m < mlp->hidden_w->m; ++m) {
-		for (n = 0; n < mlp->hidden_w->n; ++n) {
-			NV_MAT_V(mlp->hidden_w, m, n) = nv_rand();
-		}
-		nv_vector_normalize_L2(mlp->hidden_w, m);
-		NV_MAT_V(mlp->hidden_bias, m, 0) = -nv_rand();
-	}
-}
-
-
-void nv_mlp_init_rand(nv_mlp_t *mlp)
-{
-	int m, n;
+	int j, i;
+	const float data_scale = 1.0f / data->m;
+	const float input_norm_mean = sqrtf(0.8f * (mlp->input_w->m + 1));
+	const float hidden_norm_mean = sqrtf(0.8f * (mlp->hidden_w->m + 1));
+	float data_norm_mean;
+	float input_scale, hidden_scale;
 	
-	for (m = 0; m < mlp->input_w->m; ++m) {
-		for (n = 0; n < mlp->input_w->n; ++n) {
-			NV_MAT_V(mlp->input_w, m, n) = nv_rand() - 0.5f;
-		}
-		NV_MAT_V(mlp->input_bias, m, 0) = nv_rand() - 0.5f;
+	data_norm_mean = 0.0f;
+	for (j = 0; j < data->m; ++j) {
+		data_norm_mean += nv_vector_norm(data, j) * data_scale;
 	}
-
-	for (m = 0; m < mlp->hidden_w->m; ++m) {
-		for (n = 0; n < mlp->hidden_w->n; ++n) {
-			NV_MAT_V(mlp->hidden_w, m, n) = nv_rand() - 0.5f;
-		}
-		NV_MAT_V(mlp->hidden_bias, m, 0) = nv_rand() - 0.5f;
-	}
-}
-
-void nv_mlp_init_kmeans(nv_mlp_t *mlp, const nv_matrix_t *data)
-{
-	int m, n;
-	nv_matrix_t *means = nv_matrix_alloc(mlp->input, mlp->hidden);
-	nv_matrix_t *labels = nv_matrix_alloc(1, data->m);
-	nv_matrix_t *count = nv_matrix_alloc(1, mlp->hidden);
+	input_scale = 1.0f / (data_norm_mean * input_norm_mean);
+	hidden_scale = 1.0f / hidden_norm_mean;
 	
-	nv_kmeans(means, count, labels, data, mlp->hidden, 50);
-	
-	for (m = 0; m < mlp->input_w->m; ++m) {
-		nv_vector_copy(mlp->input_w, m, means, m);
-		nv_vector_normalize_L2(mlp->input_w, m);
-		NV_MAT_V(mlp->input_bias, m, 0) = nv_rand() - 0.5f;
-	}
-	for (m = 0; m < mlp->hidden_w->m; ++m) {
-		for (n = 0; n < mlp->hidden_w->n; ++n) {
-			NV_MAT_V(mlp->hidden_w, m, n) = nv_rand() - 0.5f;
+	for (j = 0; j < mlp->input_w->m; ++j) {
+		for (i = 0; i < mlp->input_w->n; ++i) {
+			NV_MAT_V(mlp->input_w, j, i) = nv_gaussian_rand(0.0f, 1.0f) * input_scale;
 		}
-		NV_MAT_V(mlp->hidden_bias, m, 0) = nv_rand() - 0.5f;
+		NV_MAT_V(mlp->input_bias, j, 0) = nv_gaussian_rand(0.0f, 1.0f) * input_scale;
 	}
-	nv_matrix_free(&means);
-	nv_matrix_free(&labels);
-	nv_matrix_free(&count);
+	for (j = 0; j < mlp->hidden_w->m; ++j) {
+		for (i = 0; i < mlp->hidden_w->n; ++i) {
+			NV_MAT_V(mlp->hidden_w, j, i) = nv_gaussian_rand(0.0f, 1.0f) * hidden_scale;
+		}
+		NV_MAT_V(mlp->hidden_bias, j, 0) = nv_gaussian_rand(0.0f, 1.0f) * hidden_scale;
+	}
 }
 
-void nv_mlp_init(nv_mlp_t *mlp)
+void
+nv_mlp_init(nv_mlp_t *mlp, const nv_matrix_t *data)
 {
-	nv_mlp_init_rand(mlp);
+	nv_mlp_init_rand(mlp, data);
 }
 
-void nv_mlp_make_t(nv_matrix_t *t, const nv_matrix_t *label)
+void
+nv_mlp_make_t(nv_matrix_t *t, const nv_matrix_t *label)
 {
 	int m, n;
 
@@ -479,30 +393,24 @@ void nv_mlp_make_t(nv_matrix_t *t, const nv_matrix_t *label)
 
 /* クラス分類器の学習 */
 
-float nv_mlp_train(nv_mlp_t *mlp, const nv_matrix_t *data, const nv_matrix_t *label, int epoch)
+float
+nv_mlp_train(nv_mlp_t *mlp,
+			 const nv_matrix_t *data, const nv_matrix_t *label,
+			 int epoch)
 {
-	nv_matrix_t *ir = nv_matrix_alloc(1, mlp->output == 1 ? 2 : mlp->output);
-	nv_matrix_t *hr = nv_matrix_alloc(1, mlp->output == 1 ? 2 : mlp->output);
-	int j;
 	float ret;
-	for (j = 0; j < mlp->output; ++j) {
-		NV_MAT_V(ir, j, 0) = NV_MLP_IR;
-		NV_MAT_V(hr, j, 0) = NV_MLP_HR;
-	}
-	ret = nv_mlp_train_ex(mlp, data, label, ir, hr, 0, epoch, epoch);
-
-	nv_matrix_free(&ir);
-	nv_matrix_free(&hr);
+	ret = nv_mlp_train_ex(mlp, data, label, NV_MLP_IR, NV_MLP_HR, 0, epoch, epoch);
 
 	return ret;
 }
 
-float nv_mlp_train_ex(nv_mlp_t *mlp,
-					  const nv_matrix_t *data,
-					  const nv_matrix_t *label,
-					  const nv_matrix_t *ir, const nv_matrix_t *hr,
-					  int start_epoch, int end_epoch,
-					  int max_epoch)
+float
+nv_mlp_train_ex(nv_mlp_t *mlp,
+				const nv_matrix_t *data,
+				const nv_matrix_t *label,
+				float ir, float hr,
+				int start_epoch, int end_epoch,
+				int max_epoch)
 {
 	float p;
 
@@ -514,238 +422,240 @@ float nv_mlp_train_ex(nv_mlp_t *mlp,
 	return p;
 }
 
-float nv_mlp_train_lex(nv_mlp_t *mlp,
-					   const nv_matrix_t *data,
-					   const nv_matrix_t *label,
-					   const nv_matrix_t *t,
-					   const nv_matrix_t *ir, const nv_matrix_t *hr, 
-					   int start_epoch, int end_epoch, int max_epoch)
+static void
+nv_mlp_show_train_validation(const nv_mlp_t *mlp,
+							 const nv_matrix_t *data, const nv_matrix_t *label)
 {
-	long tm;
-	int m, n, im, ok;
+	int i;
+	int output = mlp->output;
+	int *ok_count = nv_alloc_type(int, output);
+	int *ng_count = nv_alloc_type(int, output);
+	
+	memset(ok_count, 0, sizeof(int) * output);
+	memset(ng_count, 0, sizeof(int) * output);
+	for (i = 0; i < data->m; ++i) {
+		int predict = nv_mlp_predict_label(mlp, data, i);
+		int teach = (int)NV_MAT_V(label, i, 0);
+		if (predict == teach) {
+			++ok_count[teach];
+		} else {
+			++ng_count[teach];
+		}
+	}
+	for (i = 0; i < output; ++i) {
+		if (ok_count[i] + ng_count[i] > 0) {
+			printf("%d: ok: %d, ng: %d, %f\n",
+				   i, ok_count[i], ng_count[i], 
+				   (float)ok_count[i] / (float)(ok_count[i] + ng_count[i]));
+		} else {
+			printf("%d: no data found\n", i);
+		}
+	}
+	nv_free(ok_count);
+	nv_free(ng_count);
+}
+
+static void
+nv_mlp_forward(nv_matrix_t *input_y, int ij,
+			   nv_matrix_t *hidden_y, int hj,
+			   const nv_mlp_t *mlp, const nv_matrix_t *data, int dm)
+{
+	int m;
+	
+	for (m = 0; m < mlp->input_w->m; ++m) {
+		if (nv_rand() > mlp->dropout) {
+			float y = NV_MAT_V(mlp->input_bias, m, 0);
+			y += nv_vector_dot(data, dm, mlp->input_w, m);
+			y = nv_mlp_sigmoid(y);
+			NV_MAT_V(input_y, ij, m) = y;
+		} else {
+			NV_MAT_V(input_y, ij, m) = 0.0f;
+		}
+	}
+	for (m = 0; m < mlp->hidden_w->m; ++m) {
+		float y = NV_MAT_V(mlp->hidden_bias, m, 0);
+		y += nv_vector_dot(input_y, ij, mlp->hidden_w, m);
+		NV_MAT_V(hidden_y, hj, m) = y;
+	}
+}
+
+static void
+nv_mlp_softmax(nv_matrix_t *output_y, int oj,
+			   const nv_matrix_t *hidden_y, int hj)
+{
+	float base = NV_MAT_V(hidden_y, hj, nv_vector_max_n(hidden_y, hj));
+	float z = 0.0f;
+	int n;
+	for (n = 0; n < output_y->n; ++n) {
+		NV_MAT_V(output_y, oj, n) = expf(NV_MAT_V(hidden_y, hj, n) - base);
+		z += NV_MAT_V(output_y, oj, n);
+	}
+	nv_vector_divs(output_y, oj, output_y, oj, z);
+}
+
+static float
+nv_mlp_error(const nv_matrix_t *output_y, int oj,
+			 const nv_matrix_t *t, int dm)
+{
+	int n;
+	float e = 0.0f;
+	for (n = 0; n < output_y->n; ++n) {
+		if (NV_MAT_V(output_y, oj, n) > FLT_EPSILON) {
+			e += -NV_MAT_V(t, dm, n) * logf(NV_MAT_V(output_y, oj, n));
+		}
+	}
+	return e;
+}
+
+static void
+nv_mlp_backward(
+	int batch_size,
+	nv_mlp_t *mlp,
+	const nv_matrix_t *output_y,
+	const nv_matrix_t *input_y,
+	const nv_matrix_t *data,
+	const nv_matrix_t *t,
+	int *dm,
+	const float ir,
+	const float hr)
+{
+	int n, m, j;
+	nv_matrix_t *output_bp = nv_matrix_alloc(mlp->output, batch_size);
+	nv_matrix_t *hidden_bp = nv_matrix_alloc(mlp->input_w->m, batch_size);
+	
+#ifdef _OPENMP
+#pragma omp parallel for private(m, n)
+#endif
+	for (j = 0; j < batch_size; ++j) {
+		for (n = 0; n < output_bp->n; ++n) {
+			float y_t = NV_MAT_V(output_y, j, n) - NV_MAT_V(t, dm[j], n);
+			float bp = y_t;
+			NV_MAT_V(output_bp, j, n) = bp;
+		}
+		for (m = 0; m < mlp->hidden_w->n; ++m) {
+			float y = 0.0f;
+			for (n = 0; n < mlp->output; ++n) {
+				y += NV_MAT_V(output_bp, j, n) * NV_MAT_V(mlp->hidden_w, n, m);
+			}
+			NV_MAT_V(hidden_bp, j, m) = 
+				y * (1.0f - NV_MAT_V(input_y, j, m)) * NV_MAT_V(input_y, j, m);
+		}
+	}
+#ifdef _OPENMP
+#pragma omp parallel for private(m, j)
+#endif
+	for (n = 0; n < mlp->hidden_w->m; ++n) {
+		for (j = 0; j < batch_size; ++j) {
+			const float w = hr * NV_MAT_V(output_bp, j, n);
+			for (m = 0; m < mlp->hidden_w->n; ++m) {
+				NV_MAT_V(mlp->hidden_w, n, m) -= w * NV_MAT_V(input_y, j, m);
+			}
+			NV_MAT_V(mlp->hidden_bias, n, 0) -= w;
+		}
+	}
+#ifdef _OPENMP
+#pragma omp parallel for private(m, j)
+#endif
+	for (n = 0; n < mlp->input_w->m; ++n) {
+		for (j = 0; j < batch_size; ++j) {
+			const float w = ir * NV_MAT_V(hidden_bp, j, n);
+			if (w != 0.0f) { 
+				for (m = 0; m < mlp->input_w->n; ++m) {
+					NV_MAT_V(mlp->input_w, n, m) -= w * NV_MAT_V(data, dm[j], m);
+				}
+				NV_MAT_V(mlp->input_bias, n, 0) -= w;
+			} // else dropout
+		}
+	}
+	nv_matrix_free(&output_bp);
+	nv_matrix_free(&hidden_bp);
+}
+
+float
+nv_mlp_train_lex(nv_mlp_t *mlp,
+				 const nv_matrix_t *data,
+				 const nv_matrix_t *label,
+				 const nv_matrix_t *t,
+				 float ir, float hr, 
+				 int start_epoch, int end_epoch, int max_epoch)
+{
+	int i;
+	int batch_size = 32;
 	int epoch = 1;
 	float p;
-	float y, data_e, bp_sum;
-	int *rand_idx = (int *)nv_malloc(sizeof(int) * data->m);
-	int label_ok;
-	int do_train;
-	
-	nv_matrix_t *input_y = nv_matrix_alloc(mlp->input_w->m, 1);
-	nv_matrix_t *hidden_y = nv_matrix_alloc(mlp->hidden_w->m, 1);
-	nv_matrix_t *output_y = nv_matrix_alloc(mlp->output, 1);
-	nv_matrix_t *output_bp = nv_matrix_alloc(mlp->output, 1);
-	nv_matrix_t *hidden_bp = nv_matrix_alloc(mlp->input_w->m, 1);
-	nv_matrix_t *rand_s = nv_matrix_alloc(mlp->input_w->m, 1);
-	float rand_s_base = logf(mlp->hidden) / logf(32.0);
+	nv_matrix_t *input_y = nv_matrix_alloc(mlp->input_w->m, batch_size);
+	nv_matrix_t *hidden_y = nv_matrix_alloc(mlp->hidden_w->m, batch_size);
+	nv_matrix_t *output_y = nv_matrix_alloc(mlp->output, batch_size);
+	int *dms = nv_alloc_type(int, batch_size);
+	int *rand_idx = nv_alloc_type(int, data->m);
 	
 	epoch = start_epoch + 1;
 	do {
-		ok = 0;
-		data_e = 0.0f;
+		long tm;
+		int ok = 0;
+		float data_e = 0.0f;
+		int data_count = 0;
+		
 		tm = nv_clock();
 		nv_shuffle_index(rand_idx, 0, data->m);
-		for (im = 0; im < data->m; ++im) {
-			float e;
-			float mp = -FLT_MAX;
-			int l = -1;
-			int dm = rand_idx[im];
-
-			for (m = 0; m < mlp->input_w->m; ++m) {
-				NV_MAT_V(rand_s, 0, m) = (nv_rand() * rand_s_base) - (rand_s_base * 0.5f);
-			}
-
+		
+		for (i = 0; i < data->m / batch_size; ++i) {
+			int j;
 #ifdef _OPENMP
-#pragma omp parallel for private(y) //if (mlp->input * mlp->hidden > 10240)
+#pragma omp parallel for schedule(dynamic, 1) reduction(+:ok, data_count, data_e)
 #endif
-			for (m = 0; m < mlp->input_w->m; ++m) {
-				if (nv_rand() > mlp->dropout) {
-					y = NV_MAT_V(mlp->input_bias, m, 0);
-					y += nv_vector_dot(data, dm, mlp->input_w, m) + NV_MAT_V(rand_s, 0, m);
-					y = nv_mlp_sigmoid(y);
-					NV_MAT_V(input_y, 0, m) = y;
-				} else {
-					NV_MAT_V(input_y, 0, m) = 0.0f;
+			for (j = 0; j < batch_size; ++j) {
+				int label_ok;
+				int dm = rand_idx[i * batch_size + j];
+				dms[j] = dm;
+				
+				nv_mlp_forward(input_y, j, hidden_y, j, mlp, data, dm);
+				nv_mlp_softmax(output_y, j, hidden_y, j);
+				data_e += nv_mlp_error(output_y, j, t, dm);
+				label_ok = (int)NV_MAT_V(label, dm, 0);
+				if (nv_vector_max_n(output_y, j) == label_ok) {
+					++ok;
 				}
+				data_count += 1;
 			}
-
-#ifdef _OPENMP
-#pragma omp parallel for private(y) if (mlp->output > 256)
-#endif
-			for (m = 0; m < mlp->hidden_w->m; ++m) {
-				y = NV_MAT_V(mlp->hidden_bias, m, 0);
-				y += nv_vector_dot(input_y, 0, mlp->hidden_w, m);
-				NV_MAT_V(hidden_y, 0, m) = y;
-			}
-
-			for (m = 0; m < mlp->hidden_w->m; ++m) {
-				NV_MAT_V(output_y, 0, m) = nv_mlp_sigmoid(NV_MAT_V(hidden_y, 0, m));
-			}
-
-			do_train = 0;
-			e = 0.0f;
-			for (n = 0; n < output_y->n; ++n) {
-				float y = NV_MAT_V(output_y, 0, n);
-				float yt = NV_MAT_V(t, dm, n);
-				if (y == 0.0f) {
-					e += (yt * 0.0f + (1.0f - yt) * logf(1.0f - y)) * -1.0f;
-				} else if (y == 1.0f) {
-					e += (yt * logf(y) + (1.0f - yt) * 0.0f) * - 1.0f;
-				} else {
-					e += (yt * logf(y) + (1.0f - yt) * logf(1.0f - y)) * -1.0f;
-				}
-			}
-			data_e += e;
-			mp = -FLT_MAX;
-			l = -1; // nega
-			label_ok = (int)NV_MAT_V(label, dm, 0);
-
-			if (output_y->n == 1) {
-				if (NV_MAT_V(output_y, 0, 0) > 0.5f) {
-					l = 0;
-				} else {
-					l = 1;
-				}
-				if (label_ok == 0) {
-					if (NV_MAT_V(output_y, 0, 0) < 0.995f) {
-						do_train = 1;
-					}
-				} else {
-					if (NV_MAT_V(output_y, 0, 0) > 0.005f) {
-						do_train = 1;
-					}
-				}
-			} else {
-				for (n = 0; n < output_y->n; ++n) {
-					if (//NV_MAT_V(output_y, 0, n) > 0.5f
-						//&&
-						mp < NV_MAT_V(output_y, 0, n)) 
-					{
-						mp = NV_MAT_V(output_y, 0, n);
-						l = n;
-					}
-					if (n == label_ok) {
-						if (NV_MAT_V(output_y, 0, n) < 0.995f) {
-							do_train = 1;
-						}
-					} else {
-						if (NV_MAT_V(output_y, 0, n) > 0.005f) {
-							do_train = 1;
-						}
-					}
-				}
-			}
-			if (l == label_ok) {
-				++ok;
-			}
-			if (do_train) {
-				bp_sum = 0.0f;
-				for (n = 0; n < output_bp->n; ++n) {
-					float y = NV_MAT_V(hidden_y, 0, n);
-					float yt = NV_MAT_V(t, dm, n);
-					float expy = expf(y);
-					float bp = -((2.0f * yt - 1.0f) * expy + yt) 
-						/ (expf(2.0f * y) + 2.0f * expy + 1.0f);
-					bp_sum += bp;
-					NV_MAT_V(output_bp, 0, n) = bp;
-				}
-				if (bp_sum != 0.0f) {
-					for (m = 0; m < mlp->hidden_w->n; ++m) {
-						y = 0.0f;
-						for (n = 0; n < mlp->output; ++n) {
-							y += NV_MAT_V(output_bp, 0, n) * NV_MAT_V(mlp->hidden_w, n, m);
-						}
-						NV_MAT_V(hidden_bp, 0, m) = 
-							y * (1.0f - NV_MAT_V(input_y, 0, m)) * NV_MAT_V(input_y, 0, m);
-					}
-#ifdef _OPENMP
-#pragma omp parallel for private(m) // if (mlp->input * mlp->hidden > 10240)
-#endif
-					for (n = 0; n < mlp->input_w->m; ++n) {
-						for (m = 0; m < mlp->input_w->n; ++m) {
-							NV_MAT_V(mlp->input_w, n, m) -= 
-								NV_MAT_V(ir, label_ok, 0) 
-								* NV_MAT_V(data, dm, m) * NV_MAT_V(hidden_bp, 0, n)
-								;
-						}
-						NV_MAT_V(mlp->input_bias, n, 0) -=
-							NV_MAT_V(ir, label_ok, 0) * 1.0f * NV_MAT_V(hidden_bp, 0, n)
-							;
-					}
-#ifdef _OPENMP
-#pragma omp parallel for private(m) if (mlp->output > 256)
-#endif
-					for (n = 0; n < mlp->hidden_w->m; ++n) {
-						for (m = 0; m < mlp->hidden_w->n; ++m) {
-							NV_MAT_V(mlp->hidden_w, n, m) -= 
-								NV_MAT_V(hr, label_ok, 0) 
-								* NV_MAT_V(input_y, 0, m) * NV_MAT_V(output_bp, 0, n)
-								;
-						}
-						NV_MAT_V(mlp->hidden_bias, n, 0) -=
-							NV_MAT_V(hr, label_ok, 0) * 1.0f * NV_MAT_V(output_bp, 0, n)
-							;
-					}
-				}
-			}
+			nv_mlp_backward(
+				batch_size,
+				mlp,
+				output_y, input_y, 
+				data, t, dms,
+				ir, hr);
 		}
-		p = (float)ok / data->m;
+		p = (float)ok / data_count;
 		if (nv_mlp_progress_flag) {
 			printf("%d: E:%E, %f (%d/%d), %ldms\n",
-				epoch, data_e / data->m / mlp->output,
-				p, ok,
-				data->m, 
+				   epoch, data_e / data_count / mlp->output,
+				   p, ok,
+				   data_count, 
 				nv_clock() - tm);
 			if (nv_mlp_progress_flag >= 2) {
-				int i;
-				int output = mlp->output > 1 ? mlp->output : 2;
-				int *ok_count = nv_alloc_type(int, output);
-				int *ng_count = nv_alloc_type(int, output);
-
-				memset(ok_count, 0, sizeof(int) * output);
-				memset(ng_count, 0, sizeof(int) * output);
-				for (i = 0; i < data->m; ++i) {
-					int predict = nv_mlp_predict_label(mlp, data, i);
-					int teach = (int)NV_MAT_V(label, i, 0);
-					if (predict == teach) {
-						++ok_count[teach];
-					} else {
-						++ng_count[teach];
-					}
-				}
-				for (i = 0; i < output; ++i) {
-					if (ok_count[i] + ng_count[i] > 0) {
-						printf("%d: ok: %d, ng: %d, %f\n",
-							i, ok_count[i], ng_count[i], 
-							(float)ok_count[i] / (float)(ok_count[i] + ng_count[i]));
-					} else {
-						printf("%d: no data found\n", i);
-					}
-				}
-				nv_free(ok_count);
-				nv_free(ng_count);
+				nv_mlp_show_train_validation(mlp, data, label);
 			}
 			fflush(stdout);
 		}
-	} while (epoch++ < end_epoch);
 
+	} while (epoch++ < end_epoch);
+	nv_free(rand_idx);
+	nv_free(dms);
 	nv_matrix_free(&input_y);
 	nv_matrix_free(&hidden_y);
 	nv_matrix_free(&output_y);
-	nv_matrix_free(&hidden_bp);
-	nv_matrix_free(&output_bp);
-	nv_matrix_free(&rand_s);
-	nv_free(rand_idx);
-
+	
 	return p;
 }
 
 /* 回帰 */
-void nv_mlp_train_regression(
-					 nv_mlp_t *mlp,
-					 const nv_matrix_t *data,
-					 const nv_matrix_t *t,
-					 float ir, float hr,
-					 int start_epoch, int max_epoch)
+void
+nv_mlp_train_regression(
+	nv_mlp_t *mlp,
+	const nv_matrix_t *data,
+	const nv_matrix_t *t,
+	float ir, float hr,
+	int start_epoch, int max_epoch)
 {
 	long tm;
 	int m, n, im;

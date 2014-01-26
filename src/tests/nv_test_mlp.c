@@ -32,8 +32,6 @@ nv_test_mlp(const nv_matrix_t *train_data,
 			const nv_matrix_t *test_labels)
 {
 	nv_mlp_t *mlp = nv_mlp_alloc(train_data->n, HIDDEN_UNIT, NV_TEST_DATA_K);
-	nv_matrix_t *ir = nv_matrix_alloc(1, mlp->output == 1 ? 2 : mlp->output);
-	nv_matrix_t *hr = nv_matrix_alloc(1, mlp->output == 1 ? 2 : mlp->output);
 	int i, ok;
 	
 	NV_TEST_NAME;
@@ -42,16 +40,14 @@ nv_test_mlp(const nv_matrix_t *train_data,
 		   train_data->m,
 		   test_data->m,
 		   train_data->n);
-
-	nv_mlp_progress(1);
-	nv_mlp_gaussian_init(mlp, 1.0f, (int)sqrtf(train_data->n), (int)sqrtf(train_data->n), 1);
-	nv_matrix_fill(ir, 0.2f);
-	nv_matrix_fill(hr, 0.1f);
-	nv_mlp_train_ex(mlp, train_data, train_labels, ir, hr, 0, 90, 100);
-	nv_matrix_fill(ir, 0.01f);
-	nv_matrix_fill(hr, 0.01f);
-	nv_mlp_train_ex(mlp, train_data, train_labels, ir, hr, 90, 100, 100);
 	
+	nv_mlp_progress(1);
+	nv_mlp_init(mlp, train_data);
+	nv_mlp_dropout(mlp, 0.5f);
+	nv_mlp_train_ex(mlp, train_data, train_labels, 0.01f, 0.01f, 0, 20, 120);
+	nv_mlp_train_ex(mlp, train_data, train_labels, 2.0f, 0.1f, 20, 80, 120);
+	nv_mlp_train_ex(mlp, train_data, train_labels, 0.001f, 0.001f, 80, 120, 120);
+
 	ok = 0;
 	for (i = 0; i < test_data->m; ++i) {
 		if (nv_mlp_predict_label(mlp, test_data, i) == (int)NV_MAT_V(test_labels, i, 0)) {
@@ -64,8 +60,6 @@ nv_test_mlp(const nv_matrix_t *train_data,
 
 	NV_ASSERT((float)ok / test_data->m > 0.7f);
 
-	nv_matrix_free(&ir);
-	nv_matrix_free(&hr);
 	nv_mlp_free(&mlp);
 	fflush(stdout);
 }

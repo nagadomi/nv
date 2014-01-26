@@ -46,23 +46,21 @@ nv_mlp_t *nv_mlp_alloc(int input, int hidden, int k);
 void nv_mlp_free(nv_mlp_t **mlp);
 
 float nv_mlp_sigmoid(float a);
-void nv_mlp_init(nv_mlp_t *mlp);
-void nv_mlp_init_rand(nv_mlp_t *mlp);
-void nv_mlp_init_nonnegative(nv_mlp_t *mlp);
-void nv_mlp_init_kmeans(nv_mlp_t *mlp, const nv_matrix_t *data);
+void nv_mlp_init(nv_mlp_t *mlp, const nv_matrix_t *data);
+void nv_mlp_init_rand(nv_mlp_t *mlp, const nv_matrix_t *data);
 void nv_mlp_gaussian_init(nv_mlp_t *mlp, float var, int height, int width, int zdim);
 
 void nv_mlp_dropout(nv_mlp_t *mlp, float dropout);
 void nv_mlp_make_t(nv_matrix_t *t, const nv_matrix_t *label);
 float nv_mlp_train_ex(nv_mlp_t *mlp,
-					 const nv_matrix_t *data, const nv_matrix_t *label,
-					 const nv_matrix_t *ir, const nv_matrix_t *hr,
+					  const nv_matrix_t *data, const nv_matrix_t *label,
+					  float ir, float hr,
 					 int start_epoch, int end_epoch, int max_epoch);
 float nv_mlp_train_lex(nv_mlp_t *mlp,
 					   const nv_matrix_t *data,
 					   const nv_matrix_t *label,
 					   const nv_matrix_t *t,
-					   const nv_matrix_t *ir, const nv_matrix_t *hr,
+					   float ir, float hr,
 					   int start_epoch, int end_epoch, int max_epoch);
 float nv_mlp_train(nv_mlp_t *mlp, const nv_matrix_t *data, const nv_matrix_t *label, int epoch);
 
