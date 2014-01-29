@@ -540,3 +540,55 @@ nv_mat_list_v(const nv_matrix_t *mat, int list, int m, int n)
 	return &mat->v[mat->list_step * list + m * mat->step + n];
 }
 
+/* shallow copy */
+nv_matrix_t *
+nv_vector_reshape(nv_matrix_t *vec, int vec_j,
+				  int n, int m)
+{
+	nv_matrix_t *mat;
+
+	NV_ASSERT(vec->n == n * m);
+	NV_ASSERT(n < 8 || n % 8 == 0); // n >= 8 && n % 8 != 0, AVX does not work	
+
+	if (!(vec->n == n * m && (n < 8 || n % 8 == 0))) {
+		return NULL;
+	}
+	mat = (nv_matrix_t *)nv_malloc(sizeof(nv_matrix_t));
+	mat->list = 1;
+	mat->n = n;
+	mat->m = m;
+	mat->rows = 1;
+	mat->cols = m;
+	mat->v = &NV_MAT_V(vec, vec_j, 0);
+	mat->step = n;
+	mat->list_step = (int64_t)mat->step * mat->m;
+	mat->alias = 1;
+	
+	return mat;
+}
+
+nv_matrix_t *
+nv_vector_reshape3d(nv_matrix_t *vec, int vec_j,
+					int n, int rows, int cols)
+{
+	nv_matrix_t *mat;
+
+	NV_ASSERT(vec->n == n * rows * cols);
+	NV_ASSERT(n < 8 || n % 8 == 0); // n >= 8 && n % 8 != 0, AVX does not work
+	
+	if (!(vec->n == n * rows * cols && (n < 8 || n % 8 == 0))) {
+		return NULL;
+	}
+	mat = (nv_matrix_t *)nv_malloc(sizeof(nv_matrix_t));
+	mat->list = 1;
+	mat->n = n;
+	mat->m = rows * cols;
+	mat->rows = rows;
+	mat->cols = cols;
+	mat->v = &NV_MAT_V(vec, vec_j, 0);
+	mat->step = n;
+	mat->list_step = (int64_t)mat->step * mat->m;
+	mat->alias = 1;
+	
+	return mat;
+}

@@ -127,6 +127,11 @@ void nv_matrix3d_print(FILE *out, const nv_matrix_t *mat, int channel);
 
 void nv_matrix_dump_c(FILE *out, const nv_matrix_t *mat, const char *name, int static_variable);
 
+nv_matrix_t *nv_vector_reshape(nv_matrix_t *vec, int vec_j,
+							   int n, int m);
+nv_matrix_t *nv_vector_reshape3d(nv_matrix_t *vec, int vec_j,
+								 int n, int rows, int cols);
+
 typedef enum 
 {
 	NV_SORT_DIR_ASC = 0,
