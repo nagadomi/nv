@@ -44,9 +44,10 @@ nv_test_mlp(const nv_matrix_t *train_data,
 	nv_mlp_progress(1);
 	nv_mlp_init(mlp, train_data);
 	nv_mlp_dropout(mlp, 0.5f);
-	nv_mlp_train_ex(mlp, train_data, train_labels, 0.01f, 0.01f, 0, 20, 120);
-	nv_mlp_train_ex(mlp, train_data, train_labels, 2.0f, 0.1f, 20, 80, 120);
-	nv_mlp_train_ex(mlp, train_data, train_labels, 0.001f, 0.001f, 80, 120, 120);
+	nv_mlp_drop_connect(mlp, 0.1f);
+	nv_mlp_train_ex(mlp, train_data, train_labels, 0.01f, 0.01f, 0, 20, 200);
+	nv_mlp_train_ex(mlp, train_data, train_labels, 2.0f, 0.1f, 20, 180, 200);
+	nv_mlp_train_ex(mlp, train_data, train_labels, 0.001f, 0.001f, 180, 200, 200);
 
 	ok = 0;
 	for (i = 0; i < test_data->m; ++i) {

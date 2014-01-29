@@ -34,6 +34,7 @@ typedef struct
 	int hidden;
 	int output;
 	float dropout;
+	float drop_connect;
 	nv_matrix_t *input_w;
 	nv_matrix_t *hidden_w;
 	nv_matrix_t *input_bias;
@@ -51,6 +52,7 @@ void nv_mlp_init_rand(nv_mlp_t *mlp, const nv_matrix_t *data);
 void nv_mlp_gaussian_init(nv_mlp_t *mlp, float var, int height, int width, int zdim);
 
 void nv_mlp_dropout(nv_mlp_t *mlp, float dropout);
+void nv_mlp_drop_connect(nv_mlp_t *mlp, float drop_connect);
 void nv_mlp_make_t(nv_matrix_t *t, const nv_matrix_t *label);
 float nv_mlp_train_ex(nv_mlp_t *mlp,
 					  const nv_matrix_t *data, const nv_matrix_t *label,
