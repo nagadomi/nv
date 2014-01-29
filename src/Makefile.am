@@ -78,6 +78,7 @@ nv_io_libsvm.c \
 nv_io_video.c \
 nv_io_kmeans_tree.c \
 nv_io_klr_tree.c \
+nv_fv_rectangle_feature.c \
 3rd_party/sha1/sha1.c \
 3rd_party/mt/mt19937-64.c \
 3rd_party/getopt/getopt.c
@@ -155,7 +156,8 @@ nv_io.h \
 nv_io_image.h \
 nv_io_video.h \
 nv_io_kmeans_tree.h \
-nv_io_klr_tree.h
+nv_io_klr_tree.h \
+nv_fv_rectangle_feature.h
 
 bin_PROGRAMS = nv_dump_lr nv_flags nv_matrix_text2bin nv_kmeans_tree_text2bin
 
