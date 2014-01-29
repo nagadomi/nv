@@ -740,8 +740,26 @@ nv_lmca_projection(nv_matrix_t *y, int yj,
 	int i;
 	
 	NV_ASSERT(ldm->m == y->n);
+	NV_ASSERT(ldm->n == x->n);
 	
 	for (i = 0; i < ldm->m; ++i) {
 		NV_MAT_V(y, yj, i) = nv_vector_dot(ldm, i, x, xj);
+	}
+}
+void
+nv_lmca_projection_all(nv_matrix_t *y,
+					   const nv_matrix_t *ldm,
+					   const nv_matrix_t *x)
+{
+	int i;
+	NV_ASSERT(ldm->m == y->n);
+	NV_ASSERT(ldm->n == x->n);
+	NV_ASSERT(y->m >= x->m);
+	
+#ifdef _OPENMP
+#pragma omp parallel for
+#endif
+	for (i = 0; i < x->m; ++i) {
+		nv_lmca_projection(y, i, ldm, x, i);
 	}
 }
