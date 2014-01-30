@@ -416,8 +416,8 @@ nv_mlp_forward(nv_matrix_t *input_y, int ij,
 	if (drop_connect != NULL) {
 		for (m = 0; m < mlp->input_w->m; ++m) {
 			if (nv_rand() > mlp->dropout) {
-				float y = NV_MAT_V(mlp->input_bias, m, 0);
 				int i;
+				float y = NV_MAT_V(mlp->input_bias, m, 0);
 				for (i = 0; i < data->n; ++i) {
 					y += NV_MAT_V(drop_connect, cj, i) * NV_MAT_V(data, dj, i) * NV_MAT_V(mlp->input_w, m, i);
 				}
@@ -573,8 +573,10 @@ nv_mlp_train_lex(nv_mlp_t *mlp,
 	int *djs = nv_alloc_type(int, NV_MLP_BATCH_SIZE);
 	int *rand_idx = nv_alloc_type(int, data->m);
 
+	NV_ASSERT(data->m > NV_MLP_BATCH_SIZE);
+
 	if (mlp->drop_connect > 0.0f) {
-		drop_connect = nv_matrix_alloc(mlp->input_w->m, NV_MLP_BATCH_SIZE);
+		drop_connect = nv_matrix_alloc(mlp->input_w->n, NV_MLP_BATCH_SIZE);
 	}
 	
 	epoch = start_epoch + 1;
@@ -589,9 +591,6 @@ nv_mlp_train_lex(nv_mlp_t *mlp,
 		
 		for (i = 0; i < data->m / NV_MLP_BATCH_SIZE; ++i) {
 			int j;
-			if (drop_connect) {
-				nv_matrix_zero(drop_connect);
-			}
 #ifdef _OPENMP
 #pragma omp parallel for schedule(dynamic, 1) reduction(+:correct, count, e)
 #endif
@@ -600,11 +599,13 @@ nv_mlp_train_lex(nv_mlp_t *mlp,
 				int dj = rand_idx[i * NV_MLP_BATCH_SIZE + j];
 				djs[j] = dj;
 				
-				if (drop_connect) {
+				if (drop_connect != NULL) {
 					int k;
 					for (k = 0; k < drop_connect->n; ++k) {
 						if (nv_rand() > mlp->drop_connect) {
 							NV_MAT_V(drop_connect, j, k) = 1.0f;
+						} else {
+							NV_MAT_V(drop_connect, j, k) = 0.0f;
 						}
 					}
 				}
