@@ -66,6 +66,7 @@ nv_ip_hsv.c \
 nv_ip_ccv.c \
 nv_ip_bgseg.c \
 nv_ip_morphology.c \
+nv_ip_patch.c \
 nv_io_stream.c \
 nv_io_ipl.c \
 nv_io_mlp.c \
@@ -144,6 +145,7 @@ nv_ip_hsv.h \
 nv_ip_ccv.h \
 nv_ip_bgseg.h \
 nv_ip_morphology.h \
+nv_ip_patch.h \
 nv_io_stream.h \
 nv_io_ipl.h \
 nv_io_mlp.h \
