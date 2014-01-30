@@ -20,7 +20,7 @@
 #include "nv_ip_patch.h"
 
 nv_matrix_t *
-nv_patch_matrix_alloc(nv_matrix_t *src, int patch_size)
+nv_patch_matrix_alloc(const nv_matrix_t *src, int patch_size)
 {
 	NV_ASSERT(patch_size <= src->rows);
 	NV_ASSERT(patch_size <= src->cols);
