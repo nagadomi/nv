@@ -54,11 +54,12 @@ nv_load_mlp_text(const char *filename)
 	}
 	mlp = nv_alloc_type(nv_mlp_t, 1);
 	c = fscanf(fp, "%d %d %d %f", &mlp->input, &mlp->hidden, &mlp->output, &mlp->dropout);
-	if (c != 3) {
+	if (c != 4) {
 		nv_free(mlp);
 		fclose(fp);
 		return NULL;
 	}
+	mlp->drop_connect = 0.0f;
 	mlp->input_w = nv_load_matrix_fp(fp);
 	mlp->input_bias = nv_load_matrix_fp(fp);
 	mlp->hidden_w = nv_load_matrix_fp(fp);
