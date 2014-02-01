@@ -588,7 +588,10 @@ nv_mlp_train_lex(nv_mlp_t *mlp,
 		
 		tm = nv_clock();
 		nv_shuffle_index(rand_idx, 0, data->m);
-		
+
+		if (drop_connect != NULL) {
+			nv_matrix_zero(drop_connect);
+		}		
 		for (i = 0; i < data->m / NV_MLP_BATCH_SIZE; ++i) {
 			int j;
 #ifdef _OPENMP
@@ -604,8 +607,6 @@ nv_mlp_train_lex(nv_mlp_t *mlp,
 					for (k = 0; k < drop_connect->n; ++k) {
 						if (nv_rand() > mlp->drop_connect) {
 							NV_MAT_V(drop_connect, j, k) = 1.0f;
-						} else {
-							NV_MAT_V(drop_connect, j, k) = 0.0f;
 						}
 					}
 				}
