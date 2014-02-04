@@ -27,6 +27,8 @@
  * 2 Layer
  */
 
+#define NV_MLP_BIAS 0.03125f
+
 static int nv_mlp_progress_flag = 0;
 
 void nv_mlp_progress(int onoff)
@@ -111,12 +113,12 @@ int nv_mlp_predict_label(const nv_mlp_t *mlp, const nv_matrix_t *x, int xm)
 #pragma omp parallel for
 #endif
 	for (m = 0; m < mlp->hidden; ++m) {
-		float y = NV_MAT_V(mlp->input_bias, m, 0);
+		float y = NV_MAT_V(mlp->input_bias, m, 0) * NV_MLP_BIAS;
 		y += nv_vector_dot(x, xm, mlp->input_w, m);
 		NV_MAT_V(input_y, 0, m) = nv_mlp_sigmoid(y) * dropout_scale;
 	}
 	for (m = 0; m < mlp->output; ++m) {
-		float y = NV_MAT_V(mlp->hidden_bias, m, 0);
+		float y = NV_MAT_V(mlp->hidden_bias, m, 0) * NV_MLP_BIAS;
 		y += nv_vector_dot(input_y, 0, mlp->hidden_w, m);
 		if (max_output < y) {
 			label = m;
@@ -142,13 +144,13 @@ float nv_mlp_predict(const nv_mlp_t *mlp,
 #pragma omp parallel for private(y)
 #endif
 	for (m = 0; m < mlp->hidden; ++m) {
-		y = NV_MAT_V(mlp->input_bias, m, 0);
+		y = NV_MAT_V(mlp->input_bias, m, 0) * NV_MLP_BIAS;
 		y += nv_vector_dot(x, xm, mlp->input_w, m);
 		NV_MAT_V(input_y, 0, m) = nv_mlp_sigmoid(y) * dropout_scale;
 	}
 
 	for (m = 0; m < mlp->output; ++m) {
-		y = NV_MAT_V(mlp->hidden_bias, m, 0);;
+		y = NV_MAT_V(mlp->hidden_bias, m, 0) * NV_MLP_BIAS;
 		y += nv_vector_dot(input_y, 0, mlp->hidden_w, m);
 		NV_MAT_V(output_y, 0, m) = nv_mlp_sigmoid(y);
 	}
@@ -187,13 +189,13 @@ void nv_mlp_regression(const nv_mlp_t *mlp,
 #pragma omp parallel for private(y)
 #endif
 	for (m = 0; m < mlp->input_w->m; ++m) {
-		y = NV_MAT_V(mlp->input_bias, m, 0);
+		y = NV_MAT_V(mlp->input_bias, m, 0)  * NV_MLP_BIAS;
 		y += nv_vector_dot(x, xm, mlp->input_w, m);
 		NV_MAT_V(input_y, 0, m) = nv_mlp_sigmoid(y);
 	}
 
 	for (m = 0; m < mlp->hidden_w->m; ++m) {
-		y = NV_MAT_V(mlp->hidden_bias, m, 0);
+		y = NV_MAT_V(mlp->hidden_bias, m, 0) * NV_MLP_BIAS;
 		y += nv_vector_dot(input_y, 0, mlp->hidden_w, m);
 		NV_MAT_V(hidden_y, 0, m) = y;
 	}
@@ -218,7 +220,7 @@ void nv_mlp_hidden_vector(const nv_mlp_t *mlp,
 #pragma omp parallel for private(y)
 #endif
 	for (m = 0; m < mlp->input_w->m; ++m) {
-		y = NV_MAT_V(mlp->input_bias, m, 0);
+		y = NV_MAT_V(mlp->input_bias, m, 0)  * NV_MLP_BIAS;
 		y += nv_vector_dot(x, xm, mlp->input_w, m);
 		NV_MAT_V(input_y, 0, m) = nv_mlp_sigmoid(y);
 	}
@@ -306,13 +308,13 @@ nv_mlp_init_rand(nv_mlp_t *mlp, const nv_matrix_t *data)
 		for (i = 0; i < mlp->input_w->n; ++i) {
 			NV_MAT_V(mlp->input_w, j, i) = nv_gaussian_rand(0.0f, 1.0f) * input_scale;
 		}
-		NV_MAT_V(mlp->input_bias, j, 0) = nv_gaussian_rand(0.0f, 1.0f) * input_scale;
+		NV_MAT_V(mlp->input_bias, j, 0) = 0.0f;
 	}
 	for (j = 0; j < mlp->hidden_w->m; ++j) {
 		for (i = 0; i < mlp->hidden_w->n; ++i) {
 			NV_MAT_V(mlp->hidden_w, j, i) = nv_gaussian_rand(0.0f, 1.0f) * hidden_scale;
 		}
-		NV_MAT_V(mlp->hidden_bias, j, 0) = nv_gaussian_rand(0.0f, 1.0f) * hidden_scale;
+		NV_MAT_V(mlp->hidden_bias, j, 0) = 0.0f;
 	}
 }
 
@@ -417,7 +419,7 @@ nv_mlp_forward(nv_matrix_t *input_y, int ij,
 		for (m = 0; m < mlp->input_w->m; ++m) {
 			if (nv_rand() > mlp->dropout) {
 				int i;
-				float y = NV_MAT_V(mlp->input_bias, m, 0);
+				float y = NV_MAT_V(mlp->input_bias, m, 0) * NV_MLP_BIAS;
 				for (i = 0; i < data->n; ++i) {
 					y += NV_MAT_V(drop_connect, cj, i) * NV_MAT_V(data, dj, i) * NV_MAT_V(mlp->input_w, m, i);
 				}
@@ -430,7 +432,7 @@ nv_mlp_forward(nv_matrix_t *input_y, int ij,
 	} else {
 		for (m = 0; m < mlp->input_w->m; ++m) {
 			if (nv_rand() > mlp->dropout) {
-				float y = NV_MAT_V(mlp->input_bias, m, 0);
+				float y = NV_MAT_V(mlp->input_bias, m, 0) * NV_MLP_BIAS;
 				y += nv_vector_dot(data, dj, mlp->input_w, m);
 				y = nv_mlp_sigmoid(y);
 				NV_MAT_V(input_y, ij, m) = y;
@@ -440,7 +442,7 @@ nv_mlp_forward(nv_matrix_t *input_y, int ij,
 		}
 	}
 	for (m = 0; m < mlp->hidden_w->m; ++m) {
-		float y = NV_MAT_V(mlp->hidden_bias, m, 0);
+		float y = NV_MAT_V(mlp->hidden_bias, m, 0) * NV_MLP_BIAS;
 		y += nv_vector_dot(input_y, ij, mlp->hidden_w, m);
 		NV_MAT_V(hidden_y, hj, m) = y;
 	}
@@ -517,7 +519,7 @@ nv_mlp_backward(
 			for (m = 0; m < mlp->hidden_w->n; ++m) {
 				NV_MAT_V(mlp->hidden_w, n, m) -= w * NV_MAT_V(input_y, j, m);
 			}
-			NV_MAT_V(mlp->hidden_bias, n, 0) -= w;
+			NV_MAT_V(mlp->hidden_bias, n, 0) -= w * NV_MLP_BIAS;
 		}
 	}
 	if (drop_connect != NULL) {
@@ -531,7 +533,7 @@ nv_mlp_backward(
 					for (m = 0; m < mlp->input_w->n; ++m) {
 						NV_MAT_V(mlp->input_w, n, m) -= NV_MAT_V(drop_connect, j, m) * w * NV_MAT_V(data, dj[j], m);
 					}
-					NV_MAT_V(mlp->input_bias, n, 0) -= w;
+					NV_MAT_V(mlp->input_bias, n, 0) -= w * NV_MLP_BIAS;
 				} // else dropout
 			}
 		}
@@ -546,7 +548,7 @@ nv_mlp_backward(
 					for (m = 0; m < mlp->input_w->n; ++m) {
 						NV_MAT_V(mlp->input_w, n, m) -= w * NV_MAT_V(data, dj[j], m);
 					}
-					NV_MAT_V(mlp->input_bias, n, 0) -= w;
+					NV_MAT_V(mlp->input_bias, n, 0) -= w  * NV_MLP_BIAS;
 				} // else dropout
 			}
 		}
@@ -688,7 +690,7 @@ nv_mlp_train_regression(
 #pragma omp parallel for private(y) //if (mlp->input * mlp->hidden > 10240)
 #endif
 			for (m = 0; m < mlp->input_w->m; ++m) {
-				y = NV_MAT_V(mlp->input_bias, m, 0);
+				y = NV_MAT_V(mlp->input_bias, m, 0) * NV_MLP_BIAS;
 				y += nv_vector_dot(data, dm, mlp->input_w, m);
 				y = nv_mlp_sigmoid(y + NV_MAT_V(rand_s, 0, m)); // y + noise
 
@@ -699,7 +701,7 @@ nv_mlp_train_regression(
 #pragma omp parallel for private(y) if (mlp->output > 256)
 #endif
 			for (m = 0; m < mlp->hidden_w->m; ++m) {
-				y = NV_MAT_V(mlp->hidden_bias, m, 0);
+				y = NV_MAT_V(mlp->hidden_bias, m, 0) * NV_MLP_BIAS;
 				y += nv_vector_dot(input_y, 0, mlp->hidden_w, m);
 				NV_MAT_V(hidden_y, 0, m) = y;
 			}
@@ -732,7 +734,7 @@ nv_mlp_train_regression(
 					df = ir * (NV_MAT_V(data, dm, m) * NV_MAT_V(hidden_bp, 0, n));
 					NV_MAT_V(mlp->input_w, n, m) -= df;
 				}
-				df = ir * 1.0f * NV_MAT_V(hidden_bp, 0, n);
+				df = ir * NV_MLP_BIAS * NV_MAT_V(hidden_bp, 0, n);
 				NV_MAT_V(mlp->input_bias, n, 0) -= df;
 			}
 
@@ -745,7 +747,7 @@ nv_mlp_train_regression(
 					df = hr * NV_MAT_V(input_y, 0, m) * NV_MAT_V(output_bp, 0, n);
 					NV_MAT_V(mlp->hidden_w, n, m) -= df;
 				}
-				df = hr * 1.0f * NV_MAT_V(output_bp, 0, n);
+				df = hr * NV_MLP_BIAS * NV_MAT_V(output_bp, 0, n);
 				NV_MAT_V(mlp->hidden_bias, n, 0) -= df;
 			}
 		}
