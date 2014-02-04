@@ -2,13 +2,13 @@ EXTRA_DIST = \
 nv_internal.h \
 nv_config_msvc.h \
 3rd_party/sha1/sha.h \
-3rd_party/mt/mt64.h \
+3rd_party/tinymt/tinymt32.h \
 nv.pc.in \
 libnv-2.def
 
 lib_LTLIBRARIES = libnv.la
 libnv_la_LIBADD = 
-libnv_la_CFLAGS = -I$(srcdir)/3rd_party/sha1 -I$(srcdir)/3rd_party/mt
+libnv_la_CFLAGS = -I$(srcdir)/3rd_party/sha1 -I$(srcdir)/3rd_party/tinymt
 
 libnv_la_CXXFLAGS = $(libnv_la_CFLAGS)
 libnv_la_LDFLAGS = -no-undefined -version-number @NV_MAJOR@:@NV_MINOR@:@NV_REVISION@ -rpath "$(libdir)"
@@ -81,7 +81,7 @@ nv_io_kmeans_tree.c \
 nv_io_klr_tree.c \
 nv_fv_rectangle_feature.c \
 3rd_party/sha1/sha1.c \
-3rd_party/mt/mt19937-64.c \
+3rd_party/tinymt/tinymt32.c \
 3rd_party/getopt/getopt.c
 
 nodist_include_HEADERS = nv_config_auto.h

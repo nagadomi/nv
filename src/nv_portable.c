@@ -241,6 +241,9 @@ nv_initialize(void)
 	if (nv_initialized == 0) {
 		nv_initialized = 1;
 		nv_enable_sse2_math();
+
+		/* initialize tinymt32 */
+		nv_rand_init();
 #if NV_POSIX		
 		/* Enable some exceptions.  At startup all exceptions are masked.  */
 		/* feenableexcept(FE_INVALID|FE_DIVBYZERO|FE_OVERFLOW); */

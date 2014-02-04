@@ -18,26 +18,57 @@
  */
 
 #include "nv_core.h"
-#include "mt64.h"
+#include "tinymt32.h"
 #include <time.h>
+
+#define NV_RAND_THREAD_MAX 128
+
+tinymt32_t g_state[128];
+
+void
+nv_rand_init(void)
+{
+	int i;
+	for (i = 0; i < NV_RAND_THREAD_MAX; ++i) {
+		tinymt32_init_param(&g_state[i],
+							0x09f6013eU,
+							0xf848fe13U,
+							0x52a0f5ffU);
+	}
+	tinymt32_init(&g_state[0], 11);
+	for (i = 1; i < NV_RAND_THREAD_MAX; ++i) {
+		tinymt32_init(&g_state[i], 11 + i);
+	}
+}
 
 void 
 nv_srand_time(void)
 {
-	unsigned long long seed = (unsigned long long)time(NULL);
-	mt_init_genrand64(seed);
+	uint32_t seed = (uint32_t)(time(NULL) & 0xffffffff);
+	int i;
+	
+	tinymt32_init(&g_state[0], seed);
+	for (i = 1; i < NV_RAND_THREAD_MAX; ++i) {
+		tinymt32_init(&g_state[i], seed + i);
+	}
 }
 
 void 
 nv_srand(unsigned int seed)
 {
-	mt_init_genrand64(seed);
+	int i;
+	tinymt32_init(&g_state[0], seed);
+	for (i = 1; i < NV_RAND_THREAD_MAX; ++i) {
+		tinymt32_init(&g_state[i], seed + i);
+	}
 }
 
 float 
 nv_rand(void)
 {
-	return (float)mt_genrand64_real1();
+	int thread_id = nv_omp_thread_id();
+	NV_ASSERT(thread_id < NV_RAND_THREAD_MAX);
+	return tinymt32_generate_float(&g_state[thread_id]);
 }
 
 float 
@@ -51,7 +82,7 @@ nv_gaussian_rand(float average, float variance)
 int
 nv_rand_index(int n)
 {
-	return (int)(n * mt_genrand64_real2());
+	return (int)(n * nv_rand());
 }
 
 void 

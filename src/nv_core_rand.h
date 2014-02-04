@@ -24,6 +24,7 @@
 extern "C" {
 #endif
 
+void nv_rand_init(void);
 void nv_srand_time(void);
 void nv_srand(unsigned int seed);
 float nv_rand(void);      /* [0 - 1] */
