@@ -30,7 +30,9 @@ nv_save_mlp_text(const char *filename, const nv_mlp_t *mlp)
 	if (fp == NULL) {
 		return -1;
 	}
-	fprintf(fp, "%d %d %d %f\n", mlp->input, mlp->hidden, mlp->output, mlp->dropout);
+	fprintf(fp, "%d %d %d %E %E\n",
+			mlp->input, mlp->hidden, mlp->output,
+			mlp->dropout, mlp->noise);
 	nv_save_matrix_fp(fp, mlp->input_w);
 	nv_save_matrix_fp(fp, mlp->input_bias);
 	nv_save_matrix_fp(fp, mlp->hidden_w);
@@ -53,13 +55,15 @@ nv_load_mlp_text(const char *filename)
 		return NULL;
 	}
 	mlp = nv_alloc_type(nv_mlp_t, 1);
-	c = fscanf(fp, "%d %d %d %f", &mlp->input, &mlp->hidden, &mlp->output, &mlp->dropout);
-	if (c != 4) {
+	c = fscanf(fp, "%d %d %d %E %E",
+			   &mlp->input, &mlp->hidden, &mlp->output,
+			   &mlp->dropout, &mlp->noise);
+	if (c != 5) {
 		nv_free(mlp);
 		fclose(fp);
 		return NULL;
 	}
-	mlp->drop_connect = 0.0f;
+	mlp->noise = 0.0f;
 	mlp->input_w = nv_load_matrix_fp(fp);
 	mlp->input_bias = nv_load_matrix_fp(fp);
 	mlp->hidden_w = nv_load_matrix_fp(fp);
