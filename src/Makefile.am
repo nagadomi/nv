@@ -47,6 +47,7 @@ nv_ml_gaussian.c \
 nv_ml_klr.c \
 nv_ml_knb.c \
 nv_ml_mlp.c \
+nv_ml_dae.c \
 nv_ml_som.c \
 nv_ml_kmeans_tree.c \
 nv_ml_pca_kmeans_tree.c \
@@ -124,6 +125,7 @@ nv_ml_gaussian.h \
 nv_ml_klr.h \
 nv_ml_knb.h \
 nv_ml_mlp.h \
+nv_ml_dae.h \
 nv_ml_som.h \
 nv_ml_kmeans_tree.h \
 nv_ml_pca_kmeans_tree.h \

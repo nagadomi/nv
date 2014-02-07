@@ -32,10 +32,10 @@ int main(void)
 	nv_matrix_t *test_labels = nv_matrix_alloc(labels->n, labels->m - train_labels->m);
 
 	nv_vector_normalize_all(data);
+	nv_srand(11);
 	nv_dataset(data, labels,
 			   train_data, train_labels,
 			   test_data, test_labels);
-
 	NV_BACKTRACE;
 	nv_test_sha1();
 	nv_test_io();
@@ -54,6 +54,7 @@ int main(void)
 	nv_test_lr(train_data, train_labels, test_data, test_labels);
 	nv_test_arow(train_data, train_labels, test_data, test_labels);
 	nv_test_mlp(train_data, train_labels, test_data, test_labels);
+	nv_test_dae(train_data, train_labels, test_data, test_labels);
 	nv_test_nb(train_data, train_labels, test_data, test_labels);
 	
 	nv_test_knn(train_data);

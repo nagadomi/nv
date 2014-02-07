@@ -27,6 +27,7 @@
 #include "nv_ml_gaussian.h"
 #include "nv_ml_nb.h"
 #include "nv_ml_mlp.h"
+#include "nv_ml_dae.h"
 #include "nv_ml_som.h"
 #include "nv_ml_kmeans.h"
 #include "nv_ml_xmeans.h"

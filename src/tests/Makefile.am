@@ -6,6 +6,7 @@ nv_test_serialize.c \
 nv_test_lr.c \
 nv_test_arow.c \
 nv_test_mlp.c \
+nv_test_dae.c \
 nv_test_nb.c \
 nv_test_keypoint.c \
 nv_test_kmeans.c \

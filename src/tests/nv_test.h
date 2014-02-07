@@ -40,6 +40,11 @@ void nv_test_mlp(const nv_matrix_t *train_data,
 				 const nv_matrix_t *train_labels,
 				 const nv_matrix_t *test_data,
 				 const nv_matrix_t *test_labels);
+void nv_test_dae(const nv_matrix_t *train_data,
+				 const nv_matrix_t *train_labels,
+				 const nv_matrix_t *test_data,
+				 const nv_matrix_t *test_labels);
+
 void nv_test_nb(const nv_matrix_t *train_data,
 				const nv_matrix_t *train_labels,
 				const nv_matrix_t *test_data,

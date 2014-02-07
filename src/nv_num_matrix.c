@@ -24,15 +24,22 @@
 nv_matrix_t *
 nv_matrix_tr(const nv_matrix_t *mat)
 {
-	int j, i;
 	nv_matrix_t *tr = nv_matrix_alloc(mat->m, mat->n);
+	nv_matrix_tr_ex(tr, mat);
+	return tr;
+}
+
+void
+nv_matrix_tr_ex(nv_matrix_t *tr, const nv_matrix_t *mat)
+{
+	int j, i;
+	NV_ASSERT(tr->n == mat->m);
+	NV_ASSERT(tr->m == mat->n);
 	for (j = 0; j < mat->m; ++j) {
 		for (i = 0; i < mat->n; ++i) {
 			NV_MAT_V(tr, i, j) = NV_MAT_V(mat, j, i);
 		}
 	}
-
-	return tr;
 }
 
 nv_matrix_t *
