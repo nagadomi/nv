@@ -305,13 +305,13 @@ nv_mlp_init_rand(nv_mlp_t *mlp, const nv_matrix_t *data)
 	
 	for (j = 0; j < mlp->input_w->m; ++j) {
 		for (i = 0; i < mlp->input_w->n; ++i) {
-			NV_MAT_V(mlp->input_w, j, i) = nv_gaussian_rand(0.0f, 1.0f) * input_scale;
+			NV_MAT_V(mlp->input_w, j, i) = (nv_rand() - 0.5f) * input_scale;
 		}
 		NV_MAT_V(mlp->input_bias, j, 0) = 0.0f;
 	}
 	for (j = 0; j < mlp->hidden_w->m; ++j) {
 		for (i = 0; i < mlp->hidden_w->n; ++i) {
-			NV_MAT_V(mlp->hidden_w, j, i) = nv_gaussian_rand(0.0f, 1.0f) * hidden_scale;
+			NV_MAT_V(mlp->hidden_w, j, i) = (nv_rand() - 0.5f) * hidden_scale;
 		}
 		NV_MAT_V(mlp->hidden_bias, j, 0) = 0.0f;
 	}
