@@ -25,10 +25,6 @@
  * Denoising Autoencoders
  */
 
-#define NV_DAE_IR 0.001f
-#define NV_DAE_HR 0.001f
-#define NV_DAE_L2 0.0001f
-#define NV_DAE_FOLOS_W 0.0001f
 #define NV_DAE_BATCH_SIZE 20
 
 #define nv_dae_sigmoid(a) NV_SIGMOID(a)
@@ -42,10 +38,19 @@ nv_dae_progress(int onoff)
 	nv_dae_progress_flag = onoff;
 }
 
+/*
+ * pair max pooling
+ *
+ * 隣り合った中間層をペアとして
+ * 出力の小さい方をdropoutさせる
+ * ペア内で相反するフィルタが学習され
+ * encodeした時の特徴量がスパースになる
+ */
 void
-nv_dae_dropout(nv_dae_t *dae, float dropout)
+nv_dae_pooling(nv_dae_t *dae, int pooling)
 {
-	dae->dropout = dropout;
+	NV_ASSERT(dae->hidden % 2 == 0);
+	dae->pooling = pooling;
 }
 
 nv_dae_t *
@@ -55,7 +60,7 @@ nv_dae_alloc(int input, int hidden)
 	
 	dae->input = input;
 	dae->hidden = hidden;
-	dae->dropout = 0.0f;
+	dae->pooling = 0;
 	dae->noise = 0.1f;
 	dae->input_w = nv_matrix_alloc(input, hidden);
 	dae->input_bias = nv_matrix_alloc(1, hidden);
@@ -108,15 +113,19 @@ nv_dae_forward(nv_matrix_t *input_y, int ij,
 	int m;
 	for (m = 0; m < dae->input_w->m; ++m) {
 		int i;
-		if (nv_rand() > dae->dropout) {
-			float y = NV_MAT_V(dae->input_bias, m, 0) * NV_DAE_BIAS;
-			for (i = 0; i < data->n; ++i) {
-				y += NV_MAT_V(noise, cj, i) * NV_MAT_V(data, dj, i) * NV_MAT_V(dae->input_w, m, i);
+		float y = NV_MAT_V(dae->input_bias, m, 0) * NV_DAE_BIAS;
+		for (i = 0; i < data->n; ++i) {
+			y += NV_MAT_V(noise, cj, i) * NV_MAT_V(data, dj, i) * NV_MAT_V(dae->input_w, m, i);
+		}
+		NV_MAT_V(input_y, ij, m) = nv_dae_sigmoid(y);
+	}
+	if (dae->pooling) {
+		for (m = 0; m < dae->input_w->m; m += 2) {
+			if (NV_MAT_V(input_y, ij, m) > NV_MAT_V(input_y, ij, m + 1)) {
+				NV_MAT_V(input_y, ij, m + 1) = 0.0f;
+			} else {
+				NV_MAT_V(input_y, ij, m) = 0.0f;
 			}
-			y = nv_dae_sigmoid(y);
-			NV_MAT_V(input_y, ij, m) = y;
-		} else {
-			NV_MAT_V(input_y, ij, m) = 0.0f;
 		}
 	}
 	for (m = 0; m < hidden_w->m; ++m) {
@@ -304,5 +313,14 @@ nv_dae_encode(const nv_dae_t *dae,
 		float z = NV_MAT_V(dae->input_bias, i, 0)  * NV_DAE_BIAS;
 		z += nv_vector_dot(x, x_j, dae->input_w, i);
 		NV_MAT_V(y, y_j, i) = nv_dae_sigmoid(z);
+	}
+	if (dae->pooling) {
+		for (i = 0; i < dae->hidden; i += 2) {
+			if (NV_MAT_V(y, y_j, i) > NV_MAT_V(y, y_j, i + 1)) {
+				NV_MAT_V(y, y_j, i + 1) = 0.0f;
+			} else {
+				NV_MAT_V(y, y_j, i) = 0.0f;
+			}
+		}
 	}
 }
