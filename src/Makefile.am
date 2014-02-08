@@ -71,6 +71,7 @@ nv_ip_patch.c \
 nv_io_stream.c \
 nv_io_ipl.c \
 nv_io_mlp.c \
+nv_io_dae.c \
 nv_io_lr.c \
 nv_io_nb.c \
 nv_io_cov.c \
@@ -151,6 +152,7 @@ nv_ip_patch.h \
 nv_io_stream.h \
 nv_io_ipl.h \
 nv_io_mlp.h \
+nv_io_dae.h \
 nv_io_lr.h \
 nv_io_nb.h \
 nv_io_cov.h \
