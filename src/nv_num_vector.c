@@ -20,7 +20,6 @@
 #include "nv_core.h"
 #include "nv_num_distance.h"
 #include "nv_num_vector.h"
-#include <limits.h>
 
 void 
 nv_vector_sqrt(nv_matrix_t *vec0, int m0,
@@ -769,38 +768,6 @@ nv_vector_avg(nv_matrix_t *mean, int mean_m, const nv_matrix_t *mat)
 			NV_MAT_V(mean, mean_m, n) += factor * NV_MAT_V(mat, m, n);
 		}
 	}
-}
-
-void 
-nv_vector_rand(nv_matrix_t *v, int vm)
-{
-	int n;
-	for (n = 0; n < v->n; ++n) {
-		NV_MAT_V(v, vm, n) = nv_rand();
-	}
-}
-
-void 
-nv_vector_nrand(nv_matrix_t *v, int vm, float u, float s)
-{
-	int n;
-	for (n = 0; n < v->n; ++n) {
-		NV_MAT_V(v, vm, n) = nv_gaussian_rand(u, s);
-	}
-}
-
-void nv_vector_nrand_ex(nv_matrix_t *v, int j,
-						float u, float s,
-						unsigned long seed)
-{
-	int i;
-	unsigned long next_seed = (unsigned int)nv_rand_index(INT_MAX);
-	
-	nv_srand(seed);
-	for (i = 0; i < v->n; ++i) {
-		NV_MAT_V(v, j, i) = nv_gaussian_rand(u, s);
-	}
-	nv_srand(next_seed);
 }
 
 void 

@@ -158,7 +158,7 @@ nv_lmca_init_random_projection(nv_matrix_t *ldm)
 	
 	for (i = 0; i < ldm->m; ++i) {
 		for (j = 0; j < ldm->n; ++j) {
-			NV_MAT_V(ldm, i, j) = nv_gaussian_rand(0.0f, 1.0f);
+			NV_MAT_V(ldm, i, j) = nv_nrand(0.0f, 1.0f);
 		}
 	}
 	nv_vector_normalize_all(ldm);

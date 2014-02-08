@@ -58,14 +58,14 @@ nv_plsi_init(nv_plsi_t *p)
 	int d, w;
 	float sum;
 
-	nv_vector_rand(p->z, 0);
+	nv_vector_rand(p->z, 0, 0.0f, 1.0f);
 	sum = nv_vector_sum(p->z, 0);
 	if (sum != 0.0f) {
 		nv_vector_muls(p->z, 0, p->z, 0, 1.0f / sum);
 	}
 
 	for (d = 0; d < p->d; ++d) {
-		nv_vector_rand(p->dz, d);
+		nv_vector_rand(p->dz, d, 0.0f, 1.0f);
 		sum = nv_vector_sum(p->dz, d);
 		if (sum != 0.0f) {
 			nv_vector_muls(p->dz, 0, p->dz, 0, 1.0f / sum);
@@ -73,7 +73,7 @@ nv_plsi_init(nv_plsi_t *p)
 	}
 
 	for (w = 0; w < p->w; ++w) {
-		nv_vector_rand(p->wz, w);
+		nv_vector_rand(p->wz, w, 0.0f, 1.0f);
 		sum = nv_vector_sum(p->wz, w);
 		if (sum != 0.0f) {
 			nv_vector_muls(p->wz, 0, p->wz, 0, 1.0f / sum);

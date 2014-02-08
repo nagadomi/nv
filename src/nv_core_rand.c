@@ -20,6 +20,7 @@
 #include "nv_core.h"
 #include "tinymt32.h"
 #include <time.h>
+#include <limits.h>
 
 #define NV_RAND_THREAD_MAX 128
 
@@ -68,11 +69,11 @@ nv_rand(void)
 {
 	int thread_id = nv_omp_thread_id();
 	NV_ASSERT(thread_id < NV_RAND_THREAD_MAX);
-	return tinymt32_generate_float(&g_state[thread_id]);
+	return tinymt32_generate_float01(&g_state[thread_id]);
 }
 
 float 
-nv_gaussian_rand(float average, float variance)
+nv_nrand(float average, float variance)
 {
 	float a = nv_rand();
 	float b = nv_rand();
@@ -82,7 +83,17 @@ nv_gaussian_rand(float average, float variance)
 int
 nv_rand_index(int n)
 {
-	return (int)(n * nv_rand());
+	int thread_id = nv_omp_thread_id();
+	int index;
+	
+	NV_ASSERT(thread_id < NV_RAND_THREAD_MAX);
+	
+	index = (int)(n * tinymt32_generate_32double(&g_state[thread_id]));
+	if (index == n) {
+		index -= 1;
+	}
+	
+	return index;
 }
 
 void 
@@ -148,4 +159,44 @@ nv_vector_shuffle_pair(nv_matrix_t *mat1, nv_matrix_t *mat2)
 	nv_matrix_free(&tmp2);
 }
 
+void 
+nv_vector_rand(nv_matrix_t *v, int v_j, float rmin, float rmax)
+{
+	int n;
+	for (n = 0; n < v->n; ++n) {
+		NV_MAT_V(v, v_j, n) = nv_rand() * (rmax - rmin) + rmin;
+	}
+}
 
+void 
+nv_vector_nrand(nv_matrix_t *v, int v_j, float u, float s)
+{
+	int n;
+	for (n = 0; n < v->n; ++n) {
+		NV_MAT_V(v, v_j, n) = nv_nrand(u, s);
+	}
+}
+
+void
+nv_matrix_rand(nv_matrix_t *mat, float rmin, float rmax)
+{
+	int i;
+#ifdef _OPENMP
+#pragma omp parallel for
+#endif	
+	for (i = 0; i < mat->m; ++i) {
+		nv_vector_rand(mat, i, rmin, rmax);
+	}
+}
+
+void
+nv_matrix_nrand(nv_matrix_t *mat, float u, float s)
+{
+	int i;
+#ifdef _OPENMP
+#pragma omp parallel for	
+#endif	
+	for (i = 0; i < mat->m; ++i) {
+		nv_vector_nrand(mat, i, u, s);
+	}
+}

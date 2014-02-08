@@ -107,10 +107,6 @@ float nv_vector_mean(const nv_matrix_t *x, int j);
 float nv_vector_var(const nv_matrix_t *x, int j);
 float nv_vector_var_ex(const nv_matrix_t *x, int j, float mean);
 
-void nv_vector_rand(nv_matrix_t *v, int vm);
-void nv_vector_nrand(nv_matrix_t *v, int vm, float u, float s);
-void nv_vector_nrand_ex(nv_matrix_t *v, int vm, float u, float s, unsigned long seed);
-	
 void nv_vector_normalize_L1(nv_matrix_t *v, int vm);
 void nv_vector_normalize_L2(nv_matrix_t *v, int vm);
 #define nv_vector_normalize(v, vm) nv_vector_normalize_L2((v), (vm))
