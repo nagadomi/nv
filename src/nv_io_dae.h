@@ -1,7 +1,7 @@
 /*
  * This file is part of libnv.
  *
- * Copyright (C) 2008-2012 nagadomi@nurs.or.jp
+ * Copyright (C) 2014 nagadomi@nurs.or.jp
  * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,24 +17,23 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef NV_IO_H
-#define NV_IO_H
+#ifndef NV_IO_DAE_H
+#define NV_IO_DAE_H
 
 #include "nv_core.h"
-#if NV_WITH_OPENCV
-#include "nv_io_ipl.h"
+#include "nv_ml_dae.h"
+#ifdef __cplusplus
+extern "C" {
 #endif
-#include "nv_io_matrix.h"
-#include "nv_io_image.h"
-#include "nv_io_stream.h"
-#include "nv_io_mlp.h"
-#include "nv_io_dae.h"
-#include "nv_io_cov.h"
-#include "nv_io_nb.h"
-#include "nv_io_lr.h"
-#include "nv_io_video.h"
-#include "nv_io_kmeans_tree.h"
-#include "nv_io_klr_tree.h"
-#include "nv_io_libsvm.h"
+
+nv_dae_t *nv_load_dae_text(const char *filename);
+int nv_save_dae_text(const char *filename, const nv_dae_t *dae);
+
+#define nv_load_dae(filename) nv_load_dae_text(filename)
+#define nv_save_dae(filename, dae) nv_save_dae_text(filename, dae)
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
