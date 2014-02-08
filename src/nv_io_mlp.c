@@ -63,7 +63,6 @@ nv_load_mlp_text(const char *filename)
 		fclose(fp);
 		return NULL;
 	}
-	mlp->noise = 0.0f;
 	mlp->input_w = nv_load_matrix_fp(fp);
 	mlp->input_bias = nv_load_matrix_fp(fp);
 	mlp->hidden_w = nv_load_matrix_fp(fp);
