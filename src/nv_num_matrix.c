@@ -169,6 +169,22 @@ nv_matrix_muls(nv_matrix_t *y, const nv_matrix_t *a, float scale)
 }
 
 void
+nv_matrix_adds(nv_matrix_t *y, const nv_matrix_t *a, float val)
+{
+	int i;
+	
+	NV_ASSERT(y->m == a->m);
+	NV_ASSERT(y->n == a->n);
+	
+#ifdef _OPENMP
+#pragma omp parallel for
+#endif
+	for (i = 0; i < y->m; ++i) {
+		nv_vector_adds(y, i, a, i, val);
+	}
+}
+
+void
 nv_matrix_add(nv_matrix_t *y, const nv_matrix_t *a, const nv_matrix_t *b)
 {
 	int i;

@@ -31,6 +31,7 @@ void nv_matrix_tr_ex(nv_matrix_t *tr, const nv_matrix_t *mat);
 
 nv_matrix_t *nv_matrix3d_tr(const nv_matrix_t *mat);
 void nv_matrix_muls(nv_matrix_t *y, const nv_matrix_t *a, float scale);
+void nv_matrix_adds(nv_matrix_t *y, const nv_matrix_t *a, float val);
 void nv_matrix_add(nv_matrix_t *y, const nv_matrix_t *a, const nv_matrix_t *b);
 void nv_matrix_sub(nv_matrix_t *y, const nv_matrix_t *a, const nv_matrix_t *b);
 
