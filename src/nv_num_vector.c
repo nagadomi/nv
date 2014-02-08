@@ -1235,3 +1235,17 @@ nv_vector_mulmtr(nv_matrix_t *vec0, int m0,
 		NV_MAT_V(vec0, m0, i) = nv_vector_dot(vec1, m1, mat, i);
 	}
 }
+
+void
+nv_vector_clip(nv_matrix_t *v, int v_j, float vmin, float vmax)
+{
+	int i;
+	for (i = 0; i < v->n; ++i) {
+		if (NV_MAT_V(v, v_j, i) < vmin) {
+			NV_MAT_V(v, v_j, i) = vmin;
+		}
+		if (NV_MAT_V(v, v_j, i) > vmax) {
+			NV_MAT_V(v, v_j, i) = vmax;
+		}
+	}
+}

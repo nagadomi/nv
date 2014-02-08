@@ -128,6 +128,8 @@ void nv_vector_normalize_all_L2(nv_matrix_t *mat);
 #define nv_vector_normalize_all(mat) nv_vector_normalize_all_L2(mat)
 #define nv_vector_absmax(v, m) NV_MAX(fabsf(nv_vector_max(v, m)), fabsf(nv_vector_min(v, m)))
 
+void nv_vector_clip(nv_matrix_t *v, int v_j, float vmin, float vmax);
+
 #ifdef __cplusplus
 }
 #endif
