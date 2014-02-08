@@ -24,6 +24,8 @@ extern "C" {
 #endif
 #include "nv_core.h"
 
+nv_matrix_t *nv_patch_matrix_alloc_ex(const nv_matrix_t *src,
+									  int patch_size, int grid_rows, int grid_cols);
 nv_matrix_t *nv_patch_matrix_alloc(const nv_matrix_t *src, int patch_size);
 void nv_patch_extract(nv_matrix_t *patches, const nv_matrix_t *src, int patch_size);
 
