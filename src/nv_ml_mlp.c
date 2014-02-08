@@ -289,12 +289,12 @@ nv_mlp_gaussian_init(nv_mlp_t *mlp, float var, int height, int width, int zdim)
 void
 nv_mlp_init_rand(nv_mlp_t *mlp, const nv_matrix_t *data)
 {
-	int j, i;
 	const float data_scale = 1.0f / data->m;
 	const float input_norm_mean = sqrtf(0.8f * (mlp->input_w->m + 1));
 	const float hidden_norm_mean = sqrtf(0.8f * (mlp->hidden_w->m + 1));
 	float data_norm_mean;
 	float input_scale, hidden_scale;
+	int j;
 	
 	data_norm_mean = 0.0f;
 	for (j = 0; j < data->m; ++j) {
@@ -303,18 +303,10 @@ nv_mlp_init_rand(nv_mlp_t *mlp, const nv_matrix_t *data)
 	input_scale = 1.0f / (data_norm_mean * input_norm_mean);
 	hidden_scale = 1.0f / hidden_norm_mean;
 	
-	for (j = 0; j < mlp->input_w->m; ++j) {
-		for (i = 0; i < mlp->input_w->n; ++i) {
-			NV_MAT_V(mlp->input_w, j, i) = (nv_rand() - 0.5f) * input_scale;
-		}
-		NV_MAT_V(mlp->input_bias, j, 0) = 0.0f;
-	}
-	for (j = 0; j < mlp->hidden_w->m; ++j) {
-		for (i = 0; i < mlp->hidden_w->n; ++i) {
-			NV_MAT_V(mlp->hidden_w, j, i) = (nv_rand() - 0.5f) * hidden_scale;
-		}
-		NV_MAT_V(mlp->hidden_bias, j, 0) = 0.0f;
-	}
+	nv_matrix_rand(mlp->input_w, -0.5f * input_scale, 0.5f * input_scale);
+	nv_matrix_rand(mlp->hidden_w, -0.5f * hidden_scale, 0.5f * hidden_scale);
+	nv_matrix_zero(mlp->input_bias);
+	nv_matrix_zero(mlp->hidden_bias);
 }
 
 void

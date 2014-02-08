@@ -84,16 +84,11 @@ nv_dae_free(nv_dae_t **dae)
 void
 nv_dae_init(nv_dae_t *dae, const nv_matrix_t *data)
 {
-	int j, i;
 	float scale = sqrtf(6.0f / (dae->hidden + dae->input + 1.0f));
 
 	nv_matrix_zero(dae->input_bias);
 	nv_matrix_zero(dae->hidden_bias);
-	for (j = 0; j < dae->input_w->m; ++j) {
-		for (i = 0; i < dae->input_w->n; ++i) {
-			NV_MAT_V(dae->input_w, j, i) = (nv_rand() - 0.5f) * scale;
-		}
-	}
+	nv_matrix_rand(dae->input_w, -0.5f * scale, 0.5f * scale);
 }
 
 void
