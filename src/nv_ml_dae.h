@@ -53,6 +53,15 @@ void nv_dae_encode(const nv_dae_t *dae,
 				   int y_j,
 				   const nv_matrix_t *x,
 				   int x_j);
+void
+nv_dae_conv2d(const nv_dae_t *dae,
+			  nv_matrix_t *output,
+			  const nv_matrix_t *patches);
+
+void
+nv_dae_pooling3x3(nv_matrix_t *output,
+				  const nv_matrix_t *conv);
+
 
 #ifdef __cplusplus
 }

@@ -319,3 +319,89 @@ nv_dae_encode(const nv_dae_t *dae,
 		}
 	}
 }
+
+/* conv utils */
+#define NV_DAE_POOLING_SIZE   3
+#define NV_DAE_POOLING_SIZE2  (NV_DAE_POOLING_SIZE / 2)
+#define NV_DAE_POOLING_STRIDE 2
+
+// image  : 32x32
+// patch  : 6
+// patched: (32-6)x(32-6) = 26x26
+// conved : 26x26
+// pooling: size:3, stride:2, padding: 1
+// pooled : 26/2 x 26/2 = 13x13
+// patch  : 2
+// patched: (13-2)x(13-2) = 11x11
+// conved : 11x11
+// pooling: size:3, stride:2, padding: 1
+// pooled : 11/2 x 11/2 = 5x5
+//
+
+void
+nv_dae_conv2d(const nv_dae_t *dae,
+			  nv_matrix_t *output,
+			  const nv_matrix_t *patches)
+{
+	int y;
+	NV_ASSERT(output->n == dae->hidden);
+	NV_ASSERT(patches->n == dae->input);
+	NV_ASSERT(output->rows == patches->rows);
+	NV_ASSERT(output->cols == patches->cols);
+
+#ifdef _OPENMP
+#pragma omp parallel for
+#endif	
+	for (y = 0; y < patches->rows; ++y) {
+		int x;
+		for (x = 0; x < patches->cols; ++x) {
+			nv_dae_encode(dae,
+						  output, NV_MAT_M(output, y, x),
+						  patches, NV_MAT_M(patches, y, x));
+			
+		}
+	}
+}
+
+void
+nv_dae_pooling3x3(nv_matrix_t *output,
+				  const nv_matrix_t *conv)
+{
+	int y;
+
+	NV_ASSERT(output->n == conv->n);
+	NV_ASSERT(output->rows == conv->rows / NV_DAE_POOLING_STRIDE);
+	NV_ASSERT(output->cols == conv->cols / NV_DAE_POOLING_STRIDE);
+	
+	nv_matrix_zero(output);
+
+#ifdef _OPENMP
+#pragma omp parallel for
+#endif	
+	for (y = 0; y < output->rows; ++y) {
+		int x;
+		for (x = 0; x < output->cols; ++x) {
+			int h;
+			for (h = 0; h < NV_DAE_POOLING_SIZE; ++h) {
+				int w;
+				const int yh = y * NV_DAE_POOLING_STRIDE + h - NV_DAE_POOLING_SIZE2;
+				if (!(yh >= 0 && yh < conv->rows)) {
+					continue;
+				}
+				for (w = 0; w < NV_DAE_POOLING_SIZE; ++w) {
+					int j;
+					const int xw = x * NV_DAE_POOLING_STRIDE + w - NV_DAE_POOLING_SIZE2;
+					if (!(xw >= 0 && xw < conv->cols)) {
+						continue;
+					}
+					for (j = 0; j < output->n; ++j) {
+						if (NV_MAT3D_V(conv, yh, xw, j) > NV_MAT3D_V(output, y, x, j)) {
+							NV_MAT3D_V(output, y, x, j) = NV_MAT3D_V(conv, yh, xw, j);
+						}
+					}
+				}
+			}
+		}
+	}	
+}
+
