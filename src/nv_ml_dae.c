@@ -98,7 +98,8 @@ nv_dae_noise(nv_dae_t *dae, float noise)
 }
 
 static void
-nv_dae_forward(nv_matrix_t *input_y, int ij,
+nv_dae_forward(nv_dae_type_t type,
+			   nv_matrix_t *input_y, int ij,
 			   nv_matrix_t *output_y, int oj,
 			   nv_matrix_t *noise, int cj,
 			   const nv_dae_t *dae,
@@ -123,10 +124,18 @@ nv_dae_forward(nv_matrix_t *input_y, int ij,
 			}
 		}
 	}
-	for (m = 0; m < hidden_w->m; ++m) {
-		float y = NV_MAT_V(dae->hidden_bias, m, 0) * NV_DAE_BIAS;
-		y += nv_vector_dot(input_y, ij, hidden_w, m);
-		NV_MAT_V(output_y, oj, m) = nv_dae_sigmoid(y);
+	if (type == NV_DAE_SIGMOID) {
+		for (m = 0; m < hidden_w->m; ++m) {
+			float y = NV_MAT_V(dae->hidden_bias, m, 0) * NV_DAE_BIAS;
+			y += nv_vector_dot(input_y, ij, hidden_w, m);
+			NV_MAT_V(output_y, oj, m) = nv_dae_sigmoid(y);
+		}
+	} else {
+		for (m = 0; m < hidden_w->m; ++m) {
+			float y = NV_MAT_V(dae->hidden_bias, m, 0) * NV_DAE_BIAS;
+			y += nv_vector_dot(input_y, ij, hidden_w, m);
+			NV_MAT_V(output_y, oj, m) = y;
+		}
 	}
 }
 
@@ -147,6 +156,7 @@ nv_dae_error(const nv_matrix_t *output_y, int oj,
 
 static void
 nv_dae_backward(
+	nv_dae_type_t type,
 	nv_dae_t *dae,
 	const nv_matrix_t *output_y,
 	const nv_matrix_t *input_y,
@@ -211,10 +221,11 @@ nv_dae_backward(
 }
 
 float
-nv_dae_train(nv_dae_t *dae,
-			 const nv_matrix_t *data,
-			 float ir, float hr,
-			 int start_epoch, int end_epoch, int max_epoch)
+nv_dae_train_ex(nv_dae_t *dae,
+				nv_dae_type_t type,
+				const nv_matrix_t *data,
+				float ir, float hr,
+				int start_epoch, int end_epoch, int max_epoch)
 {
 	int i;
 	int epoch = 1;
@@ -258,13 +269,15 @@ nv_dae_train(nv_dae_t *dae,
 						NV_MAT_V(noise, j, k) = 1.0f;
 					}
 				}
-				nv_dae_forward(input_y, j, output_y, j,
+				nv_dae_forward(type,
+							   input_y, j, output_y, j,
 							   noise, j,
 							   dae, hidden_w, data, dj);
 				e += nv_dae_error(output_y, j, data, dj);
 				count += 1;
 			}
 			nv_dae_backward(
+				type,
 				dae,
 				output_y, input_y, hidden_w,
 				noise,
@@ -288,6 +301,29 @@ nv_dae_train(nv_dae_t *dae,
 	
 	return p;
 }
+
+float
+nv_dae_train(nv_dae_t *dae,
+			 const nv_matrix_t *data,
+			 float ir, float hr,
+			 int start_epoch, int end_epoch, int max_epoch)
+{
+	return nv_dae_train_ex(dae, NV_DAE_SIGMOID,
+						   data,
+						   ir, hr, start_epoch, end_epoch, max_epoch);
+}
+
+float
+nv_dae_train_linear(nv_dae_t *dae,
+					const nv_matrix_t *data,
+					float ir, float hr,
+					int start_epoch, int end_epoch, int max_epoch)
+{
+	return nv_dae_train_ex(dae, NV_DAE_LINEAR,
+						   data,
+						   ir, hr, start_epoch, end_epoch, max_epoch);
+}
+
 
 void
 nv_dae_encode(const nv_dae_t *dae,

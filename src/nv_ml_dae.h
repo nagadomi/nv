@@ -26,6 +26,11 @@
 extern "C" {
 #endif
 
+typedef enum {
+	NV_DAE_SIGMOID,
+	NV_DAE_LINEAR
+} nv_dae_type_t;
+
 typedef struct
 {
 	int input;
@@ -48,6 +53,19 @@ float nv_dae_train(nv_dae_t *dae,
 				   const nv_matrix_t *data,
 				   float ir, float hr,
 				   int start_epoch, int end_epoch, int max_epoch);
+float nv_dae_train_linear(nv_dae_t *dae,
+						  const nv_matrix_t *data,
+						  float ir, float hr,
+						  int start_epoch, int end_epoch, int max_epoch);
+
+float
+nv_dae_train_ex(nv_dae_t *dae,
+				nv_dae_type_t type,
+				const nv_matrix_t *data,
+				float ir, float hr,
+				int start_epoch, int end_epoch, int max_epoch);
+
+
 void nv_dae_encode(const nv_dae_t *dae,
 				   nv_matrix_t *y,
 				   int y_j,
