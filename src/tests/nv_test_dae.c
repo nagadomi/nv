@@ -26,12 +26,11 @@
 #define MLP_HIDDEN_UNIT 320
 #define DAE_HIDDEN_UNIT 128
 
-void normalize(nv_matrix_t *data, nv_matrix_t *mean)
+void normalize(nv_matrix_t *data)
 {
 	int j;
 	for (j = 0; j < data->m; ++j) {
-		nv_vector_sub(data, j, data, j, mean, 0);
-		nv_vector_normalize_shift(data, j, 0.0f, 1.0f);
+		nv_vector_normalize_shift(data, j, 0.15f, 1.0f);
 	}
 }
 
@@ -47,8 +46,6 @@ nv_test_dae(const nv_matrix_t *train_data,
 	nv_matrix_t *scale_test_data = nv_matrix_dup(test_data);
 	nv_matrix_t *dae_train_data = nv_matrix_alloc(DAE_HIDDEN_UNIT, train_data->m);
 	nv_matrix_t *dae_test_data = nv_matrix_alloc(DAE_HIDDEN_UNIT, test_data->m);
-	nv_matrix_t *mean = nv_matrix_alloc(train_data->n, 1);
-
 	int i, ok;
 	
 	NV_TEST_NAME;
@@ -57,14 +54,13 @@ nv_test_dae(const nv_matrix_t *train_data,
 		   train_data->m,
 		   test_data->m,
 		   train_data->n);
-	nv_matrix_mean(mean, 0, scale_train_data);
-	normalize(scale_train_data, mean);
-	normalize(scale_test_data, mean);
+	normalize(scale_train_data);
+	normalize(scale_test_data);
 	
 	nv_dae_progress(1);
 	nv_dae_init(dae, scale_train_data);
 	nv_dae_noise(dae, 0.1f);
-	nv_dae_pooling(dae, 1);	
+	nv_dae_pooling(dae, 1);
 	nv_dae_train(dae, scale_train_data, 0.01f, 0.01f, 0, 50, 50);
 
 	for (i = 0; i < train_data->m; ++i) {
@@ -96,7 +92,6 @@ nv_test_dae(const nv_matrix_t *train_data,
 
 	nv_mlp_free(&mlp);
 	nv_dae_free(&dae);
-	nv_matrix_free(&mean);
 	nv_matrix_free(&dae_test_data);
 	nv_matrix_free(&dae_train_data);
 	nv_matrix_free(&scale_test_data);
