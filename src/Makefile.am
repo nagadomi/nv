@@ -60,6 +60,7 @@ nv_ip_star_integral.c \
 nv_ip_keypoint.cpp \
 nv_ip_laplacian.c \
 nv_ip_resize.c \
+nv_ip_pooling.c \
 nv_ip_star_integral_static.c \
 nv_ip_flip.c \
 nv_ip_euclidean_color.c \
@@ -140,6 +141,7 @@ nv_ip_star_integral.h \
 nv_ip_keypoint.h \
 nv_ip_laplacian.h \
 nv_ip_resize.h \
+nv_ip_pooling.h \
 nv_ip_flip.h \
 nv_ip.h \
 nv_ip_star_integral_static.h \
