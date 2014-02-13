@@ -29,9 +29,9 @@ nv_save_dae_text(const char *filename, const nv_dae_t *dae)
 	if (fp == NULL) {
 		return -1;
 	}
-	fprintf(fp, "%d %d %d %E\n",
+	fprintf(fp, "%d %d %E\n",
 			dae->input, dae->hidden,
-			dae->pooling, dae->noise);
+			dae->noise);
 	nv_save_matrix_fp(fp, dae->input_w);
 	nv_save_matrix_fp(fp, dae->input_bias);
 	nv_save_matrix_fp(fp, dae->hidden_bias);
@@ -53,9 +53,9 @@ nv_load_dae_text(const char *filename)
 		return NULL;
 	}
 	dae = nv_alloc_type(nv_dae_t, 1);
-	c = fscanf(fp, "%d %d %d %E",
+	c = fscanf(fp, "%d %d %E",
 			   &dae->input, &dae->hidden,
-			   &dae->pooling, &dae->noise);
+			   &dae->noise);
 	if (c != 4) {
 		nv_free(dae);
 		fclose(fp);

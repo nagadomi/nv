@@ -29,9 +29,13 @@
 void normalize(nv_matrix_t *data)
 {
 	int j;
+	nv_matrix_t *mean = nv_matrix_alloc(data->n, 1);
+	nv_matrix_mean(mean, 0, data);
 	for (j = 0; j < data->m; ++j) {
-		nv_vector_normalize_shift(data, j, 0.15f, 1.0f);
+		nv_vector_sub(data, j, data, j, mean, 0);
 	}
+	nv_matrix_normalize_shift(data, 0.0f, 1.0f);
+	nv_matrix_free(&mean);
 }
 
 void
@@ -59,9 +63,8 @@ nv_test_dae(const nv_matrix_t *train_data,
 	
 	nv_dae_progress(1);
 	nv_dae_init(dae, scale_train_data);
-	nv_dae_noise(dae, 0.1f);
-	nv_dae_pooling(dae, 1);
-	nv_dae_train(dae, scale_train_data, 0.01f, 0.01f, 0, 50, 50);
+	nv_dae_noise(dae, 0.05f);
+	nv_dae_train(dae, scale_train_data, 0.1f, 0.1f, 0, 50, 50);
 
 	for (i = 0; i < train_data->m; ++i) {
 		nv_dae_encode(dae, dae_train_data, i, scale_train_data, i);
@@ -69,15 +72,11 @@ nv_test_dae(const nv_matrix_t *train_data,
 	for (i = 0; i < test_data->m; ++i) {
 		nv_dae_encode(dae, dae_test_data, i, scale_test_data, i);
 	}
-	
 	nv_mlp_progress(1);
 	nv_mlp_init(mlp, dae_train_data);
 	nv_mlp_dropout(mlp, 0.5f);
-	nv_mlp_noise(mlp, 0.0f);
-	nv_mlp_train_ex(mlp, dae_train_data, train_labels, 0.001f, 0.001f, 0, 50, 250);
-	nv_mlp_train_ex(mlp, dae_train_data, train_labels, 1.0f, 0.1f, 50, 200, 250);
-	nv_mlp_train_ex(mlp, dae_train_data, train_labels, 0.001f, 0.001f, 200, 250, 250);	
-
+	nv_mlp_noise(mlp, 0.1f);
+	nv_mlp_train_ex(mlp, dae_train_data, train_labels, 0.1f, 0.1f, 0, 250, 250);
 	ok = 0;
 	for (i = 0; i < dae_test_data->m; ++i) {
 		if (nv_mlp_predict_label(mlp, dae_test_data, i) == (int)NV_MAT_V(test_labels, i, 0)) {

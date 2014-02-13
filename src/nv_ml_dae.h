@@ -36,8 +36,8 @@ typedef struct
 	int input;
 	int hidden;
 	float noise;
-	int pooling;
 	nv_matrix_t *input_w;
+	nv_matrix_t *hidden_w;
 	nv_matrix_t *input_bias;
 	nv_matrix_t *hidden_bias;
 } nv_dae_t;
@@ -47,7 +47,6 @@ void nv_dae_progress(int onoff);
 nv_dae_t *nv_dae_alloc(int input, int hidden);
 void nv_dae_free(nv_dae_t **dae);
 void nv_dae_init(nv_dae_t *dae, const nv_matrix_t *data);
-void nv_dae_pooling(nv_dae_t *dae, int groups);
 void nv_dae_noise(nv_dae_t *dae, float noise);
 float nv_dae_train(nv_dae_t *dae,
 				   const nv_matrix_t *data,

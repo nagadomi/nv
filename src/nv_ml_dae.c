@@ -38,21 +38,6 @@ nv_dae_progress(int onoff)
 	nv_dae_progress_flag = onoff;
 }
 
-/*
- * pair max pooling
- *
- * 隣り合った中間層をペアとして
- * 出力の小さい方をdropoutさせる
- * ペア内で相反するフィルタが学習され
- * encodeした時の特徴量がスパースになる
- */
-void
-nv_dae_pooling(nv_dae_t *dae, int pooling)
-{
-	NV_ASSERT(dae->hidden % 2 == 0);
-	dae->pooling = pooling;
-}
-
 nv_dae_t *
 nv_dae_alloc(int input, int hidden)
 {
@@ -60,9 +45,9 @@ nv_dae_alloc(int input, int hidden)
 	
 	dae->input = input;
 	dae->hidden = hidden;
-	dae->pooling = 0;
 	dae->noise = 0.1f;
 	dae->input_w = nv_matrix_alloc(input, hidden);
+	dae->hidden_w = nv_matrix_alloc(hidden, input);
 	dae->input_bias = nv_matrix_alloc(1, hidden);
 	dae->hidden_bias = nv_matrix_alloc(1, input);
 	
@@ -74,6 +59,7 @@ nv_dae_free(nv_dae_t **dae)
 {
 	if (*dae) {
 		nv_matrix_free(&(*dae)->input_w);
+		nv_matrix_free(&(*dae)->hidden_w);
 		nv_matrix_free(&(*dae)->input_bias);
 		nv_matrix_free(&(*dae)->hidden_bias);
 		nv_free(*dae);
@@ -89,6 +75,7 @@ nv_dae_init(nv_dae_t *dae, const nv_matrix_t *data)
 	nv_matrix_zero(dae->input_bias);
 	nv_matrix_zero(dae->hidden_bias);
 	nv_matrix_rand(dae->input_w, -0.5f * scale, 0.5f * scale);
+	nv_matrix_rand(dae->hidden_w, -0.5f * scale, 0.5f * scale);
 }
 
 void
@@ -114,15 +101,6 @@ nv_dae_forward(nv_dae_type_t type,
 			y += NV_MAT_V(noise, cj, i) * NV_MAT_V(data, dj, i) * NV_MAT_V(dae->input_w, m, i);
 		}
 		NV_MAT_V(input_y, ij, m) = nv_dae_sigmoid(y);
-	}
-	if (dae->pooling) {
-		for (m = 0; m < dae->input_w->m; m += 2) {
-			if (NV_MAT_V(input_y, ij, m) > NV_MAT_V(input_y, ij, m + 1)) {
-				NV_MAT_V(input_y, ij, m + 1) = 0.0f;
-			} else {
-				NV_MAT_V(input_y, ij, m) = 0.0f;
-			}
-		}
 	}
 	if (type == NV_DAE_SIGMOID) {
 		for (m = 0; m < hidden_w->m; ++m) {
@@ -344,15 +322,6 @@ nv_dae_encode(const nv_dae_t *dae,
 		float z = NV_MAT_V(dae->input_bias, i, 0)  * NV_DAE_BIAS;
 		z += nv_vector_dot(x, x_j, dae->input_w, i);
 		NV_MAT_V(y, y_j, i) = nv_dae_sigmoid(z);
-	}
-	if (dae->pooling) {
-		for (i = 0; i < dae->hidden; i += 2) {
-			if (NV_MAT_V(y, y_j, i) > NV_MAT_V(y, y_j, i + 1)) {
-				NV_MAT_V(y, y_j, i + 1) = 0.0f;
-			} else {
-				NV_MAT_V(y, y_j, i) = 0.0f;
-			}
-		}
 	}
 }
 
