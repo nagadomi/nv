@@ -1,7 +1,7 @@
 /*
  * This file is part of libnv.
  *
- * Copyright (C) 2008-2012 nagadomi@nurs.or.jp
+ * Copyright (C) 2014 nagadomi@nurs.or.jp
  * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,7 +25,7 @@
  * Denoising Autoencoders
  */
 
-#define NV_DAE_BATCH_SIZE 20
+#define NV_DAE_BATCH_SIZE 32
 
 #define nv_dae_sigmoid(a) NV_SIGMOID(a)
 #define NV_DAE_BIAS 1.0f
@@ -47,7 +47,6 @@ nv_dae_alloc(int input, int hidden)
 	dae->hidden = hidden;
 	dae->noise = 0.1f;
 	dae->input_w = nv_matrix_alloc(input, hidden);
-	dae->hidden_w = nv_matrix_alloc(hidden, input);
 	dae->input_bias = nv_matrix_alloc(1, hidden);
 	dae->hidden_bias = nv_matrix_alloc(1, input);
 	
@@ -59,7 +58,6 @@ nv_dae_free(nv_dae_t **dae)
 {
 	if (*dae) {
 		nv_matrix_free(&(*dae)->input_w);
-		nv_matrix_free(&(*dae)->hidden_w);
 		nv_matrix_free(&(*dae)->input_bias);
 		nv_matrix_free(&(*dae)->hidden_bias);
 		nv_free(*dae);
@@ -75,7 +73,6 @@ nv_dae_init(nv_dae_t *dae, const nv_matrix_t *data)
 	nv_matrix_zero(dae->input_bias);
 	nv_matrix_zero(dae->hidden_bias);
 	nv_matrix_rand(dae->input_w, -0.5f * scale, 0.5f * scale);
-	nv_matrix_rand(dae->hidden_w, -0.5f * scale, 0.5f * scale);
 }
 
 void
@@ -85,33 +82,34 @@ nv_dae_noise(nv_dae_t *dae, float noise)
 }
 
 static void
-nv_dae_forward(nv_dae_type_t type,
+nv_dae_forward(const nv_dae_t *dae,
+			   nv_dae_type_t type,
 			   nv_matrix_t *input_y, int ij,
 			   nv_matrix_t *output_y, int oj,
-			   nv_matrix_t *noise, int cj,
-			   const nv_dae_t *dae,
-			   const nv_matrix_t *hidden_w,
-			   const nv_matrix_t *data, int dj)
+			   nv_matrix_t *corrupted_data, int cj)
 {
 	int m;
 	for (m = 0; m < dae->input_w->m; ++m) {
-		int i;
 		float y = NV_MAT_V(dae->input_bias, m, 0) * NV_DAE_BIAS;
-		for (i = 0; i < data->n; ++i) {
-			y += NV_MAT_V(noise, cj, i) * NV_MAT_V(data, dj, i) * NV_MAT_V(dae->input_w, m, i);
-		}
+		y += nv_vector_dot(corrupted_data, cj, dae->input_w, m);
 		NV_MAT_V(input_y, ij, m) = nv_dae_sigmoid(y);
 	}
 	if (type == NV_DAE_SIGMOID) {
-		for (m = 0; m < hidden_w->m; ++m) {
+		for (m = 0; m < dae->input_w->n; ++m) {
 			float y = NV_MAT_V(dae->hidden_bias, m, 0) * NV_DAE_BIAS;
-			y += nv_vector_dot(input_y, ij, hidden_w, m);
+			int i;
+			for (i = 0; i < dae->input_w->m; ++i) {
+				y += NV_MAT_V(input_y, ij, i) * NV_MAT_V(dae->input_w, i, m);
+			}
 			NV_MAT_V(output_y, oj, m) = nv_dae_sigmoid(y);
 		}
 	} else {
-		for (m = 0; m < hidden_w->m; ++m) {
+		for (m = 0; m < dae->input_w->n; ++m) {
 			float y = NV_MAT_V(dae->hidden_bias, m, 0) * NV_DAE_BIAS;
-			y += nv_vector_dot(input_y, ij, hidden_w, m);
+			int i;
+			for (i = 0; i < dae->input_w->m; ++i) {
+				y += NV_MAT_V(input_y, ij, i) * NV_MAT_V(dae->input_w, i, m);
+			}
 			NV_MAT_V(output_y, oj, m) = y;
 		}
 	}
@@ -134,12 +132,11 @@ nv_dae_error(const nv_matrix_t *output_y, int oj,
 
 static void
 nv_dae_backward(
-	nv_dae_type_t type,
 	nv_dae_t *dae,
+	nv_dae_type_t type,
 	const nv_matrix_t *output_y,
 	const nv_matrix_t *input_y,
-	const nv_matrix_t *hidden_w,
-	const nv_matrix_t *noise,
+	const nv_matrix_t *corrupted_data,
 	const nv_matrix_t *data,
 	int *dj,
 	const float ir,
@@ -158,11 +155,8 @@ nv_dae_backward(
 			float bp = y_t;
 			NV_MAT_V(output_bp, j, n) = bp;
 		}
-		for (m = 0; m < hidden_w->n; ++m) {
-			float y = 0.0f;
-			for (n = 0; n < dae->input; ++n) {
-				y += NV_MAT_V(output_bp, j, n) * NV_MAT_V(hidden_w, n, m);
-			}
+		for (m = 0; m < dae->input_w->m; ++m) {
+			float y = nv_vector_dot(output_bp, j, dae->input_w, m);
 			NV_MAT_V(hidden_bp, j, m) = 
 				y * (1.0f - NV_MAT_V(input_y, j, m)) * NV_MAT_V(input_y, j, m);
 		}
@@ -170,14 +164,9 @@ nv_dae_backward(
 #ifdef _OPENMP
 #pragma omp parallel for private(m, j)
 #endif
-	for (n = 0; n < hidden_w->m; ++n) {
+	for (n = 0; n < dae->input_w->n; ++n) {
 		for (j = 0; j < NV_DAE_BATCH_SIZE; ++j) {
-			const float w = hr * NV_MAT_V(output_bp, j, n) * 0.5f;
-			for (m = 0; m < hidden_w->n; ++m) {
-				// tied: hidden_w = input_w'
-				NV_MAT_V(dae->input_w, m, n) -= w * NV_MAT_V(input_y, j, m);
-			}
-			NV_MAT_V(dae->hidden_bias, n, 0) -= w * NV_DAE_BIAS;
+			NV_MAT_V(dae->hidden_bias, n, 0) -= hr * NV_MAT_V(output_bp, j, n) * NV_DAE_BIAS;
 		}
 	}
 #ifdef _OPENMP
@@ -185,17 +174,33 @@ nv_dae_backward(
 #endif
 	for (n = 0; n < dae->input_w->m; ++n) {
 		for (j = 0; j < NV_DAE_BATCH_SIZE; ++j) {
-			const float w = ir * NV_MAT_V(hidden_bp, j, n) * 0.5f;
-			if (w != 0.0f) {
-				for (m = 0; m < dae->input_w->n; ++m) {
-					NV_MAT_V(dae->input_w, n, m) -= NV_MAT_V(noise, j, m) * w * NV_MAT_V(data, dj[j], m);
-				}
-				NV_MAT_V(dae->input_bias, n, 0) -= w * NV_DAE_BIAS;
-			} // else dropout
+			const float d1 = ir * NV_MAT_V(hidden_bp, j, n);
+			for (m = 0; m < dae->input_w->n; ++m) {
+				const float d2 = hr * NV_MAT_V(output_bp, j, m);
+				NV_MAT_V(dae->input_w, n, m) -=
+					(d1 * NV_MAT_V(corrupted_data, j, m))
+					+ (d2 * NV_MAT_V(input_y, j, n));
+			}
+			NV_MAT_V(dae->input_bias, n, 0) -= d1 * NV_DAE_BIAS;
 		}
 	}
 	nv_matrix_free(&output_bp);
 	nv_matrix_free(&hidden_bp);
+}
+
+void
+nv_dae_corrupt(const nv_dae_t *dae,
+			   nv_matrix_t *corrupted_data, int cj,
+			   const nv_matrix_t *data, int dj)
+{
+	int i;
+	for (i = 0; i < corrupted_data->n; ++i) {
+		if (nv_rand() < dae->noise) {
+			NV_MAT_V(corrupted_data, cj, i) = 0.0f;
+		} else {
+			NV_MAT_V(corrupted_data, cj, i) = NV_MAT_V(data, dj, i);
+		}
+	}
 }
 
 float
@@ -208,10 +213,9 @@ nv_dae_train_ex(nv_dae_t *dae,
 	int i;
 	int epoch = 1;
 	float p;
-	nv_matrix_t *input_y = nv_matrix_alloc(dae->input_w->m, NV_DAE_BATCH_SIZE);
+	nv_matrix_t *input_y = nv_matrix_alloc(dae->hidden, NV_DAE_BATCH_SIZE);
 	nv_matrix_t *output_y = nv_matrix_alloc(dae->input, NV_DAE_BATCH_SIZE);
-	nv_matrix_t *hidden_w = nv_matrix_alloc(dae->input_w->m, dae->input_w->n);
-	nv_matrix_t *noise = nv_matrix_alloc(dae->input_w->n, NV_DAE_BATCH_SIZE);
+	nv_matrix_t *corrupted_data = nv_matrix_alloc(dae->input, NV_DAE_BATCH_SIZE);
 	int *djs = nv_alloc_type(int, NV_DAE_BATCH_SIZE);
 	int *rand_idx = nv_alloc_type(int, data->m);
 
@@ -230,35 +234,24 @@ nv_dae_train_ex(nv_dae_t *dae,
 		for (i = 0; i < data->m / NV_DAE_BATCH_SIZE; ++i) {
 			int j;
 			
-			nv_matrix_zero(noise);
-			
-			// tied: hidden_w = input_w'
-			nv_matrix_tr_ex(hidden_w, dae->input_w);
 #ifdef _OPENMP
 #pragma omp parallel for schedule(dynamic, 1) reduction(+:correct, count, e)
 #endif
 			for (j = 0; j < NV_DAE_BATCH_SIZE; ++j) {
 				int dj = rand_idx[i * NV_DAE_BATCH_SIZE + j];
-				int k;
-				
 				djs[j] = dj;
-				for (k = 0; k < noise->n; ++k) {
-					if (nv_rand() > dae->noise) {
-						NV_MAT_V(noise, j, k) = 1.0f;
-					}
-				}
-				nv_dae_forward(type,
+				nv_dae_corrupt(dae, corrupted_data, j, data, dj);
+				nv_dae_forward(dae, type,
 							   input_y, j, output_y, j,
-							   noise, j,
-							   dae, hidden_w, data, dj);
+							   corrupted_data, j);
 				e += nv_dae_error(output_y, j, data, dj);
 				count += 1;
 			}
 			nv_dae_backward(
-				type,
 				dae,
-				output_y, input_y, hidden_w,
-				noise,
+				type,
+				output_y, input_y,
+				corrupted_data,
 				data, djs,
 				ir, hr);
 		}
@@ -272,10 +265,9 @@ nv_dae_train_ex(nv_dae_t *dae,
 	} while (epoch++ < end_epoch);
 	nv_free(rand_idx);
 	nv_free(djs);
-	nv_matrix_free(&hidden_w);
 	nv_matrix_free(&input_y);
 	nv_matrix_free(&output_y);
-	nv_matrix_free(&noise);
+	nv_matrix_free(&corrupted_data);
 	
 	return p;
 }

@@ -37,7 +37,6 @@ typedef struct
 	int hidden;
 	float noise;
 	nv_matrix_t *input_w;
-	nv_matrix_t *hidden_w;
 	nv_matrix_t *input_bias;
 	nv_matrix_t *hidden_bias;
 } nv_dae_t;

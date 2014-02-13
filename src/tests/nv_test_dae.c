@@ -1,7 +1,7 @@
 /*
  * This file is part of libnv.
  *
- * Copyright (C) 2008-2012 nagadomi@nurs.or.jp
+ * Copyright (C) 2014 nagadomi@nurs.or.jp
  * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -64,7 +64,7 @@ nv_test_dae(const nv_matrix_t *train_data,
 	nv_dae_progress(1);
 	nv_dae_init(dae, scale_train_data);
 	nv_dae_noise(dae, 0.05f);
-	nv_dae_train(dae, scale_train_data, 0.1f, 0.1f, 0, 50, 50);
+	nv_dae_train(dae, scale_train_data, 0.01f, 0.01f, 0, 50, 50);
 
 	for (i = 0; i < train_data->m; ++i) {
 		nv_dae_encode(dae, dae_train_data, i, scale_train_data, i);
