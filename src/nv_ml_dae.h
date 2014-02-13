@@ -49,19 +49,18 @@ void nv_dae_init(nv_dae_t *dae, const nv_matrix_t *data);
 void nv_dae_noise(nv_dae_t *dae, float noise);
 float nv_dae_train(nv_dae_t *dae,
 				   const nv_matrix_t *data,
-				   float ir, float hr,
+				   float lr,
 				   int start_epoch, int end_epoch, int max_epoch);
 float nv_dae_train_linear(nv_dae_t *dae,
 						  const nv_matrix_t *data,
-						  float ir, float hr,
+						  float lr,
 						  int start_epoch, int end_epoch, int max_epoch);
 
-float
-nv_dae_train_ex(nv_dae_t *dae,
-				nv_dae_type_t type,
-				const nv_matrix_t *data,
-				float ir, float hr,
-				int start_epoch, int end_epoch, int max_epoch);
+float nv_dae_train_ex(nv_dae_t *dae,
+					  nv_dae_type_t type,
+					  const nv_matrix_t *data,
+					  float lr, 
+					  int start_epoch, int end_epoch, int max_epoch);
 
 
 void nv_dae_encode(const nv_dae_t *dae,
@@ -69,10 +68,9 @@ void nv_dae_encode(const nv_dae_t *dae,
 				   int y_j,
 				   const nv_matrix_t *x,
 				   int x_j);
-void
-nv_dae_conv2d(const nv_dae_t *dae,
-			  nv_matrix_t *output,
-			  const nv_matrix_t *patches);
+void nv_dae_conv2d(const nv_dae_t *dae,
+				   nv_matrix_t *output,
+				   const nv_matrix_t *patches);
 
 #ifdef __cplusplus
 }

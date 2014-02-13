@@ -139,8 +139,7 @@ nv_dae_backward(
 	const nv_matrix_t *corrupted_data,
 	const nv_matrix_t *data,
 	int *dj,
-	const float ir,
-	const float hr)
+	const float lr)
 {
 	int n, m, j;
 	nv_matrix_t *output_bp = nv_matrix_alloc(dae->input, NV_DAE_BATCH_SIZE);
@@ -166,7 +165,7 @@ nv_dae_backward(
 #endif
 	for (n = 0; n < dae->input_w->n; ++n) {
 		for (j = 0; j < NV_DAE_BATCH_SIZE; ++j) {
-			NV_MAT_V(dae->hidden_bias, n, 0) -= hr * NV_MAT_V(output_bp, j, n) * NV_DAE_BIAS;
+			NV_MAT_V(dae->hidden_bias, n, 0) -= lr * NV_MAT_V(output_bp, j, n) * NV_DAE_BIAS;
 		}
 	}
 #ifdef _OPENMP
@@ -174,9 +173,9 @@ nv_dae_backward(
 #endif
 	for (n = 0; n < dae->input_w->m; ++n) {
 		for (j = 0; j < NV_DAE_BATCH_SIZE; ++j) {
-			const float d1 = ir * NV_MAT_V(hidden_bp, j, n);
+			const float d1 = lr * NV_MAT_V(hidden_bp, j, n);
 			for (m = 0; m < dae->input_w->n; ++m) {
-				const float d2 = hr * NV_MAT_V(output_bp, j, m);
+				const float d2 = lr * NV_MAT_V(output_bp, j, m);
 				NV_MAT_V(dae->input_w, n, m) -=
 					(d1 * NV_MAT_V(corrupted_data, j, m))
 					+ (d2 * NV_MAT_V(input_y, j, n));
@@ -207,7 +206,7 @@ float
 nv_dae_train_ex(nv_dae_t *dae,
 				nv_dae_type_t type,
 				const nv_matrix_t *data,
-				float ir, float hr,
+				float lr,
 				int start_epoch, int end_epoch, int max_epoch)
 {
 	int i;
@@ -253,7 +252,7 @@ nv_dae_train_ex(nv_dae_t *dae,
 				output_y, input_y,
 				corrupted_data,
 				data, djs,
-				ir, hr);
+				lr);
 		}
 		p = (float)correct / count;
 		if (nv_dae_progress_flag) {
@@ -275,23 +274,23 @@ nv_dae_train_ex(nv_dae_t *dae,
 float
 nv_dae_train(nv_dae_t *dae,
 			 const nv_matrix_t *data,
-			 float ir, float hr,
+			 float lr,
 			 int start_epoch, int end_epoch, int max_epoch)
 {
 	return nv_dae_train_ex(dae, NV_DAE_SIGMOID,
 						   data,
-						   ir, hr, start_epoch, end_epoch, max_epoch);
+						   lr, start_epoch, end_epoch, max_epoch);
 }
 
 float
 nv_dae_train_linear(nv_dae_t *dae,
 					const nv_matrix_t *data,
-					float ir, float hr,
+					float lr, 
 					int start_epoch, int end_epoch, int max_epoch)
 {
 	return nv_dae_train_ex(dae, NV_DAE_LINEAR,
 						   data,
-						   ir, hr, start_epoch, end_epoch, max_epoch);
+						   lr, start_epoch, end_epoch, max_epoch);
 }
 
 
