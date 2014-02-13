@@ -56,7 +56,7 @@ nv_load_dae_text(const char *filename)
 	c = fscanf(fp, "%d %d %E",
 			   &dae->input, &dae->hidden,
 			   &dae->noise);
-	if (c != 4) {
+	if (c != 3) {
 		nv_free(dae);
 		fclose(fp);
 		return NULL;
