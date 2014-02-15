@@ -25,7 +25,14 @@
  * 2 Layer
  */
 
-#define NV_MLP_BIAS 0.03125f
+#define NV_MLP_MOMENTUM 0.9f
+#define NV_MLP_WEIGHT_DECAY 0.0005f
+#define NV_MLP_IR 0.001f
+#define NV_MLP_HR 0.001f
+#define NV_MLP_BATCH_SIZE 32
+#define NV_MLP_BIAS (1.0f / NV_MLP_BATCH_SIZE)
+
+#define nv_mlp_sigmoid(a) NV_SIGMOID(a)
 
 static int nv_mlp_progress_flag = 0;
 
@@ -34,7 +41,6 @@ void nv_mlp_progress(int onoff)
 	nv_mlp_progress_flag = onoff;
 }
 
-#define nv_mlp_sigmoid(a) NV_SIGMOID(a)
 
 nv_mlp_t *nv_mlp_alloc(int input, int hidden, int k)
 {
@@ -230,10 +236,6 @@ void nv_mlp_hidden_vector(const nv_mlp_t *mlp,
 
 
 /* training */
-
-#define NV_MLP_IR 0.001f
-#define NV_MLP_HR 0.001f
-#define NV_MLP_BATCH_SIZE 32
 
 /* 初期化 */
 
@@ -450,6 +452,10 @@ nv_mlp_error(const nv_matrix_t *output_y, int oj,
 static void
 nv_mlp_backward(
 	nv_mlp_t *mlp,
+	nv_matrix_t *input_w_momentum,
+	nv_matrix_t *input_bias_momentum,
+	nv_matrix_t *hidden_w_momentum,
+	nv_matrix_t *hidden_bias_momentum,
 	const nv_matrix_t *output_y,
 	const nv_matrix_t *input_y,
 	const nv_matrix_t *corrupted_data,
@@ -461,7 +467,17 @@ nv_mlp_backward(
 	int n, m, j;
 	nv_matrix_t *output_bp = nv_matrix_alloc(mlp->output, NV_MLP_BATCH_SIZE);
 	nv_matrix_t *hidden_bp = nv_matrix_alloc(mlp->input_w->m, NV_MLP_BATCH_SIZE);
-	
+	nv_matrix_t *input_w_grad = nv_matrix_alloc(mlp->input_w->n, mlp->input_w->m);
+	nv_matrix_t *input_bias_grad = nv_matrix_alloc(mlp->input_bias->n,
+													   mlp->input_bias->m);
+	nv_matrix_t *hidden_w_grad = nv_matrix_alloc(mlp->hidden_w->n, mlp->hidden_w->m);
+	nv_matrix_t *hidden_bias_grad = nv_matrix_alloc(mlp->hidden_bias->n,
+													mlp->hidden_bias->m);
+	nv_matrix_zero(input_w_grad);
+	nv_matrix_zero(hidden_w_grad);
+	nv_matrix_zero(input_bias_grad);
+	nv_matrix_zero(hidden_bias_grad);
+
 #ifdef _OPENMP
 #pragma omp parallel for private(m, n)
 #endif
@@ -485,11 +501,11 @@ nv_mlp_backward(
 #endif
 	for (n = 0; n < mlp->hidden_w->m; ++n) {
 		for (j = 0; j < NV_MLP_BATCH_SIZE; ++j) {
-			const float w = hr * NV_MAT_V(output_bp, j, n);			
+			const float w = hr * NV_MAT_V(output_bp, j, n);
 			for (m = 0; m < mlp->hidden_w->n; ++m) {
-				NV_MAT_V(mlp->hidden_w, n, m) -= w * NV_MAT_V(input_y, j, m);
+				NV_MAT_V(hidden_w_grad, n, m) += w * NV_MAT_V(input_y, j, m);
 			}
-			NV_MAT_V(mlp->hidden_bias, n, 0) -= w * NV_MLP_BIAS;
+			NV_MAT_V(hidden_bias_grad, n, 0) += w * NV_MLP_BIAS;
 		}
 	}
 #ifdef _OPENMP
@@ -500,12 +516,50 @@ nv_mlp_backward(
 			const float w = ir * NV_MAT_V(hidden_bp, j, n);
 			if (w != 0.0f) {
 				for (m = 0; m < mlp->input_w->n; ++m) {
-					NV_MAT_V(mlp->input_w, n, m) -= w * NV_MAT_V(corrupted_data, j, m);
+					NV_MAT_V(input_w_grad, n, m) += w * NV_MAT_V(corrupted_data, j, m);
 				}
-				NV_MAT_V(mlp->input_bias, n, 0) -= w * NV_MLP_BIAS;
-			} // else dropout
+				NV_MAT_V(input_bias_grad, n, 0) += w * NV_MLP_BIAS;
+			} // dropout
 		}
 	}
+
+#ifdef _OPENMP
+#pragma omp parallel for private(m)
+#endif
+	for (n = 0; n < mlp->hidden_w->m; ++n) {
+		for (m = 0; m < mlp->hidden_w->n; ++m) {
+			NV_MAT_V(hidden_w_momentum, n, m) =
+				NV_MLP_MOMENTUM * NV_MAT_V(hidden_w_momentum, n, m)
+				+ NV_MLP_WEIGHT_DECAY * hr * NV_MAT_V(mlp->hidden_w, n, m)
+				+ NV_MAT_V(hidden_w_grad, n, m);
+			NV_MAT_V(mlp->hidden_w, n, m) -= NV_MAT_V(hidden_w_momentum, n, m) * (1.0f - NV_MLP_MOMENTUM);
+		}
+		NV_MAT_V(hidden_bias_momentum, n, 0) =
+			NV_MLP_MOMENTUM * NV_MAT_V(hidden_bias_momentum, n, 0)
+			+ NV_MLP_WEIGHT_DECAY * hr * NV_MAT_V(mlp->hidden_bias, n, 0)
+			+ NV_MAT_V(hidden_bias_grad, n, 0);
+		NV_MAT_V(mlp->hidden_bias, n, 0) -= NV_MAT_V(hidden_bias_momentum, n, 0) * (1.0f - NV_MLP_MOMENTUM);
+	}
+#ifdef _OPENMP
+#pragma omp parallel for private(m)
+#endif
+	for (n = 0; n < mlp->input_w->m; ++n) {
+		for (m = 0; m < mlp->input_w->n; ++m) {
+			NV_MAT_V(input_w_momentum, n, m) =
+				NV_MLP_MOMENTUM * NV_MAT_V(input_w_momentum, n, m)
+				+ NV_MAT_V(input_w_grad, n, m);
+			NV_MAT_V(mlp->input_w, n, m) -= NV_MAT_V(input_w_momentum, n, m) * (1.0f - NV_MLP_MOMENTUM);
+		}
+		NV_MAT_V(input_bias_momentum, n, 0) =
+			NV_MLP_MOMENTUM * NV_MAT_V(input_bias_momentum, n, 0)
+			+ NV_MAT_V(input_bias_grad, n, 0);
+		NV_MAT_V(mlp->input_bias, n, 0) -= NV_MAT_V(input_bias_momentum, n, 0) * (1.0f - NV_MLP_MOMENTUM);
+	}
+	
+	nv_matrix_free(&input_w_grad);
+	nv_matrix_free(&hidden_w_grad);
+	nv_matrix_free(&input_bias_grad);
+	nv_matrix_free(&hidden_bias_grad);
 	nv_matrix_free(&output_bp);
 	nv_matrix_free(&hidden_bp);
 }
@@ -544,10 +598,22 @@ nv_mlp_train_lex(nv_mlp_t *mlp,
 	nv_matrix_t *hidden_y = nv_matrix_alloc(mlp->hidden_w->m, NV_MLP_BATCH_SIZE);
 	nv_matrix_t *output_y = nv_matrix_alloc(mlp->output, NV_MLP_BATCH_SIZE);
 	nv_matrix_t *corrupted_data = nv_matrix_alloc(mlp->input, NV_MLP_BATCH_SIZE);
+	nv_matrix_t *input_w_momentum = nv_matrix_alloc(mlp->input_w->n, mlp->input_w->m);
+	nv_matrix_t *input_bias_momentum = nv_matrix_alloc(mlp->input_bias->n,
+													   mlp->input_bias->m);
+	nv_matrix_t *hidden_w_momentum = nv_matrix_alloc(mlp->hidden_w->n, mlp->hidden_w->m);
+	nv_matrix_t *hidden_bias_momentum = nv_matrix_alloc(mlp->hidden_bias->n,
+														mlp->hidden_bias->m);
+	
 	int *djs = nv_alloc_type(int, NV_MLP_BATCH_SIZE);
 	int *rand_idx = nv_alloc_type(int, data->m);
-
+	
 	NV_ASSERT(data->m > NV_MLP_BATCH_SIZE);
+
+	nv_matrix_zero(input_w_momentum);
+	nv_matrix_zero(hidden_w_momentum);
+	nv_matrix_zero(input_bias_momentum);
+	nv_matrix_zero(hidden_bias_momentum);
 
 	epoch = start_epoch + 1;
 	do {
@@ -582,6 +648,8 @@ nv_mlp_train_lex(nv_mlp_t *mlp,
 			}
 			nv_mlp_backward(
 				mlp,
+				input_w_momentum, input_bias_momentum,
+				hidden_w_momentum, hidden_bias_momentum,
 				output_y, input_y, corrupted_data,
 				t, djs,
 				ir, hr);
@@ -605,6 +673,10 @@ nv_mlp_train_lex(nv_mlp_t *mlp,
 	nv_matrix_free(&hidden_y);
 	nv_matrix_free(&output_y);
 	nv_matrix_free(&corrupted_data);
+	nv_matrix_free(&input_w_momentum);
+	nv_matrix_free(&input_bias_momentum);
+	nv_matrix_free(&hidden_w_momentum);
+	nv_matrix_free(&hidden_bias_momentum);
 	
 	return p;
 }
