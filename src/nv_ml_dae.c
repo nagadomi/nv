@@ -27,6 +27,7 @@
 
 #define NV_DAE_BATCH_SIZE 128
 #define NV_DAE_BIAS 1.0f
+#define NV_DAE_SPARSITY_BETA 3.0f
 
 static int nv_dae_progress_flag = 0;
 
@@ -43,7 +44,8 @@ nv_dae_alloc(int input, int hidden)
 	
 	dae->input = input;
 	dae->hidden = hidden;
-	dae->noise = 0.1f;
+	dae->noise = 0.0f;
+	dae->sparsity = 0.0f;
 	dae->input_w = nv_matrix_alloc(input, hidden);
 	dae->input_bias = nv_matrix_alloc(1, hidden);
 	dae->hidden_bias = nv_matrix_alloc(1, input);
@@ -77,6 +79,12 @@ void
 nv_dae_noise(nv_dae_t *dae, float noise)
 {
 	dae->noise = noise;
+}
+
+void
+nv_dae_sparsity(nv_dae_t *dae, float sparsity)
+{
+	dae->sparsity = sparsity;
 }
 
 static void
@@ -142,21 +150,47 @@ nv_dae_backward(
 	int i, j, batch_id;
 	nv_matrix_t *output_bp = nv_matrix_alloc(dae->input, NV_DAE_BATCH_SIZE);
 	nv_matrix_t *hidden_bp = nv_matrix_alloc(dae->input_w->m, NV_DAE_BATCH_SIZE);
-	
+
+	if (dae->sparsity > 0.0f) {
+		/* sparse autoencoders */
+		nv_matrix_t *activation_mean = nv_matrix_alloc(dae->hidden, 1);
+		nv_matrix_mean(activation_mean, 0, input_y);
 #ifdef _OPENMP
 #pragma omp parallel for private(i)
 #endif
-	for (batch_id = 0; batch_id < NV_DAE_BATCH_SIZE; ++batch_id) {
-		for (i = 0; i < output_bp->n; ++i) {
-			float y_t = NV_MAT_V(output_y, batch_id, i) - NV_MAT_V(data, dj[batch_id], i);
-			NV_MAT_V(output_bp, batch_id, i) = y_t;
+		for (batch_id = 0; batch_id < NV_DAE_BATCH_SIZE; ++batch_id) {
+			for (i = 0; i < output_bp->n; ++i) {
+				float y_t = NV_MAT_V(output_y, batch_id, i) - NV_MAT_V(data, dj[batch_id], i);
+				NV_MAT_V(output_bp, batch_id, i) = y_t;
+			}
+			for (i = 0; i < dae->input_w->m; ++i) {
+				float y = nv_vector_dot(output_bp, batch_id, dae->input_w, i);
+				float penalty =
+					-dae->sparsity / (NV_MAT_V(activation_mean, 0, i) + FLT_EPSILON)
+					+ (1.0f - dae->sparsity) / (1.0f - NV_MAT_V(activation_mean, 0, i) + FLT_EPSILON);
+				NV_MAT_V(hidden_bp, batch_id, i) = 
+					(y + NV_DAE_SPARSITY_BETA * penalty)
+					 * (1.0f - NV_MAT_V(input_y, batch_id, i)) * NV_MAT_V(input_y, batch_id, i);
+			}
 		}
-		for (i = 0; i < dae->input_w->m; ++i) {
-			float y = nv_vector_dot(output_bp, batch_id, dae->input_w, i);
-			NV_MAT_V(hidden_bp, batch_id, i) = 
-				y * (1.0f - NV_MAT_V(input_y, batch_id, i)) * NV_MAT_V(input_y, batch_id, i);
+		nv_matrix_free(&activation_mean);	
+	} else {
+#ifdef _OPENMP
+#pragma omp parallel for private(i)
+#endif
+		for (batch_id = 0; batch_id < NV_DAE_BATCH_SIZE; ++batch_id) {
+			for (i = 0; i < output_bp->n; ++i) {
+				float y_t = NV_MAT_V(output_y, batch_id, i) - NV_MAT_V(data, dj[batch_id], i);
+				NV_MAT_V(output_bp, batch_id, i) = y_t;
+			}
+			for (i = 0; i < dae->input_w->m; ++i) {
+				float y = nv_vector_dot(output_bp, batch_id, dae->input_w, i);
+				NV_MAT_V(hidden_bp, batch_id, i) = 
+					y * (1.0f - NV_MAT_V(input_y, batch_id, i)) * NV_MAT_V(input_y, batch_id, i);
+			}
 		}
 	}
+	
 #ifdef _OPENMP
 #pragma omp parallel for private(batch_id)
 #endif
