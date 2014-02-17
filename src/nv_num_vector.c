@@ -270,6 +270,108 @@ nv_vector_add(nv_matrix_t *vec0, int m0,
 }
 
 void 
+nv_vector_max(nv_matrix_t *vec0, int m0,
+			  const nv_matrix_t *vec1, int m1,
+			  const nv_matrix_t *vec2, int m2)
+{
+	NV_ASSERT(vec1->n == vec2->n);
+	NV_ASSERT(vec2->n == vec0->n);
+	
+#if NV_ENABLE_AVX
+	{
+		__m256 x;
+		int n;
+		int pk_lp = (vec1->n & 0xfffffff8);
+		
+		for (n = 0; n < pk_lp; n += 8) {
+			x = _mm256_load_ps(&NV_MAT_V(vec1, m1, n));
+			_mm256_store_ps(&NV_MAT_V(vec0, m0, n),
+							_mm256_max_ps(x, *(const __m256 *)&NV_MAT_V(vec2, m2, n)));
+		}
+		for (n = pk_lp; n < vec1->n; ++n) {
+			NV_MAT_V(vec0, m0, n) = NV_MAT_V(vec1, m1, n) > NV_MAT_V(vec2, m2, n) ?
+				NV_MAT_V(vec1, m1, n):NV_MAT_V(vec2, m2, n);
+		}
+	}
+#elif NV_ENABLE_SSE2
+	{
+		
+		int n;
+		int pk_lp = (vec1->n & 0xfffffffc);
+
+		for (n = 0; n < pk_lp; n += 4) {
+			__m128 x = _mm_load_ps(&NV_MAT_V(vec1, m1, n));
+			_mm_store_ps(&NV_MAT_V(vec0, m0, n),
+						 _mm_max_ps(x, *(const __m128 *)&NV_MAT_V(vec2, m2, n)));
+		}
+		for (n = pk_lp; n < vec1->n; ++n) {
+			NV_MAT_V(vec0, m0, n) = NV_MAT_V(vec1, m1, n) > NV_MAT_V(vec2, m2, n) ?
+				NV_MAT_V(vec1, m1, n):NV_MAT_V(vec2, m2, n);
+		}
+	}
+#else
+	{
+		int n;
+		for (n = 0; n < vec1->n; ++n) {
+			NV_MAT_V(vec0, m0, n) = NV_MAT_V(vec1, m1, n) > NV_MAT_V(vec2, m2, n) ?
+				NV_MAT_V(vec1, m1, n):NV_MAT_V(vec2, m2, n);
+		}
+	}
+#endif
+}
+void 
+nv_vector_min(nv_matrix_t *vec0, int m0,
+			  const nv_matrix_t *vec1, int m1,
+			  const nv_matrix_t *vec2, int m2)
+{
+	NV_ASSERT(vec1->n == vec2->n);
+	NV_ASSERT(vec2->n == vec0->n);
+	
+#if NV_ENABLE_AVX
+	{
+		__m256 x;
+		int n;
+		int pk_lp = (vec1->n & 0xfffffff8);
+		
+		for (n = 0; n < pk_lp; n += 8) {
+			x = _mm256_load_ps(&NV_MAT_V(vec1, m1, n));
+			_mm256_store_ps(&NV_MAT_V(vec0, m0, n),
+							_mm256_min_ps(x, *(const __m256 *)&NV_MAT_V(vec2, m2, n)));
+		}
+		for (n = pk_lp; n < vec1->n; ++n) {
+			NV_MAT_V(vec0, m0, n) = NV_MAT_V(vec1, m1, n) < NV_MAT_V(vec2, m2, n) ?
+				NV_MAT_V(vec1, m1, n):NV_MAT_V(vec2, m2, n);
+		}
+	}
+#elif NV_ENABLE_SSE2
+	{
+		
+		int n;
+		int pk_lp = (vec1->n & 0xfffffffc);
+
+		for (n = 0; n < pk_lp; n += 4) {
+			__m128 x = _mm_load_ps(&NV_MAT_V(vec1, m1, n));
+			_mm_store_ps(&NV_MAT_V(vec0, m0, n),
+						 _mm_min_ps(x, *(const __m128 *)&NV_MAT_V(vec2, m2, n)));
+		}
+		for (n = pk_lp; n < vec1->n; ++n) {
+			NV_MAT_V(vec0, m0, n) = NV_MAT_V(vec1, m1, n) < NV_MAT_V(vec2, m2, n) ?
+				NV_MAT_V(vec1, m1, n):NV_MAT_V(vec2, m2, n);
+		}
+	}
+#else
+	{
+		int n;
+		for (n = 0; n < vec1->n; ++n) {
+			NV_MAT_V(vec0, m0, n) = NV_MAT_V(vec1, m1, n) < NV_MAT_V(vec2, m2, n) ?
+				NV_MAT_V(vec1, m1, n):NV_MAT_V(vec2, m2, n);
+		}
+	}
+#endif
+}
+
+
+void 
 nv_vector_mul(nv_matrix_t *vec0, int m0,
 			  const nv_matrix_t *vec1, int m1,
 			  const nv_matrix_t *vec2, int m2)
@@ -496,7 +598,7 @@ nv_int_float_t
 nv_vector_max_ex(const nv_matrix_t *v, int m)
 {
 	nv_int_float_t ret;
-	ret.f = nv_vector_max(v, m);
+	ret.f = nv_vector_maxs(v, m);
 	ret.i = (int)nv_float_find_index(&NV_MAT_V(v, m, 0), 0, v->n, ret.f);
 	
 	return ret;
@@ -505,13 +607,13 @@ nv_vector_max_ex(const nv_matrix_t *v, int m)
 int 
 nv_vector_max_n(const nv_matrix_t *v, int m)
 {
-	float v_max = nv_vector_max(v, m);
+	float v_max = nv_vector_maxs(v, m);
 	int max_n = (int)nv_float_find_index(&NV_MAT_V(v, m, 0), 0, v->n, v_max);
 	return max_n;
 }
 
 float 
-nv_vector_max(const nv_matrix_t *v, int j)
+nv_vector_maxs(const nv_matrix_t *v, int j)
 {
 	float v_max = -FLT_MAX;
 	int i;
@@ -574,7 +676,7 @@ nv_vector_max(const nv_matrix_t *v, int j)
 }
 
 float
-nv_vector_min(const nv_matrix_t *v, int j)
+nv_vector_mins(const nv_matrix_t *v, int j)
 {
 	float v_min = FLT_MAX;
 	int i;
@@ -640,7 +742,7 @@ nv_int_float_t
 nv_vector_min_ex(const nv_matrix_t *v, int m)
 {
 	nv_int_float_t ret;
-	ret.f = nv_vector_min(v, m);
+	ret.f = nv_vector_mins(v, m);
 	ret.i = (int)nv_float_find_index(&NV_MAT_V(v, m, 0), 0, v->n, ret.f);
 	
 	return ret;
@@ -650,7 +752,7 @@ nv_vector_min_ex(const nv_matrix_t *v, int m)
 int 
 nv_vector_min_n(const nv_matrix_t *v, int m)
 {
-	float v_min = nv_vector_min(v, m);
+	float v_min = nv_vector_mins(v, m);
 	int min_n = (int)nv_float_find_index(&NV_MAT_V(v, m, 0), 0, v->n, v_min);
 	return min_n;
 }

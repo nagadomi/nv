@@ -317,8 +317,8 @@ nv_matrix_normalize_shift(nv_matrix_t *mat, float min_v, float max_v)
 	float scale;
 	
 	for (i = 0; i < mat->m; ++i) {
-		float vec_max = nv_vector_max(mat, i);
-		float vec_min = nv_vector_min(mat, i);
+		float vec_max = nv_vector_maxs(mat, i);
+		float vec_min = nv_vector_mins(mat, i);
 		if (mat_max < vec_max) {
 			mat_max = vec_max;
 		}

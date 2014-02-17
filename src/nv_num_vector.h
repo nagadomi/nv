@@ -91,9 +91,16 @@ nv_vector_div(nv_matrix_t *vec0, int m0,
 float nv_vector_dot(const nv_matrix_t *vec1, int m1, const nv_matrix_t *vec2, int m2);
 float nv_vector_norm(const nv_matrix_t *v, int m);
 
-float nv_vector_max(const nv_matrix_t *v, int m);
+float nv_vector_maxs(const nv_matrix_t *v, int m);
+void nv_vector_max(nv_matrix_t *vec0, int m0,
+				   const nv_matrix_t *vec1, int m1,
+				   const nv_matrix_t *vec2, int m2);
 int nv_vector_max_n(const nv_matrix_t *v, int m);
-float nv_vector_min(const nv_matrix_t *v, int m);
+float nv_vector_mins(const nv_matrix_t *v, int m);
+void nv_vector_min(nv_matrix_t *vec0, int m0,
+				   const nv_matrix_t *vec1, int m1,
+				   const nv_matrix_t *vec2, int m2);
+int nv_vector_max_n(const nv_matrix_t *v, int m);
 int nv_vector_min_n(const nv_matrix_t *v, int m);
 int nv_vector_max_m(const nv_matrix_t *v);
 int nv_vector_min_m(const nv_matrix_t *v);
