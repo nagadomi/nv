@@ -45,17 +45,18 @@ nv_patch_extract(nv_matrix_t *patches,
 				 int patch_size)
 {
 	int y;
-	float stride_y = (float)(src->rows - patch_size) / patches->rows;
-	float stride_x = (float)(src->cols - patch_size) / patches->cols;
-	
+	float stride_y = (float)(src->rows - patch_size + 1) / patches->rows;
+	float stride_x = (float)(src->cols - patch_size + 1) / patches->cols;
+
 	NV_ASSERT(patches->n == src->n * patch_size * patch_size);
 	
 	for (y = 0; y < patches->rows; ++y) {
 		int x;
-		int src_y = NV_FLOOR(stride_y * y);
+		int src_y = NV_FLOOR_INT(stride_y * y);
+		
 		for (x = 0; x < patches->cols; ++x) {
 			int h;
-			int src_x = NV_FLOOR(stride_x * x);
+			int src_x = NV_FLOOR_INT(stride_x * x);
 			for (h = 0; h < patch_size; ++h) {
 				int w;
 				for (w = 0; w < patch_size; ++w) {
