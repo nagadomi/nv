@@ -25,9 +25,10 @@
  * Denoising Autoencoders
  */
 
-#define NV_DAE_BATCH_SIZE 128
+#define NV_DAE_BATCH_SIZE 32
 #define NV_DAE_BIAS 1.0f
 #define NV_DAE_SPARSITY_BETA 3.0f
+#define NV_DAE_WEIGHT_DECAY 0.0005f
 
 static int nv_dae_progress_flag = 0;
 
@@ -142,6 +143,7 @@ nv_dae_backward(
 	nv_dae_type_t type,
 	const nv_matrix_t *output_y,
 	const nv_matrix_t *input_y,
+	const nv_matrix_t *activation_mean,
 	const nv_matrix_t *corrupted_data,
 	const nv_matrix_t *data,
 	int *dj,
@@ -150,11 +152,10 @@ nv_dae_backward(
 	int i, j, batch_id;
 	nv_matrix_t *output_bp = nv_matrix_alloc(dae->input, NV_DAE_BATCH_SIZE);
 	nv_matrix_t *hidden_bp = nv_matrix_alloc(dae->input_w->m, NV_DAE_BATCH_SIZE);
+	float weight_decay = dae->sparsity > 0.0f ? lr * NV_DAE_WEIGHT_DECAY : 0.0f;
 
 	if (dae->sparsity > 0.0f) {
 		/* sparse autoencoders */
-		nv_matrix_t *activation_mean = nv_matrix_alloc(dae->hidden, 1);
-		nv_matrix_mean(activation_mean, 0, input_y);
 #ifdef _OPENMP
 #pragma omp parallel for private(i)
 #endif
@@ -173,7 +174,6 @@ nv_dae_backward(
 					 * (1.0f - NV_MAT_V(input_y, batch_id, i)) * NV_MAT_V(input_y, batch_id, i);
 			}
 		}
-		nv_matrix_free(&activation_mean);	
 	} else {
 #ifdef _OPENMP
 #pragma omp parallel for private(i)
@@ -209,6 +209,7 @@ nv_dae_backward(
 				const float d2 = lr * NV_MAT_V(output_bp, batch_id, i);
 				NV_MAT_V(dae->input_w, j, i) -=
 					(d1 * NV_MAT_V(corrupted_data, batch_id, i))
+					+ (weight_decay * NV_MAT_V(dae->input_w, j, i))
 					+ (d2 * NV_MAT_V(input_y, batch_id, j));
 			}
 			NV_MAT_V(dae->input_bias, j, 0) -= d1 * NV_DAE_BIAS;
@@ -246,12 +247,16 @@ nv_dae_train_ex(nv_dae_t *dae,
 	nv_matrix_t *input_y = nv_matrix_alloc(dae->hidden, NV_DAE_BATCH_SIZE);
 	nv_matrix_t *output_y = nv_matrix_alloc(dae->input, NV_DAE_BATCH_SIZE);
 	nv_matrix_t *corrupted_data = nv_matrix_alloc(dae->input, NV_DAE_BATCH_SIZE);
+	nv_matrix_t *activation_mean = nv_matrix_alloc(dae->hidden, 2);
+	nv_matrix_t *activation_tmp = nv_matrix_alloc(dae->hidden, 1);
+	int64_t activation_count;
 	int *djs = nv_alloc_type(int, NV_DAE_BATCH_SIZE);
 	int *rand_idx = nv_alloc_type(int, data->m);
 
-	lr *= 32.0f / NV_DAE_BATCH_SIZE;
 	NV_ASSERT(data->m > NV_DAE_BATCH_SIZE);
-
+	
+	nv_matrix_zero(activation_mean);
+	activation_count = 0;
 	epoch = start_epoch + 1;
 	do {
 		long tm;
@@ -278,10 +283,19 @@ nv_dae_train_ex(nv_dae_t *dae,
 				e += nv_dae_error(output_y, j, data, dj);
 				count += 1;
 			}
+			for (j = 0; j < NV_DAE_BATCH_SIZE; ++j) {
+				activation_count += 1;
+				nv_vector_muls(activation_mean, 0,
+							   activation_mean, 0,
+							   (float)(activation_count - 1) / activation_count);
+				nv_vector_muls(activation_tmp, 0, input_y, j, 1.0f / activation_count);
+				nv_vector_add(activation_mean, 0, activation_mean, 0, activation_tmp, 0);
+			}
 			nv_dae_backward(
 				dae,
 				type,
 				output_y, input_y,
+				activation_mean,
 				corrupted_data,
 				data, djs,
 				lr);
@@ -299,6 +313,8 @@ nv_dae_train_ex(nv_dae_t *dae,
 	nv_matrix_free(&input_y);
 	nv_matrix_free(&output_y);
 	nv_matrix_free(&corrupted_data);
+	nv_matrix_free(&activation_mean);
+	nv_matrix_free(&activation_tmp);
 	
 	return p;
 }
