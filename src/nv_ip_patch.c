@@ -60,10 +60,9 @@ nv_patch_extract(nv_matrix_t *patches,
 			for (h = 0; h < patch_size; ++h) {
 				int w;
 				for (w = 0; w < patch_size; ++w) {
-					int c = 0;
-					for (c = 0; c < src->n; ++c) {
-						NV_MAT3D_V(patches, y, x, (h * patch_size + w) * src->n + c) = NV_MAT3D_V(src, src_y + h, src_x + w, c);
-					}
+					memmove(&NV_MAT3D_V(patches, y, x, (h * patch_size + w) * src->n),
+							&NV_MAT3D_V(src, src_y + h, src_x + w, 0),
+							sizeof(float) * src->n);
 				}
 			}
 		}
