@@ -28,6 +28,11 @@ nv_max_pooling(nv_matrix_t *output,
 			   const nv_matrix_t *conv,
 			   int pooling_size,
 			   int stride);
+void
+nv_average_pooling(nv_matrix_t *output,
+				   const nv_matrix_t *conv,
+				   int pooling_size,
+				   int stride);
 
 #ifdef __cplusplus
 }
