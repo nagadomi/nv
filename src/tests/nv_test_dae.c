@@ -24,9 +24,10 @@
 #include "nv_test.h"
 
 #define MLP_HIDDEN_UNIT 320
-#define DAE_HIDDEN_UNIT 128
+#define DAE_HIDDEN_UNIT 512
 
-void normalize(nv_matrix_t *data)
+static void
+normalize(nv_matrix_t *data)
 {
 	int j;
 	nv_matrix_t *mean = nv_matrix_alloc(data->n, 1);
@@ -63,7 +64,8 @@ nv_test_dae(const nv_matrix_t *train_data,
 	
 	nv_dae_progress(1);
 	nv_dae_init(dae, scale_train_data);
-	nv_dae_noise(dae, 0.05f);
+	nv_dae_noise(dae, 0.5f);
+	nv_dae_sparsity(dae, 0.05f);
 	nv_dae_train(dae, scale_train_data, 0.01f, 0, 50, 50);
 
 	for (i = 0; i < train_data->m; ++i) {
