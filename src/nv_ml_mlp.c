@@ -103,6 +103,20 @@ void nv_mlp_dump_c(FILE *out, const nv_mlp_t *mlp, const char *name, int static_
 	fflush(out);
 }
 
+static void
+nv_mlp_softmax(nv_matrix_t *output_y, int oj,
+			   const nv_matrix_t *hidden_y, int hj)
+{
+	float base = NV_MAT_V(hidden_y, hj, nv_vector_max_n(hidden_y, hj));
+	float z = 0.0f;
+	int n;
+	for (n = 0; n < output_y->n; ++n) {
+		NV_MAT_V(output_y, oj, n) = expf(NV_MAT_V(hidden_y, hj, n) - base);
+		z += NV_MAT_V(output_y, oj, n);
+	}
+	nv_vector_divs(output_y, oj, output_y, oj, z);
+}
+
 /* クラス分類 */
 
 int nv_mlp_predict_label(const nv_mlp_t *mlp, const nv_matrix_t *x, int xm)
@@ -141,31 +155,67 @@ float nv_mlp_predict(const nv_mlp_t *mlp,
 	int m;
 	float y;
 	nv_matrix_t *input_y = nv_matrix_alloc(mlp->input_w->m, 1);
+	nv_matrix_t *hidden_y = nv_matrix_alloc(mlp->output, 1);
 	nv_matrix_t *output_y = nv_matrix_alloc(mlp->output, 1);
 	float p;
 	double dropout_scale = 1.0 - mlp->dropout;
+	float noise_scale = 1.0f - mlp->noise;
 	
 #ifdef _OPENMP
 #pragma omp parallel for private(y)
 #endif
 	for (m = 0; m < mlp->hidden; ++m) {
 		y = NV_MAT_V(mlp->input_bias, m, 0) * NV_MLP_BIAS;
-		y += nv_vector_dot(x, xm, mlp->input_w, m);
+		y += nv_vector_dot(x, xm, mlp->input_w, m) * noise_scale;
 		NV_MAT_V(input_y, 0, m) = nv_mlp_sigmoid(y) * dropout_scale;
 	}
 
 	for (m = 0; m < mlp->output; ++m) {
 		y = NV_MAT_V(mlp->hidden_bias, m, 0) * NV_MLP_BIAS;
 		y += nv_vector_dot(input_y, 0, mlp->hidden_w, m);
-		NV_MAT_V(output_y, 0, m) = nv_mlp_sigmoid(y);
+		NV_MAT_V(hidden_y, 0, m) = nv_mlp_sigmoid(y);
 	}
+	nv_mlp_softmax(output_y, 0, hidden_y, 0);
 	p = NV_MAT_V(output_y, 0, cls);
 
 	nv_matrix_free(&input_y);
+	nv_matrix_free(&hidden_y);
 	nv_matrix_free(&output_y);
 
 	return p;
 }
+
+void
+nv_mlp_predict_vector(const nv_mlp_t *mlp,
+					  nv_matrix_t *p, int p_j,
+					  const nv_matrix_t *x, int x_j)
+{
+	int m;
+	float y;
+	nv_matrix_t *input_y = nv_matrix_alloc(mlp->hidden, 1);
+	nv_matrix_t *hidden_y = nv_matrix_alloc(mlp->output, 1);
+	float dropout_scale = 1.0f - mlp->dropout;
+	float noise_scale = 1.0f - mlp->noise;
+	
+#ifdef _OPENMP
+#pragma omp parallel for private(y)
+#endif
+	for (m = 0; m < mlp->hidden; ++m) {
+		y = NV_MAT_V(mlp->input_bias, m, 0) * NV_MLP_BIAS;
+		y += nv_vector_dot(x, x_j, mlp->input_w, m) * noise_scale;
+		NV_MAT_V(input_y, 0, m) = nv_mlp_sigmoid(y) * dropout_scale;
+	}
+	for (m = 0; m < mlp->output; ++m) {
+		y = NV_MAT_V(mlp->hidden_bias, m, 0) * NV_MLP_BIAS;
+		y += nv_vector_dot(input_y, 0, mlp->hidden_w, m);
+		NV_MAT_V(hidden_y, 0, m) = nv_mlp_sigmoid(y);
+	}
+	nv_mlp_softmax(p, p_j, hidden_y, 0);
+
+	nv_matrix_free(&input_y);
+	nv_matrix_free(&hidden_y);
+}
+
 
 float nv_mlp_bagging_predict(const nv_mlp_t **mlp, int nmlp, 
 							 const nv_matrix_t *x, int xm, int cls)
@@ -421,20 +471,6 @@ nv_mlp_forward(const nv_mlp_t *mlp,
 	}
 }
 
-static void
-nv_mlp_softmax(nv_matrix_t *output_y, int oj,
-			   const nv_matrix_t *hidden_y, int hj)
-{
-	float base = NV_MAT_V(hidden_y, hj, nv_vector_max_n(hidden_y, hj));
-	float z = 0.0f;
-	int n;
-	for (n = 0; n < output_y->n; ++n) {
-		NV_MAT_V(output_y, oj, n) = expf(NV_MAT_V(hidden_y, hj, n) - base);
-		z += NV_MAT_V(output_y, oj, n);
-	}
-	nv_vector_divs(output_y, oj, output_y, oj, z);
-}
-
 static float
 nv_mlp_error(const nv_matrix_t *output_y, int oj,
 			 const nv_matrix_t *t, int dj)
@@ -536,7 +572,6 @@ nv_mlp_backward(
 		}
 		NV_MAT_V(hidden_bias_momentum, n, 0) =
 			NV_MLP_MOMENTUM * NV_MAT_V(hidden_bias_momentum, n, 0)
-			+ NV_MLP_WEIGHT_DECAY * hr * NV_MAT_V(mlp->hidden_bias, n, 0)
 			+ NV_MAT_V(hidden_bias_grad, n, 0);
 		NV_MAT_V(mlp->hidden_bias, n, 0) -= NV_MAT_V(hidden_bias_momentum, n, 0) * (1.0f - NV_MLP_MOMENTUM);
 	}

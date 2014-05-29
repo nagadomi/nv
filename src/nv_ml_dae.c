@@ -27,7 +27,7 @@
 
 #define NV_DAE_BATCH_SIZE 32
 #define NV_DAE_BIAS 1.0f
-#define NV_DAE_SPARSITY_BETA 3.0f
+#define NV_DAE_SPARSITY_BETA 0.25f
 #define NV_DAE_WEIGHT_DECAY 0.0005f
 
 static int nv_dae_progress_flag = 0;
@@ -69,11 +69,21 @@ nv_dae_free(nv_dae_t **dae)
 void
 nv_dae_init(nv_dae_t *dae, const nv_matrix_t *data)
 {
-	float scale = sqrtf(6.0f / (dae->hidden + dae->input + 1.0f));
-
+	const float data_scale = 1.0f / data->m;
+	const float input_norm_mean = sqrtf(0.8f * (dae->input_w->m + 1));
+	float data_norm_mean;
+	float input_scale;
+	int j;
+	
+	data_norm_mean = 0.0f;
+	for (j = 0; j < data->m; ++j) {
+		data_norm_mean += nv_vector_norm(data, j) * data_scale;
+	}
+	input_scale = 1.0f / (data_norm_mean * input_norm_mean);
+	
+	nv_matrix_rand(dae->input_w, -0.5f * input_scale, 0.5f * input_scale);
 	nv_matrix_zero(dae->input_bias);
 	nv_matrix_zero(dae->hidden_bias);
-	nv_matrix_rand(dae->input_w, -0.5f * scale, 0.5f * scale);
 }
 
 void
@@ -249,7 +259,7 @@ nv_dae_train_ex(nv_dae_t *dae,
 	nv_matrix_t *corrupted_data = nv_matrix_alloc(dae->input, NV_DAE_BATCH_SIZE);
 	nv_matrix_t *activation_mean = nv_matrix_alloc(dae->hidden, 2);
 	nv_matrix_t *activation_tmp = nv_matrix_alloc(dae->hidden, 1);
-	int64_t activation_count;
+	int activation_count;
 	int *djs = nv_alloc_type(int, NV_DAE_BATCH_SIZE);
 	int *rand_idx = nv_alloc_type(int, data->m);
 
@@ -291,22 +301,26 @@ nv_dae_train_ex(nv_dae_t *dae,
 				nv_vector_muls(activation_tmp, 0, input_y, j, 1.0f / activation_count);
 				nv_vector_add(activation_mean, 0, activation_mean, 0, activation_tmp, 0);
 			}
-			nv_dae_backward(
-				dae,
-				type,
-				output_y, input_y,
-				activation_mean,
-				corrupted_data,
-				data, djs,
-				lr);
+			if (activation_count >= 1000) {
+				nv_dae_backward(
+					dae,
+					type,
+					output_y, input_y,
+					activation_mean,
+					corrupted_data,
+					data, djs,
+					lr);
+			} // else wait for activation_mean
 		}
 		p = (float)correct / count;
 		if (nv_dae_progress_flag) {
-			printf("%d: E:%E, %ldms\n",
+			printf("%d: E:%E, AM: %E, %ldms\n",
 				   epoch, e / count / dae->input,
+				   nv_vector_mean(activation_mean, 0),
 				nv_clock() - tm);
 			fflush(stdout);
 		}
+		activation_count = 1000;
 	} while (epoch++ < end_epoch);
 	nv_free(rand_idx);
 	nv_free(djs);

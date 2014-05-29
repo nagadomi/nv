@@ -67,6 +67,10 @@ float nv_mlp_train(nv_mlp_t *mlp, const nv_matrix_t *data, const nv_matrix_t *la
 
 int nv_mlp_predict_label(const nv_mlp_t *mlp, const nv_matrix_t *x, int xm);
 float nv_mlp_predict(const nv_mlp_t *mlp, const nv_matrix_t *x, int xm, int cls);
+void nv_mlp_predict_vector(const nv_mlp_t *mlp,
+						   nv_matrix_t *p, int p_j,
+						   const nv_matrix_t *x, int x_j);
+
 float nv_mlp_bagging_predict(const nv_mlp_t **mlp, int nmlp, 
 							 const nv_matrix_t *x, int xm, int cls);
 
