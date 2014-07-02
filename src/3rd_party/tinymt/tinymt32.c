@@ -54,7 +54,7 @@
 #define MIN_LOOP 8
 #define PRE_LOOP 8
 
-#if NV_MSVC
+#ifdef _MSC_VER
 #  define MT_INLINE __inline
 #else
 #  define MT_INLINE inline
