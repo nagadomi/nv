@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -266,6 +266,14 @@
     <ClCompile Include="..\src\nv_core_matrix.c" />
     <ClCompile Include="..\src\nv_core_rand.c" />
     <ClCompile Include="..\src\nv_core_util.c" />
+    <ClCompile Include="..\src\nv_fv_rectangle_feature.c" />
+    <ClCompile Include="..\src\nv_io_dae.c" />
+    <ClCompile Include="..\src\nv_io_libsvm.c" />
+    <ClCompile Include="..\src\nv_ip_patch.c" />
+    <ClCompile Include="..\src\nv_ip_pooling.c" />
+    <ClCompile Include="..\src\nv_ml_dae.c" />
+    <ClCompile Include="..\src\nv_num_standardize.c" />
+    <ClCompile Include="..\src\nv_num_zca.c" />
     <ClCompile Include="..\src\nv_portable.c" />
     <ClCompile Include="..\src\nv_ip_bgseg.c" />
     <ClCompile Include="..\src\nv_ip_ccv.c" />
@@ -327,6 +335,12 @@
     <ClCompile Include="..\src\3rd_party\getopt\getopt.c" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\src\nv_fv_rectangle_feature.h" />
+    <ClInclude Include="..\src\nv_io_dae.h" />
+    <ClInclude Include="..\src\nv_io_libsvm.h" />
+    <ClInclude Include="..\src\nv_ip_patch.h" />
+    <ClInclude Include="..\src\nv_ip_pooling.h" />
+    <ClInclude Include="..\src\nv_ml_dae.h" />
     <ClInclude Include="..\src\nv_num.h" />
     <ClInclude Include="..\src\nv_num_cov.h" />
     <ClInclude Include="..\src\nv_num_distance.h" />
@@ -335,6 +349,7 @@
     <ClInclude Include="..\src\nv_num_matrix.h" />
     <ClInclude Include="..\src\nv_num_munkres.h" />
     <ClInclude Include="..\src\nv_num_prime.h" />
+    <ClInclude Include="..\src\nv_num_standardize.h" />
     <ClInclude Include="..\src\nv_num_vector.h" />
     <ClInclude Include="..\src\nv_config.h" />
     <ClInclude Include="..\src\nv_config_msvc.h" />
@@ -345,6 +360,7 @@
     <ClInclude Include="..\src\nv_core_rand.h" />
     <ClInclude Include="..\src\nv_core_util.h" />
     <ClInclude Include="..\src\nv_internal.h" />
+    <ClInclude Include="..\src\nv_num_zca.h" />
     <ClInclude Include="..\src\nv_portable.h" />
     <ClInclude Include="..\src\nv_io.h" />
     <ClInclude Include="..\src\nv_io_cov.h" />
