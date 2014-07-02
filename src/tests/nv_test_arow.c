@@ -42,7 +42,7 @@ nv_test_arow(const nv_matrix_t *train_data,
 	//nv_arow_progress(1);
 	nv_arow_init(arow);
 	nv_arow_train(arow,
-				  train_data, train_labels, 0.1f, 16);
+				  train_data, train_labels, 1.0f, 100);
 	ok = 0;
 	for (i = 0; i < test_data->m; ++i) {
 		if (nv_arow_predict_label(arow, test_data, i) == NV_MAT_VI(test_labels, i, 0)) {

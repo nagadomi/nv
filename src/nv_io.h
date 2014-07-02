@@ -28,11 +28,13 @@
 #include "nv_io_image.h"
 #include "nv_io_stream.h"
 #include "nv_io_mlp.h"
+#include "nv_io_dae.h"
 #include "nv_io_cov.h"
 #include "nv_io_nb.h"
 #include "nv_io_lr.h"
 #include "nv_io_video.h"
 #include "nv_io_kmeans_tree.h"
 #include "nv_io_klr_tree.h"
+#include "nv_io_libsvm.h"
 
 #endif

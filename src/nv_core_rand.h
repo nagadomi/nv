@@ -24,17 +24,23 @@
 extern "C" {
 #endif
 
+void nv_rand_init(void);
 void nv_srand_time(void);
 void nv_srand(unsigned int seed);
-float nv_rand(void);      /* [0 - 1] */
-int nv_rand_index(int n); /* [0 - n) */
+float nv_rand(void);      /* 0.0 < 1.0 */
+int nv_rand_index(int n); /* 0 < n */
 
-float nv_gaussian_rand(float average, float variance);
+float nv_nrand(float average, float variance);
 
 void nv_shuffle_index(int *a, int start, int end);
 void nv_vector_shuffle(nv_matrix_t *mat);
 void nv_vector_shuffle_pair(nv_matrix_t *mat1, nv_matrix_t *mat2);
 
+void nv_vector_rand(nv_matrix_t *v, int v_j, float rmin, float rmax);
+void nv_vector_nrand(nv_matrix_t *v, int v_j, float u, float s);
+
+void nv_matrix_rand(nv_matrix_t *mat, float rmin, float rmax);
+void nv_matrix_nrand(nv_matrix_t *mat, float u, float s);
 
 #ifdef __cplusplus
 }

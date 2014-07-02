@@ -112,7 +112,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>$(ProjectDir)..\src\;$(ProjectDir)..\src\3rd_party\sha1;$(ProjectDir)..\src\3rd_party\mt;$(ProjectDir)..\src\3rd_party;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\src\;$(ProjectDir)..\src\3rd_party\sha1;$(ProjectDir)..\src\3rd_party\tinymt;$(ProjectDir)..\src\3rd_party;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>NV_INTERNAL;_CRT_SECURE_NO_WARNINGS;__STDC_FORMAT_MACROS;__STDC_LIMIT_MACROS;__SSE__;__SSE2__;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>true</MinimalRebuild>
       <ExceptionHandling>Sync</ExceptionHandling>
@@ -143,7 +143,7 @@
       <OmitFramePointers>false</OmitFramePointers>
       <EnableFiberSafeOptimizations>false</EnableFiberSafeOptimizations>
       <WholeProgramOptimization>true</WholeProgramOptimization>
-      <AdditionalIncludeDirectories>$(ProjectDir)..\src;$(ProjectDir)..\src\3rd_party\sha1;$(ProjectDir)..\src\3rd_party\mt;$(ProjectDir)..\src\3rd_party;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\src;$(ProjectDir)..\src\3rd_party\sha1;$(ProjectDir)..\src\3rd_party\tinymt;$(ProjectDir)..\src\3rd_party;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>NV_INTERNAL;NV_DLL;_CRT_SECURE_NO_WARNINGS;NDEBUG;__STDC_FORMAT_MACROS;__STDC_LIMIT_MACROS;__SSE__;__SSE2__;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ExceptionHandling>Sync</ExceptionHandling>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
@@ -175,7 +175,7 @@
     </Midl>
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>$(ProjectDir)..\src;$(ProjectDir)..\src\3rd_party\msinttypes%3b$(ProjectDir)..\src\3rd_party\sha1%3b$(ProjectDir)..\src\3rd_party\mt;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\src;$(ProjectDir)..\src\3rd_party\msinttypes%3b$(ProjectDir)..\src\3rd_party\sha1%3b$(ProjectDir)..\src\3rd_party\tinymt;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>NV_INTERNAL;_CRT_SECURE_NO_WARNINGS;__SSE__;__SSE2__;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>true</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
@@ -205,7 +205,7 @@
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <OmitFramePointers>false</OmitFramePointers>
       <EnableFiberSafeOptimizations>false</EnableFiberSafeOptimizations>
-      <AdditionalIncludeDirectories>$(ProjectDir)..\src;$(ProjectDir)..\src\3rd_party\msinttypes;$(ProjectDir)..\src\3rd_party\sha1;$(ProjectDir)..\src\3rd_party\mt;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\src;$(ProjectDir)..\src\3rd_party\msinttypes;$(ProjectDir)..\src\3rd_party\sha1;$(ProjectDir)..\src\3rd_party\tinymt;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>NV_INTERNAL;_CRT_SECURE_NO_WARNINGS;NDEBUG;__SSE__;__SSE2__;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ExceptionHandling>Sync</ExceptionHandling>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
@@ -238,7 +238,7 @@
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <OmitFramePointers>false</OmitFramePointers>
       <EnableFiberSafeOptimizations>false</EnableFiberSafeOptimizations>
-      <AdditionalIncludeDirectories>$(ProjectDir)..\src;$(ProjectDir)..\src\3rd_party\msinttypes;$(ProjectDir)..\src\3rd_party\sha1;$(ProjectDir)..\src\3rd_party\mt;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\src;$(ProjectDir)..\src\3rd_party\msinttypes;$(ProjectDir)..\src\3rd_party\sha1;$(ProjectDir)..\src\3rd_party\tinymt;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>NV_INTERNAL;_CRT_SECURE_NO_WARNINGS;NDEBUG;__SSE__;__SSE2__;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ExceptionHandling>Sync</ExceptionHandling>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
@@ -266,6 +266,14 @@
     <ClCompile Include="..\src\nv_core_matrix.c" />
     <ClCompile Include="..\src\nv_core_rand.c" />
     <ClCompile Include="..\src\nv_core_util.c" />
+    <ClCompile Include="..\src\nv_fv_rectangle_feature.c" />
+    <ClCompile Include="..\src\nv_io_dae.c" />
+    <ClCompile Include="..\src\nv_io_libsvm.c" />
+    <ClCompile Include="..\src\nv_ip_patch.c" />
+    <ClCompile Include="..\src\nv_ip_pooling.c" />
+    <ClCompile Include="..\src\nv_ml_dae.c" />
+    <ClCompile Include="..\src\nv_num_standardize.c" />
+    <ClCompile Include="..\src\nv_num_zca.c" />
     <ClCompile Include="..\src\nv_portable.c" />
     <ClCompile Include="..\src\nv_ip_bgseg.c" />
     <ClCompile Include="..\src\nv_ip_ccv.c" />
@@ -279,7 +287,6 @@
     <ClCompile Include="..\src\nv_ip_laplacian.c" />
     <ClCompile Include="..\src\nv_ip_morphology.c" />
     <ClCompile Include="..\src\nv_ip_resize.c" />
-    <ClCompile Include="..\src\nv_ip_shapecontext.c" />
     <ClCompile Include="..\src\nv_ip_star_integral.c" />
     <ClCompile Include="..\src\nv_ip_star_integral_static.c" />
     <ClCompile Include="..\src\nv_io_cov.c" />
@@ -300,8 +307,6 @@
     <ClCompile Include="..\src\nv_num_matrix.c" />
     <ClCompile Include="..\src\nv_num_munkres.c" />
     <ClCompile Include="..\src\nv_num_prime_static.c" />
-    <ClCompile Include="..\src\nv_num_pstable.c" />
-    <ClCompile Include="..\src\nv_num_simhash.c" />
     <ClCompile Include="..\src\nv_num_vector.c" />
     <ClCompile Include="..\src\nv_ml_arow.c" />
     <ClCompile Include="..\src\nv_ml_gaussian.c" />
@@ -314,9 +319,7 @@
     <ClCompile Include="..\src\nv_ml_lmca.c" />
     <ClCompile Include="..\src\nv_ml_lr.c" />
     <ClCompile Include="..\src\nv_ml_mlp.c" />
-    <ClCompile Include="..\src\nv_ml_mlp3.c" />
     <ClCompile Include="..\src\nv_ml_nb.c" />
-    <ClCompile Include="..\src\nv_ml_pa.c" />
     <ClCompile Include="..\src\nv_ml_pca_kmeans_tree.c" />
     <ClCompile Include="..\src\nv_ml_plsi.c" />
     <ClCompile Include="..\src\nv_ml_som.c" />
@@ -328,10 +331,16 @@
     <ClCompile Include="..\src\nv_util_map.cpp" />
     <ClCompile Include="..\src\nv_util_sha1.c" />
     <ClCompile Include="..\src\3rd_party\sha1\sha1.c" />
-    <ClCompile Include="..\src\3rd_party\mt\mt19937-64.c" />
+    <ClCompile Include="..\src\3rd_party\tinymt\tinymt32.c" />
     <ClCompile Include="..\src\3rd_party\getopt\getopt.c" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\src\nv_fv_rectangle_feature.h" />
+    <ClInclude Include="..\src\nv_io_dae.h" />
+    <ClInclude Include="..\src\nv_io_libsvm.h" />
+    <ClInclude Include="..\src\nv_ip_patch.h" />
+    <ClInclude Include="..\src\nv_ip_pooling.h" />
+    <ClInclude Include="..\src\nv_ml_dae.h" />
     <ClInclude Include="..\src\nv_num.h" />
     <ClInclude Include="..\src\nv_num_cov.h" />
     <ClInclude Include="..\src\nv_num_distance.h" />
@@ -340,8 +349,7 @@
     <ClInclude Include="..\src\nv_num_matrix.h" />
     <ClInclude Include="..\src\nv_num_munkres.h" />
     <ClInclude Include="..\src\nv_num_prime.h" />
-    <ClInclude Include="..\src\nv_num_pstable.h" />
-    <ClInclude Include="..\src\nv_num_simhash.h" />
+    <ClInclude Include="..\src\nv_num_standardize.h" />
     <ClInclude Include="..\src\nv_num_vector.h" />
     <ClInclude Include="..\src\nv_config.h" />
     <ClInclude Include="..\src\nv_config_msvc.h" />
@@ -352,6 +360,7 @@
     <ClInclude Include="..\src\nv_core_rand.h" />
     <ClInclude Include="..\src\nv_core_util.h" />
     <ClInclude Include="..\src\nv_internal.h" />
+    <ClInclude Include="..\src\nv_num_zca.h" />
     <ClInclude Include="..\src\nv_portable.h" />
     <ClInclude Include="..\src\nv_io.h" />
     <ClInclude Include="..\src\nv_io_cov.h" />
@@ -378,7 +387,6 @@
     <ClInclude Include="..\src\nv_ip_laplacian.h" />
     <ClInclude Include="..\src\nv_ip_morphology.h" />
     <ClInclude Include="..\src\nv_ip_resize.h" />
-    <ClInclude Include="..\src\nv_ip_shapecontext.h" />
     <ClInclude Include="..\src\nv_ip_star_integral.h" />
     <ClInclude Include="..\src\nv_ip_star_integral_static.h" />
     <ClInclude Include="..\src\nv_ml.h" />
@@ -393,9 +401,7 @@
     <ClInclude Include="..\src\nv_ml_lmca.h" />
     <ClInclude Include="..\src\nv_ml_lr.h" />
     <ClInclude Include="..\src\nv_ml_mlp.h" />
-    <ClInclude Include="..\src\nv_ml_mlp3.h" />
     <ClInclude Include="..\src\nv_ml_nb.h" />
-    <ClInclude Include="..\src\nv_ml_pa.h" />
     <ClInclude Include="..\src\nv_ml_pca_kmeans_tree.h" />
     <ClInclude Include="..\src\nv_ml_plsi.h" />
     <ClInclude Include="..\src\nv_ml_som.h" />
@@ -409,7 +415,7 @@
     <ClInclude Include="..\src\nv_util_map.h" />
     <ClInclude Include="..\src\nv_util_sha1.h" />
     <ClInclude Include="..\src\3rd_party\sha1\sha.h" />
-    <ClInclude Include="..\src\3rd_party\mt\mt64.h" />
+    <ClInclude Include="..\src\3rd_party\tinymt\tinymt32.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\src\libnv-2.def" />

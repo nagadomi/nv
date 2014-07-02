@@ -56,7 +56,7 @@ nv_test_knn_pca(const nv_matrix_t *train_data,
 	nv_matrix_m(cov->eigen_vec, NPCA);
 	for (i = 0; i < train_data->m; ++i) {
 		nv_vector_sub(tmp, 0, train_data, i, cov->u, 0);
-		nv_gemv(train_data_pca, i, NV_MAT_TR, cov->eigen_vec, tmp, 0);
+		nv_matrix_mulv(train_data_pca, i, cov->eigen_vec, NV_MAT_TR, tmp, 0);
 	}
 	
 	ok = 0;
@@ -65,7 +65,7 @@ nv_test_knn_pca(const nv_matrix_t *train_data,
 		int j, n, max_v, max_i;
 
 		nv_vector_sub(tmp, 0, test_data, i, cov->u, 0);
-		nv_gemv(vec, 0, NV_MAT_TR, cov->eigen_vec, tmp, 0);
+		nv_matrix_mulv(vec, 0, cov->eigen_vec, NV_MAT_TR, tmp, 0);
 		n = nv_knn(results, KNN_K, train_data_pca, vec, 0);
 		for (j = 0; j < n; ++j) {
 			++knn[NV_MAT_VI(train_labels, results[j].index, 0)];

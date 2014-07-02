@@ -68,9 +68,6 @@
     <ClCompile Include="..\src\tests\nv_test_nb.c">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\tests\nv_test_pa.c">
-      <Filter>src</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\tests\nv_test_pca_kmeans_tree.c">
       <Filter>src</Filter>
     </ClCompile>
@@ -81,6 +78,12 @@
       <Filter>src</Filter>
     </ClCompile>
     <ClCompile Include="..\src\tests\nv_test_sha1.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\tests\nv_test_dae.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\tests\nv_test_matrix.c">
       <Filter>src</Filter>
     </ClCompile>
   </ItemGroup>

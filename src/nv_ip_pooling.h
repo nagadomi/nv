@@ -1,7 +1,7 @@
 /*
  * This file is part of libnv.
  *
- * Copyright (C) 2008-2012 nagadomi@nurs.or.jp
+ * Copyright (C) 2014 nagadomi@nurs.or.jp
  * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,28 +17,24 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef NV_NUM_H
-#define NV_NUM_H
-
-#include "nv_num_vector.h"
-#include "nv_num_matrix.h"
-#include "nv_num_cov.h"
-#include "nv_num_eigen.h"
-#include "nv_num_distance.h"
-#include "nv_num_munkres.h"
-#include "nv_num_prime.h"
-#include "nv_num_knn.h"
-#include "nv_num_standardize.h"
-#include "nv_num_zca.h"
-
+#ifndef NV_IP_POOLING_H
+#define NV_IP_POOLING_H
 #ifdef __cplusplus
 extern "C" {
 #endif
 
+void
+nv_max_pooling(nv_matrix_t *output,
+			   const nv_matrix_t *conv,
+			   int pooling_size,
+			   int stride);
+void
+nv_average_pooling(nv_matrix_t *output,
+				   const nv_matrix_t *conv,
+				   int pooling_size,
+				   int stride);
+
 #ifdef __cplusplus
 }
 #endif
-
-
-
 #endif

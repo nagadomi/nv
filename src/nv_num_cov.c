@@ -23,7 +23,7 @@
 #include "nv_num_matrix.h"
 #include "nv_num_eigen.h"
 
-#define NV_COV_EIGEN_MAX_EPOCH 30
+#define NV_COV_EIGEN_MAX_EPOCH 100
 
 /* 分散共分散 */
 
@@ -59,8 +59,7 @@ nv_cov_eigen_ex(nv_cov_t *cov, const nv_matrix_t *data,
 				int eigen_n, int max_epoch)
 {
 	nv_cov(cov->cov, cov->u, data);
-	nv_matrix_zero(cov->eigen_vec);
-	nv_matrix_zero(cov->eigen_val);
+    /* 高速化のためべき乗法を使うのであまり大きなeigen_nを指定しないように注意 */
 	nv_eigen(cov->eigen_vec, cov->eigen_val, cov->cov, eigen_n, max_epoch);
 	cov->data_m = data->m;
 }
@@ -69,8 +68,8 @@ void
 nv_cov_eigen(nv_cov_t *cov, const nv_matrix_t *data)
 {
 	nv_cov(cov->cov, cov->u, data);
-	nv_eigen(cov->eigen_vec, cov->eigen_val, cov->cov,
-			 cov->eigen_vec->n, NV_COV_EIGEN_MAX_EPOCH);
+	nv_eigen_sym(cov->eigen_vec, cov->eigen_val, cov->cov,
+				 NV_COV_EIGEN_MAX_EPOCH);
 	cov->data_m = data->m;
 }
 
@@ -80,9 +79,7 @@ void nv_cov(nv_matrix_t *cov,
 {
 	int m;
 	int alloc_u = 0;
-	int procs = nv_omp_procs();
-	nv_matrix_t *ut = nv_matrix_alloc(u->n, procs);
-	const float factor = 1.0f / (float)data->m;
+	const float factor = (data->m > 1) ? 1.0f / (data->m - 1): 1.0f / data->m;
 	
 	if (u == NULL) {
 		u = nv_matrix_alloc(cov->n, 1);
@@ -92,35 +89,27 @@ void nv_cov(nv_matrix_t *cov,
 			  && u->n == cov->n);
 
 	/* 平均 */
-	nv_matrix_zero(u);
-	nv_matrix_zero(ut);
-#ifdef _OPENMP
-#pragma omp parallel for num_threads(procs)
-#endif
-	for (m = 0; m < data->m; ++m) {
-		int idx = nv_omp_thread_id();
-		nv_vector_add(ut, idx, ut, idx, data, m);
-	}
-	for (m = 0; m < procs; ++m) {
-		nv_vector_add(u, 0, u, 0, ut, m);
-	}
-	nv_vector_muls(u, 0, u, 0, factor);
+	nv_matrix_mean(u, 0, data);
 
 	/* 分散共分散行列 */
 	nv_matrix_zero(cov);
 
-#ifdef _OPENMP
-#pragma omp parallel for num_threads(procs)	schedule(dynamic, 1)
-#endif
 	for (m = 0; m < cov->m; ++m) {
 		nv_matrix_t *dum = nv_matrix_alloc(data->m, 1);
-		int i, n;
+		int j, n;
 		const float um = NV_MAT_V(u, 0, m);
-		for (i = 0; i < data->m; ++i) {
-			NV_MAT_V(dum, 0, i) = (NV_MAT_V(data, i, m) - um) * factor;
+#ifdef _OPENMP
+#pragma omp parallel for
+#endif
+		for (j = 0; j < data->m; ++j) {
+			NV_MAT_V(dum, 0, j) = (NV_MAT_V(data, j, m) - um) * factor;
 		}
+#ifdef _OPENMP
+#pragma omp parallel for schedule(dynamic, 1)
+#endif
 		for (n = m; n < cov->n; ++n) {
 			float v = 0.0f;
+			int i;
 			const float un = NV_MAT_V(u, 0, n);
 			for (i = 0; i < data->m; ++i) {
 				v += (NV_MAT_V(data, i, n) - un) * NV_MAT_V(dum, 0, i);
@@ -132,5 +121,4 @@ void nv_cov(nv_matrix_t *cov,
 	if (alloc_u) {
 		nv_matrix_free(&u);
 	}
-	nv_matrix_free(&ut);
 }

@@ -1,7 +1,7 @@
 /*
  * This file is part of libnv.
  *
- * Copyright (C) 2008-2012 nagadomi@nurs.or.jp
+ * Copyright (C) 2014 nagadomi@nurs.or.jp
  * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,28 +17,23 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef NV_NUM_H
-#define NV_NUM_H
+#ifndef NV_IO_DAE_H
+#define NV_IO_DAE_H
 
-#include "nv_num_vector.h"
-#include "nv_num_matrix.h"
-#include "nv_num_cov.h"
-#include "nv_num_eigen.h"
-#include "nv_num_distance.h"
-#include "nv_num_munkres.h"
-#include "nv_num_prime.h"
-#include "nv_num_knn.h"
-#include "nv_num_standardize.h"
-#include "nv_num_zca.h"
-
+#include "nv_core.h"
+#include "nv_ml_dae.h"
 #ifdef __cplusplus
 extern "C" {
 #endif
 
+nv_dae_t *nv_load_dae_text(const char *filename);
+int nv_save_dae_text(const char *filename, const nv_dae_t *dae);
+
+#define nv_load_dae(filename) nv_load_dae_text(filename)
+#define nv_save_dae(filename, dae) nv_save_dae_text(filename, dae)
+
 #ifdef __cplusplus
 }
 #endif
-
-
 
 #endif

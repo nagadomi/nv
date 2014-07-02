@@ -91,13 +91,13 @@ void nv_gaussian5x5(nv_matrix_t *dest, int dch, const nv_matrix_t *src, int sch)
 			NV_MAT3D_V(dest, row, col, dch) = v;//NV_MIN(v, 255.0f);
 		}
 	}
-	for (row = 0; row < KERNEL_OFFSET; ++row) {
+	for (row = 0; row < KERNEL_OFFSET && row < dest->rows; ++row) {
 		int col;
 		for (col = 0; col < dest->cols; ++col) {
 			NV_MAT3D_V(dest, row, col, dch) = NV_MAT3D_V(src, row, col, sch);
 		}
 	}
-	for (row = src->rows - KERNEL_OFFSET; row < dest->rows; ++row) {
+	for (row = src->rows - KERNEL_OFFSET; row >= 0 && row < dest->rows; ++row) {
 		int col;
 		for (col = 0; col < dest->cols; ++col) {
 			NV_MAT3D_V(dest, row, col, dch) = NV_MAT3D_V(src, row, col, sch);			

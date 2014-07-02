@@ -1,7 +1,7 @@
 /*
  * This file is part of libnv.
  *
- * Copyright (C) 2008-2012 nagadomi@nurs.or.jp
+ * Copyright (C) 2014 nagadomi@nurs.or.jp
  * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,43 +17,33 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef NV_IP_SHAPECONTEXT_H
-#define NV_IP_SHAPECONTEXT_H
-
-#include "nv_core.h"
+#ifndef NV_NUM_STANDARDIZE_H
+#define NV_NUM_STANDARDIZE_H
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-#define NV_SC_LOG_R_BIN 3
-#define NV_SC_THETA_BIN 8
+void nv_standardize(nv_matrix_t *x, int x_j,
+					const nv_matrix_t *mean, int mean_j,
+					const nv_matrix_t *sd, int sd_j);
 
-typedef struct {
-	int n;
-	nv_matrix_t *tan_angle;
-	nv_matrix_t *coodinate;
-	nv_matrix_t *radius;
-	nv_matrix_t *sctx;
-} nv_shapecontext_t;
 
-nv_shapecontext_t *nv_shapecontext_alloc(int n);
-void nv_shapecontext_free(nv_shapecontext_t **sctx);
+void nv_standardize_local(nv_matrix_t *x, int x_j, float epsilon);
 
-float nv_shapecontext(const nv_shapecontext_t *img1,
-					  const nv_shapecontext_t *img2);
+void nv_standardize_train(nv_matrix_t *mean, int mean_j,
+						  nv_matrix_t *sd, int sd_j,
+						  const nv_matrix_t *data,
+						  float epsilon);
 
-void nv_shapecontext_feature(nv_shapecontext_t *sctx,
-							const nv_matrix_t *img,
-							float r);
+void nv_standardize_all(nv_matrix_t *a,
+						const nv_matrix_t *mean, int mean_j,
+						const nv_matrix_t *sd, int sd_j);
 
-float nv_shapecontext_distance(const nv_shapecontext_t *sctx1,
-							   const nv_shapecontext_t *sctx2);
-
+void nv_standardize_local_all(nv_matrix_t *a, float epsilon);
 
 #ifdef __cplusplus
 }
 #endif
 
 #endif
-

@@ -49,7 +49,7 @@ step1(nv_matrix_t *mat)
 	
 	for (j = 0; j < mat->m; ++j) {
 		nv_vector_subs(mat, j, mat, j,
-					   nv_vector_min(mat, j));
+					   nv_vector_mins(mat, j));
 	}
 	
 	return 2; /* 2へ */

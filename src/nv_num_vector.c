@@ -20,7 +20,6 @@
 #include "nv_core.h"
 #include "nv_num_distance.h"
 #include "nv_num_vector.h"
-#include <limits.h>
 
 void 
 nv_vector_sqrt(nv_matrix_t *vec0, int m0,
@@ -271,6 +270,108 @@ nv_vector_add(nv_matrix_t *vec0, int m0,
 }
 
 void 
+nv_vector_max(nv_matrix_t *vec0, int m0,
+			  const nv_matrix_t *vec1, int m1,
+			  const nv_matrix_t *vec2, int m2)
+{
+	NV_ASSERT(vec1->n == vec2->n);
+	NV_ASSERT(vec2->n == vec0->n);
+	
+#if NV_ENABLE_AVX
+	{
+		__m256 x;
+		int n;
+		int pk_lp = (vec1->n & 0xfffffff8);
+		
+		for (n = 0; n < pk_lp; n += 8) {
+			x = _mm256_load_ps(&NV_MAT_V(vec1, m1, n));
+			_mm256_store_ps(&NV_MAT_V(vec0, m0, n),
+							_mm256_max_ps(x, *(const __m256 *)&NV_MAT_V(vec2, m2, n)));
+		}
+		for (n = pk_lp; n < vec1->n; ++n) {
+			NV_MAT_V(vec0, m0, n) = NV_MAT_V(vec1, m1, n) > NV_MAT_V(vec2, m2, n) ?
+				NV_MAT_V(vec1, m1, n):NV_MAT_V(vec2, m2, n);
+		}
+	}
+#elif NV_ENABLE_SSE2
+	{
+		
+		int n;
+		int pk_lp = (vec1->n & 0xfffffffc);
+
+		for (n = 0; n < pk_lp; n += 4) {
+			__m128 x = _mm_load_ps(&NV_MAT_V(vec1, m1, n));
+			_mm_store_ps(&NV_MAT_V(vec0, m0, n),
+						 _mm_max_ps(x, *(const __m128 *)&NV_MAT_V(vec2, m2, n)));
+		}
+		for (n = pk_lp; n < vec1->n; ++n) {
+			NV_MAT_V(vec0, m0, n) = NV_MAT_V(vec1, m1, n) > NV_MAT_V(vec2, m2, n) ?
+				NV_MAT_V(vec1, m1, n):NV_MAT_V(vec2, m2, n);
+		}
+	}
+#else
+	{
+		int n;
+		for (n = 0; n < vec1->n; ++n) {
+			NV_MAT_V(vec0, m0, n) = NV_MAT_V(vec1, m1, n) > NV_MAT_V(vec2, m2, n) ?
+				NV_MAT_V(vec1, m1, n):NV_MAT_V(vec2, m2, n);
+		}
+	}
+#endif
+}
+void 
+nv_vector_min(nv_matrix_t *vec0, int m0,
+			  const nv_matrix_t *vec1, int m1,
+			  const nv_matrix_t *vec2, int m2)
+{
+	NV_ASSERT(vec1->n == vec2->n);
+	NV_ASSERT(vec2->n == vec0->n);
+	
+#if NV_ENABLE_AVX
+	{
+		__m256 x;
+		int n;
+		int pk_lp = (vec1->n & 0xfffffff8);
+		
+		for (n = 0; n < pk_lp; n += 8) {
+			x = _mm256_load_ps(&NV_MAT_V(vec1, m1, n));
+			_mm256_store_ps(&NV_MAT_V(vec0, m0, n),
+							_mm256_min_ps(x, *(const __m256 *)&NV_MAT_V(vec2, m2, n)));
+		}
+		for (n = pk_lp; n < vec1->n; ++n) {
+			NV_MAT_V(vec0, m0, n) = NV_MAT_V(vec1, m1, n) < NV_MAT_V(vec2, m2, n) ?
+				NV_MAT_V(vec1, m1, n):NV_MAT_V(vec2, m2, n);
+		}
+	}
+#elif NV_ENABLE_SSE2
+	{
+		
+		int n;
+		int pk_lp = (vec1->n & 0xfffffffc);
+
+		for (n = 0; n < pk_lp; n += 4) {
+			__m128 x = _mm_load_ps(&NV_MAT_V(vec1, m1, n));
+			_mm_store_ps(&NV_MAT_V(vec0, m0, n),
+						 _mm_min_ps(x, *(const __m128 *)&NV_MAT_V(vec2, m2, n)));
+		}
+		for (n = pk_lp; n < vec1->n; ++n) {
+			NV_MAT_V(vec0, m0, n) = NV_MAT_V(vec1, m1, n) < NV_MAT_V(vec2, m2, n) ?
+				NV_MAT_V(vec1, m1, n):NV_MAT_V(vec2, m2, n);
+		}
+	}
+#else
+	{
+		int n;
+		for (n = 0; n < vec1->n; ++n) {
+			NV_MAT_V(vec0, m0, n) = NV_MAT_V(vec1, m1, n) < NV_MAT_V(vec2, m2, n) ?
+				NV_MAT_V(vec1, m1, n):NV_MAT_V(vec2, m2, n);
+		}
+	}
+#endif
+}
+
+
+void 
 nv_vector_mul(nv_matrix_t *vec0, int m0,
 			  const nv_matrix_t *vec1, int m1,
 			  const nv_matrix_t *vec2, int m2)
@@ -312,6 +413,53 @@ nv_vector_mul(nv_matrix_t *vec0, int m0,
 		int n;
 		for (n = 0; n < vec1->n; ++n) {
 			NV_MAT_V(vec0, m0, n) = NV_MAT_V(vec1, m1, n) * NV_MAT_V(vec2, m2, n);
+		}
+	}
+#endif
+}
+
+void 
+nv_vector_div(nv_matrix_t *vec0, int m0,
+			  const nv_matrix_t *vec1, int m1,
+			  const nv_matrix_t *vec2, int m2)
+{
+	NV_ASSERT(vec1->n == vec2->n);
+	NV_ASSERT(vec2->n == vec0->n);
+	
+#if NV_ENABLE_AVX
+	{
+		__m256 x;
+		int n;
+		int pk_lp = (vec1->n & 0xfffffff8);
+		
+		for (n = 0; n < pk_lp; n += 8) {
+			x = _mm256_load_ps(&NV_MAT_V(vec1, m1, n));
+			_mm256_store_ps(&NV_MAT_V(vec0, m0, n),
+							_mm256_div_ps(x, *(const __m256 *)&NV_MAT_V(vec2, m2, n)));
+		}
+		for (n = pk_lp; n < vec1->n; ++n) {
+			NV_MAT_V(vec0, m0, n) = NV_MAT_V(vec1, m1, n) / NV_MAT_V(vec2, m2, n);
+		}
+	}
+#elif NV_ENABLE_SSE2
+	{
+		int n;
+		int pk_lp = (vec1->n & 0xfffffffc);
+
+		for (n = 0; n < pk_lp; n += 4) {
+			__m128 x = _mm_load_ps(&NV_MAT_V(vec1, m1, n));
+			_mm_store_ps(&NV_MAT_V(vec0, m0, n),
+						 _mm_div_ps(x, *(const __m128 *)&NV_MAT_V(vec2, m2, n)));
+		}
+		for (n = pk_lp; n < vec1->n; ++n) {
+			NV_MAT_V(vec0, m0, n) = NV_MAT_V(vec1, m1, n) / NV_MAT_V(vec2, m2, n);
+		}
+	}
+#else
+	{
+		int n;
+		for (n = 0; n < vec1->n; ++n) {
+			NV_MAT_V(vec0, m0, n) = NV_MAT_V(vec1, m1, n) / NV_MAT_V(vec2, m2, n);
 		}
 	}
 #endif
@@ -450,7 +598,7 @@ nv_int_float_t
 nv_vector_max_ex(const nv_matrix_t *v, int m)
 {
 	nv_int_float_t ret;
-	ret.f = nv_vector_max(v, m);
+	ret.f = nv_vector_maxs(v, m);
 	ret.i = (int)nv_float_find_index(&NV_MAT_V(v, m, 0), 0, v->n, ret.f);
 	
 	return ret;
@@ -459,13 +607,13 @@ nv_vector_max_ex(const nv_matrix_t *v, int m)
 int 
 nv_vector_max_n(const nv_matrix_t *v, int m)
 {
-	float v_max = nv_vector_max(v, m);
+	float v_max = nv_vector_maxs(v, m);
 	int max_n = (int)nv_float_find_index(&NV_MAT_V(v, m, 0), 0, v->n, v_max);
 	return max_n;
 }
 
 float 
-nv_vector_max(const nv_matrix_t *v, int j)
+nv_vector_maxs(const nv_matrix_t *v, int j)
 {
 	float v_max = -FLT_MAX;
 	int i;
@@ -528,7 +676,7 @@ nv_vector_max(const nv_matrix_t *v, int j)
 }
 
 float
-nv_vector_min(const nv_matrix_t *v, int j)
+nv_vector_mins(const nv_matrix_t *v, int j)
 {
 	float v_min = FLT_MAX;
 	int i;
@@ -594,7 +742,7 @@ nv_int_float_t
 nv_vector_min_ex(const nv_matrix_t *v, int m)
 {
 	nv_int_float_t ret;
-	ret.f = nv_vector_min(v, m);
+	ret.f = nv_vector_mins(v, m);
 	ret.i = (int)nv_float_find_index(&NV_MAT_V(v, m, 0), 0, v->n, ret.f);
 	
 	return ret;
@@ -604,7 +752,7 @@ nv_vector_min_ex(const nv_matrix_t *v, int m)
 int 
 nv_vector_min_n(const nv_matrix_t *v, int m)
 {
-	float v_min = nv_vector_min(v, m);
+	float v_min = nv_vector_mins(v, m);
 	int min_n = (int)nv_float_find_index(&NV_MAT_V(v, m, 0), 0, v->n, v_min);
 	return min_n;
 }
@@ -650,6 +798,29 @@ nv_vector_sum(const nv_matrix_t *v, int m)
 		sum += NV_MAT_V(v, m, n);
 	}
 	return sum;
+}
+
+float
+nv_vector_mean(const nv_matrix_t *x, int j)
+{
+	return nv_vector_sum(x, j) / x->n;
+}
+
+float
+nv_vector_var(const nv_matrix_t *x, int j)
+{
+	return nv_vector_var_ex(x, j, nv_vector_mean(x, j));
+}
+
+float
+nv_vector_var_ex(const nv_matrix_t *x, int j, float mean)
+{
+	float var = 0.0f;
+	int i;
+	for (i = 0; i < x->n; ++i) {
+		var += (mean - NV_MAT_V(x, j, i)) * (mean - NV_MAT_V(x, j, i));
+	}
+	return x->n > 1 ? (var / (x->n - 1)) : var;
 }
 
 int 
@@ -699,38 +870,6 @@ nv_vector_avg(nv_matrix_t *mean, int mean_m, const nv_matrix_t *mat)
 			NV_MAT_V(mean, mean_m, n) += factor * NV_MAT_V(mat, m, n);
 		}
 	}
-}
-
-void 
-nv_vector_rand(nv_matrix_t *v, int vm)
-{
-	int n;
-	for (n = 0; n < v->n; ++n) {
-		NV_MAT_V(v, vm, n) = nv_rand();
-	}
-}
-
-void 
-nv_vector_nrand(nv_matrix_t *v, int vm, float u, float s)
-{
-	int n;
-	for (n = 0; n < v->n; ++n) {
-		NV_MAT_V(v, vm, n) = nv_gaussian_rand(u, s);
-	}
-}
-
-void nv_vector_nrand_ex(nv_matrix_t *v, int j,
-						float u, float s,
-						unsigned long seed)
-{
-	int i;
-	unsigned long next_seed = (unsigned int)nv_rand_index(INT_MAX);
-	
-	nv_srand(seed);
-	for (i = 0; i < v->n; ++i) {
-		NV_MAT_V(v, j, i) = nv_gaussian_rand(u, s);
-	}
-	nv_srand(next_seed);
 }
 
 void 
@@ -857,7 +996,7 @@ nv_vector_normalize_all_L2(nv_matrix_t *mat)
 	int j;
 	
 #ifdef _OPENMP
-#pragma omp parallel for num_threads(1)
+#pragma omp parallel for
 #endif
 	for (j = 0; j < mat->m; ++j) {
 		nv_vector_normalize_L2(mat, j);
@@ -865,7 +1004,7 @@ nv_vector_normalize_all_L2(nv_matrix_t *mat)
 }
 
 void 
-nv_vector_normalize_maxmin(nv_matrix_t *v, int vm, float min_v, float max_v)
+nv_vector_normalize_shift(nv_matrix_t *v, int vm, float min_v, float max_v)
 {
 	int n;
 	float cur_max_v = -FLT_MAX;
@@ -927,6 +1066,50 @@ nv_vector_muls(nv_matrix_t *a, int am, const nv_matrix_t *x, int xm, float v)
 		int n;
 		for (n = 0; n < x->n; ++n) {
 			NV_MAT_V(a, am, n) = NV_MAT_V(x, xm, n) * v;
+		}
+	}
+#endif
+}
+
+void 
+nv_vector_divs(nv_matrix_t *a, int am, const nv_matrix_t *x, int xm, float v)
+{
+	NV_ASSERT(a->n >= x->n);
+#if NV_ENABLE_AVX
+	{
+		__m256 vv;
+		int n;
+		int pk_lp = (x->n & 0xfffffff8);
+
+		vv = _mm256_set1_ps(v);
+		for (n = 0; n < pk_lp; n += 8) {
+			_mm256_store_ps(&NV_MAT_V(a, am, n),
+							_mm256_div_ps(*(const __m256 *)&NV_MAT_V(x, xm, n), vv));
+		}
+		for (n = pk_lp; n < x->n; ++n) {
+			NV_MAT_V(a, am, n) = NV_MAT_V(x, xm, n) / v;
+		}
+	}
+#elif NV_ENABLE_SSE2
+	{
+		__m128 vv;
+		int n;
+		int pk_lp = (x->n & 0xfffffffc);
+
+		vv = _mm_set1_ps(v);
+		for (n = 0; n < pk_lp; n += 4) {
+			_mm_store_ps(&NV_MAT_V(a, am, n),
+						 _mm_div_ps(*(const __m128 *)&NV_MAT_V(x, xm, n), vv));
+		}
+		for (n = pk_lp; n < x->n; ++n) {
+			NV_MAT_V(a, am, n) = NV_MAT_V(x, xm, n) / v;
+		}
+	}
+#else
+	{
+		int n;
+		for (n = 0; n < x->n; ++n) {
+			NV_MAT_V(a, am, n) = NV_MAT_V(x, xm, n) / v;
 		}
 	}
 #endif
@@ -1136,4 +1319,35 @@ nv_float_find_index(const float *v, int64_t s, int64_t e, float key)
 		return -1;
 	}
 #endif
+}
+
+
+void 
+nv_vector_mulmtr(nv_matrix_t *vec0, int m0,
+				 const nv_matrix_t *vec1, int m1,
+				 const nv_matrix_t *mat)
+{
+	int i;
+	
+	NV_ASSERT(vec0->n == vec1->n);
+	NV_ASSERT(vec1->n == mat->n);
+	NV_ASSERT(vec0->n == mat->m);
+	
+	for (i = 0; i < mat->m; ++i) {
+		NV_MAT_V(vec0, m0, i) = nv_vector_dot(vec1, m1, mat, i);
+	}
+}
+
+void
+nv_vector_clip(nv_matrix_t *v, int v_j, float vmin, float vmax)
+{
+	int i;
+	for (i = 0; i < v->n; ++i) {
+		if (NV_MAT_V(v, v_j, i) < vmin) {
+			NV_MAT_V(v, v_j, i) = vmin;
+		}
+		if (NV_MAT_V(v, v_j, i) > vmax) {
+			NV_MAT_V(v, v_j, i) = vmax;
+		}
+	}
 }

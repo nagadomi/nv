@@ -5,8 +5,8 @@ nv_test_SOURCES = nv_test.c nv_test.h \
 nv_test_serialize.c \
 nv_test_lr.c \
 nv_test_arow.c \
-nv_test_pa.c \
 nv_test_mlp.c \
+nv_test_dae.c \
 nv_test_nb.c \
 nv_test_keypoint.c \
 nv_test_kmeans.c \
@@ -24,7 +24,8 @@ nv_test_sha1.c \
 nv_test_knn2.c \
 nv_test_knn_pca.c \
 nv_test_knn_lmca.c \
-nv_test_eigen.c
+nv_test_eigen.c \
+nv_test_matrix.c
 
 nv_test_CFLAGS= -Wall \
 -I$(srcdir)/../ -I$(srcdir)/../3rd_party/sha1 -I$(srcdir)/../3rd_party/mt -I$(srcdir)/../3rd_party/avxintrin_emu \

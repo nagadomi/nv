@@ -60,14 +60,8 @@ nv_test_knn_lmca(const nv_matrix_t *train_data,
 	t = nv_clock();
 	nv_lmca(l, train_data, train_labels, NK, MK, MARGIN, PUSH_RATIO, DELTA, EPOCH);
 	printf("-- %ldms\n", nv_clock() - t);
-	for (i = 0; i < train_data->m; ++i) {
-		nv_lmca_projection(train_data_lmca, i, l, train_data, i);
-#if 0
-		printf("%d %f %f\n", NV_MAT_VI(train_labels, i, 0),
-			   NV_MAT_V(train_data_lmca, i, 0),
-			   NV_MAT_V(train_data_lmca, i, 1));
-#endif
-	}
+	nv_lmca_projection_all(train_data_lmca, l, train_data);
+	
 	ok = 0;
 	for (i = 0; i < test_data->m; ++i) {
 		int knn[NV_TEST_DATA_K] = {0};

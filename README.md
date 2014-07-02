@@ -81,11 +81,9 @@ nv_cudaには一部関数のCUDA実装がありますが、今はちょっとメ
 
 ## 使用しているライブラリ
 
-  - [mt](http://www.math.sci.hiroshima-u.ac.jp/~m-mat/MT/mt.html)
-  - [msinttypes](http://code.google.com/p/msinttypes/)
+  - [tinymt32](http://www.math.sci.hiroshima-u.ac.jp/~m-mat/MT/TINYMT/)
   - [eiio](https://github.com/nagadomi/eiio) (optional)
   - [libcrypto](http://www.openssl.org/) (optional)
-  - [avxintrin_emu.h](http://software.intel.com/en-us/articles/avx-emulation-header-file/) (optional)
 
 ## 基本的な操作
 

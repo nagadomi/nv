@@ -41,7 +41,6 @@ nv_lr_alloc(int n, int k)
 	lr->n = n;
 	lr->k = k;
 	lr->w = nv_matrix_alloc(lr->n, k);
-
 	nv_matrix_zero(lr->w);
 
 	return lr;
@@ -148,7 +147,7 @@ nv_lr_train(nv_lr_t *lr,
 	float oe = FLT_MAX, er = 1.0f, we;
 	float sum_e = 0.0f;
 	int epoch = 0;
-	int pn = (data->m > 256) ? 128:1;
+	int pn = (data->m > 32) ? 32:1;
 	int step = data->m / (pn);
 	int threads = nv_omp_procs();
 	nv_matrix_t *y = nv_matrix_alloc(lr->k, threads);
@@ -205,7 +204,6 @@ nv_lr_train(nv_lr_t *lr,
 					sum_e += nv_lr_error(t, thread_num, y, thread_num);
 				}
 			}
-
 			for (l = 1; l < threads; ++l) {
 				for (j = 0; j < dw->m; ++j) {
 					for (i = 0; i < dw->n; ++i) {
@@ -213,6 +211,7 @@ nv_lr_train(nv_lr_t *lr,
 					}
 				}
 			}
+			
 #ifdef _OPENMP
 #pragma omp parallel for private(n)  num_threads(threads) if (lr->k > 32)
 #endif
@@ -274,14 +273,12 @@ nv_lr_train(nv_lr_t *lr,
 		if (nv_lr_progress_flag) {
 			fflush(stdout);
 		}
-
 		if (sum_e > oe) {
 			er += 1.0f;
 		}
-		if (er >= 20.0f) {
+		if (er >= 50.0f) {
 			break;
 		}
-		
 		if (sum_e < FLT_EPSILON) {
 			break;
 		}

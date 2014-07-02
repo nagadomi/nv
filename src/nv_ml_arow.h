@@ -29,6 +29,7 @@ typedef struct
 	int n;
 	int k;
 	nv_matrix_t *w;
+	nv_matrix_t *bias;
 } nv_arow_t;
 
 nv_arow_t *nv_arow_alloc(int n, int k);

@@ -38,7 +38,7 @@ nv_gaussian_predict(const nv_cov_t *cov, const nv_matrix_t *x, int xm)
 	float lambda = 1.0f;
 
 	nv_vector_sub(y, 0, x, xm, cov->u, 0);
-	nv_gemv(y, 1, NV_MAT_TR, cov->eigen_vec, y, 0);
+	nv_matrix_mulv(y, 1, cov->eigen_vec, NV_MAT_TR, y, 0);
 	for (n = 0; n < x->n; ++n) {
 		float ev = NV_MAT_V(cov->eigen_val, n, 0);
 		float xv = NV_MAT_V(y, 1, n);

@@ -57,6 +57,10 @@ nv_lmca_train_ex(nv_matrix_t *ldm,
 void nv_lmca_projection(nv_matrix_t *v1, int v1_j,
 						const nv_matrix_t *ldm,
 						const nv_matrix_t *v2, int v2_j);
+void nv_lmca_projection_all(nv_matrix_t *y,
+							const nv_matrix_t *ldm,
+							const nv_matrix_t *x);
+
 
 #ifdef __cplusplus
 }

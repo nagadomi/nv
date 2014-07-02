@@ -1,7 +1,7 @@
 /*
  * This file is part of libnv.
  *
- * Copyright (C) 2011 nagadomi@nurs.or.jp
+ * Copyright (C) 2014 nagadomi@nurs.or.jp
  * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,31 +17,21 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __NUM_SIMHASH_H
-#define __NUM_SIMHASH_H
+#ifndef NV_FV_RECTANGLE_FEATURE_H
+#define NV_FV_RECTANGLE_FEATURE_H
+
 #include "nv_core.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-typedef struct {
-	nv_matrix_t *a;
-} nv_simhash_t;
+#define NV_RECTANGLE_FEATURE_N 1152
 
-typedef uint64_t nv_simhash_hash_t;
-
-nv_simhash_t *nv_simhash_alloc(int vector_dim);
-void nv_simhash_free(nv_simhash_t **sh);
-void nv_simhash_seed(nv_simhash_t *sh, nv_matrix_t *seed);
-nv_simhash_hash_t nv_simhash_hash(const nv_simhash_t *sh, nv_matrix_t *vec, int vec_m);
-
-void
-nv_simhash_knn(const nv_simhash_t *sh,
-			   const nv_simhash_hash_t *db, int64_t nhash, 
-			   const nv_simhash_hash_t hash,
-			   int64_t *results, int k);
-
+void nv_rectangle_feature(nv_matrix_t *fv, 
+						  int fv_j,
+						  const nv_matrix_t *integral_image,
+						  int x, int y, int width, int height);
 
 #ifdef __cplusplus
 }

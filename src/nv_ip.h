@@ -39,16 +39,15 @@ extern "C" {
 #include "nv_ip_euclidean_color.h"
 #include "nv_ip_hsv.h"
 #include "nv_ip_ccv.h"
-
 #include "nv_ip_star_integral.h"
 #include "nv_ip_star_integral_static.h"
 #include "nv_ip_keypoint.h"
-#include "nv_ip_shapecontext.h"
 #include "nv_ip_resize.h"
 #include "nv_ip_flip.h"
-
 #include "nv_ip_bgseg.h"
 #include "nv_ip_morphology.h"
+#include "nv_ip_patch.h"
+#include "nv_ip_pooling.h"
 
 #ifdef __cplusplus
 }

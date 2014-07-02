@@ -209,31 +209,12 @@ nv_kmeans_init_dist(nv_matrix_t *means, int k,
 }
 
 void
-nv_kmeans_init_rand(nv_matrix_t *means, int k, const nv_matrix_t *data)
+nv_kmeans_init_rand(nv_matrix_t *means)
 {
-	int exists;
-	nv_matrix_t *work = nv_matrix_alloc(means->n, 1);
-	int j, i;
-
-	for (j = 0; j < k; ++j) {
-		int idx = nv_rand_index(data->m);
-
-		exists = 0;
-		for (i = 0; i < j; ++i) {
-			nv_vector_sub(work, 0, means, i, data, idx);
-			if (nv_vector_sum(work, 0) == 0.0f) {
-				exists = 1;
-				break;
-			}
-		}
-		if (exists) {
-			--j;
-			continue;
-		}
-		nv_vector_copy(means, j, data, idx);
+	int j;
+	for (j = 0; j < means->m; ++j) {
+		nv_vector_nrand(means, j, 0.0f, 0.1f);
 	}
-
-	nv_matrix_free(&work);
 }
 
 /* 最小距離クラス選択 */

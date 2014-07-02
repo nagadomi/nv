@@ -7,3 +7,6 @@ valgrind: all nv_test
 
 nv_test:
 	cd src/tests; make nv_test
+
+gdb: nv_test
+	cd $(abs_top_builddir)/src/tests && LD_LIBRARY_PATH="$(LD_LIBRARY_PATH):../.libs" gdb ./.libs/nv_test

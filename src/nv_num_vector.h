@@ -72,19 +72,35 @@ nv_vector_add(nv_matrix_t *vec0, int m0,
 			  const nv_matrix_t *vec1, int m1,
 			  const nv_matrix_t *vec2, int m2);
 	
-//#define nv_vector_muls(v1, j1, v2, j2, v) nv_vector_mul(v1, j1, v2, j2, v)
-
 void 
 nv_vector_mul(nv_matrix_t *vec0, int m0,
 			  const nv_matrix_t *vec1, int m1,
 			  const nv_matrix_t *vec2, int m2);
+
+void 
+nv_vector_mulmtr(nv_matrix_t *vec0, int m0,
+				 const nv_matrix_t *vec1, int m1,
+				 const nv_matrix_t *mat);
+
+void 
+nv_vector_div(nv_matrix_t *vec0, int m0,
+			  const nv_matrix_t *vec1, int m1,
+			  const nv_matrix_t *vec2, int m2);
+	
 	
 float nv_vector_dot(const nv_matrix_t *vec1, int m1, const nv_matrix_t *vec2, int m2);
 float nv_vector_norm(const nv_matrix_t *v, int m);
 
-float nv_vector_max(const nv_matrix_t *v, int m);
+float nv_vector_maxs(const nv_matrix_t *v, int m);
+void nv_vector_max(nv_matrix_t *vec0, int m0,
+				   const nv_matrix_t *vec1, int m1,
+				   const nv_matrix_t *vec2, int m2);
 int nv_vector_max_n(const nv_matrix_t *v, int m);
-float nv_vector_min(const nv_matrix_t *v, int m);
+float nv_vector_mins(const nv_matrix_t *v, int m);
+void nv_vector_min(nv_matrix_t *vec0, int m0,
+				   const nv_matrix_t *vec1, int m1,
+				   const nv_matrix_t *vec2, int m2);
+int nv_vector_max_n(const nv_matrix_t *v, int m);
 int nv_vector_min_n(const nv_matrix_t *v, int m);
 int nv_vector_max_m(const nv_matrix_t *v);
 int nv_vector_min_m(const nv_matrix_t *v);
@@ -93,18 +109,18 @@ void nv_vector_avg(nv_matrix_t *avg, int avg_m, const nv_matrix_t *mat);
 int nv_vector_maxnorm_m(const nv_matrix_t *v);
 int nv_vector_maxsum_m(const nv_matrix_t *v);
 
-float nv_vector_sum(const nv_matrix_t *v, int m);
+float nv_vector_sum(const nv_matrix_t *x, int j);
+float nv_vector_mean(const nv_matrix_t *x, int j);
+float nv_vector_var(const nv_matrix_t *x, int j);
+float nv_vector_var_ex(const nv_matrix_t *x, int j, float mean);
 
-void nv_vector_rand(nv_matrix_t *v, int vm);
-void nv_vector_nrand(nv_matrix_t *v, int vm, float u, float s);
-void nv_vector_nrand_ex(nv_matrix_t *v, int vm, float u, float s, unsigned long seed);
-	
 void nv_vector_normalize_L1(nv_matrix_t *v, int vm);
 void nv_vector_normalize_L2(nv_matrix_t *v, int vm);
 #define nv_vector_normalize(v, vm) nv_vector_normalize_L2((v), (vm))
 
-void nv_vector_normalize_maxmin(nv_matrix_t *v, int vm, float min_v, float max_v);
+void nv_vector_normalize_shift(nv_matrix_t *v, int vm, float min_v, float max_v);
 void nv_vector_muls(nv_matrix_t *a, int am, const nv_matrix_t *x, int xm, float v);
+void nv_vector_divs(nv_matrix_t *a, int am, const nv_matrix_t *x, int xm, float v);	
 void nv_vector_inv(nv_matrix_t *a, int am, const nv_matrix_t *x, int xm);
 int64_t nv_float_nonzero_index(const float *v, int64_t s, int64_t e);
 int64_t nv_float_find_index(const float *v, int64_t s, int64_t e, float key);
@@ -115,7 +131,11 @@ nv_int_float_t nv_vector_min_ex(const nv_matrix_t *v, int m);
 
 void nv_vector_normalize_all_L1(nv_matrix_t *mat);
 void nv_vector_normalize_all_L2(nv_matrix_t *mat);
+
 #define nv_vector_normalize_all(mat) nv_vector_normalize_all_L2(mat)
+#define nv_vector_absmax(v, m) NV_MAX(fabsf(nv_vector_max(v, m)), fabsf(nv_vector_min(v, m)))
+
+void nv_vector_clip(nv_matrix_t *v, int v_j, float vmin, float vmax);
 
 #ifdef __cplusplus
 }
