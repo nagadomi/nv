@@ -134,6 +134,7 @@
   <ItemGroup>
     <ClCompile Include="..\src\tests\nv_test.c" />
     <ClCompile Include="..\src\tests\nv_test_arow.c" />
+    <ClCompile Include="..\src\tests\nv_test_dae.c" />
     <ClCompile Include="..\src\tests\nv_test_eigen.c" />
     <ClCompile Include="..\src\tests\nv_test_io.c" />
     <ClCompile Include="..\src\tests\nv_test_keypoint.c" />
@@ -148,10 +149,10 @@
     <ClCompile Include="..\src\tests\nv_test_knn_pca.c" />
     <ClCompile Include="..\src\tests\nv_test_lbgu.c" />
     <ClCompile Include="..\src\tests\nv_test_lr.c" />
+    <ClCompile Include="..\src\tests\nv_test_matrix.c" />
     <ClCompile Include="..\src\tests\nv_test_mlp.c" />
     <ClCompile Include="..\src\tests\nv_test_munkres.c" />
     <ClCompile Include="..\src\tests\nv_test_nb.c" />
-    <ClCompile Include="..\src\tests\nv_test_pa.c" />
     <ClCompile Include="..\src\tests\nv_test_pca_kmeans_tree.c" />
     <ClCompile Include="..\src\tests\nv_test_plsi.c" />
     <ClCompile Include="..\src\tests\nv_test_serialize.c" />

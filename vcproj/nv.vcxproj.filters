@@ -122,9 +122,6 @@
     <ClCompile Include="..\src\nv_ip_resize.c">
       <Filter>src\nv_ip</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\nv_ip_shapecontext.c">
-      <Filter>src\nv_ip</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\nv_ip_star_integral.c">
       <Filter>src\nv_ip</Filter>
     </ClCompile>
@@ -185,12 +182,6 @@
     <ClCompile Include="..\src\nv_num_prime_static.c">
       <Filter>src\nv_num</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\nv_num_pstable.c">
-      <Filter>src\nv_num</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\nv_num_simhash.c">
-      <Filter>src\nv_num</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\nv_num_vector.c">
       <Filter>src\nv_num</Filter>
     </ClCompile>
@@ -227,13 +218,7 @@
     <ClCompile Include="..\src\nv_ml_mlp.c">
       <Filter>src\nv_ml</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\nv_ml_mlp3.c">
-      <Filter>src\nv_ml</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\nv_ml_nb.c">
-      <Filter>src\nv_ml</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\nv_ml_pa.c">
       <Filter>src\nv_ml</Filter>
     </ClCompile>
     <ClCompile Include="..\src\nv_ml_pca_kmeans_tree.c">
@@ -269,11 +254,35 @@
     <ClCompile Include="..\src\3rd_party\sha1\sha1.c">
       <Filter>src\3rd_party\sha1</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\3rd_party\mt\mt19937-64.c">
-      <Filter>src\3rd_party\mt</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\3rd_party\getopt\getopt.c">
       <Filter>src\3rd_party\getopt</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\3rd_party\tinymt\tinymt32.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\nv_ml_dae.c">
+      <Filter>src\nv_ml</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\nv_ip_pooling.c">
+      <Filter>src\nv_ip</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\nv_num_standardize.c">
+      <Filter>src\nv_num</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\nv_num_zca.c">
+      <Filter>src\nv_num</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\nv_ip_patch.c">
+      <Filter>src\nv_ip</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\nv_fv_rectangle_feature.c">
+      <Filter>src\nv_ip</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\nv_io_dae.c">
+      <Filter>src\nv_io</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\nv_io_libsvm.c">
+      <Filter>src\nv_io</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -299,12 +308,6 @@
       <Filter>include\nv_num</Filter>
     </ClInclude>
     <ClInclude Include="..\src\nv_num_prime.h">
-      <Filter>include\nv_num</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\nv_num_pstable.h">
-      <Filter>include\nv_num</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\nv_num_simhash.h">
       <Filter>include\nv_num</Filter>
     </ClInclude>
     <ClInclude Include="..\src\nv_num_vector.h">
@@ -415,9 +418,6 @@
     <ClInclude Include="..\src\nv_ip_resize.h">
       <Filter>include\nv_ip</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\nv_ip_shapecontext.h">
-      <Filter>include\nv_ip</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\nv_ip_star_integral.h">
       <Filter>include\nv_ip</Filter>
     </ClInclude>
@@ -460,13 +460,7 @@
     <ClInclude Include="..\src\nv_ml_mlp.h">
       <Filter>include\nv_ml</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\nv_ml_mlp3.h">
-      <Filter>include\nv_ml</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\nv_ml_nb.h">
-      <Filter>include\nv_ml</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\nv_ml_pa.h">
       <Filter>include\nv_ml</Filter>
     </ClInclude>
     <ClInclude Include="..\src\nv_ml_pca_kmeans_tree.h">
@@ -508,8 +502,32 @@
     <ClInclude Include="..\src\3rd_party\sha1\sha.h">
       <Filter>include\3rd_party\sha1</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\3rd_party\mt\mt64.h">
-      <Filter>include\3rd_party\mt</Filter>
+    <ClInclude Include="..\src\3rd_party\tinymt\tinymt32.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\nv_ml_dae.h">
+      <Filter>include\nv_ml</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\nv_ip_pooling.h">
+      <Filter>include\nv_ip</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\nv_num_standardize.h">
+      <Filter>include\nv_num</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\nv_num_zca.h">
+      <Filter>include\nv_num</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\nv_ip_patch.h">
+      <Filter>include\nv_ip</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\nv_fv_rectangle_feature.h">
+      <Filter>include\nv_ip</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\nv_io_dae.h">
+      <Filter>include\nv_io</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\nv_io_libsvm.h">
+      <Filter>include\nv_io</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
