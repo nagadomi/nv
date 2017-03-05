@@ -6,6 +6,7 @@ AC_INIT([nv],[2.2.0],[nagadomi@nurs.or.jp])
 NV_MAJOR=2
 NV_MINOR=2
 NV_REVISION=0
+AC_CONFIG_AUX_DIR([.])
 AM_INIT_AUTOMAKE([foreign subdir-objects])
 AC_CONFIG_SRCDIR([src])
 AC_CONFIG_HEADER([src/config.h:src/config.h.in])
