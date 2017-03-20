@@ -391,11 +391,9 @@ nv_keypoint_scale_response(const nv_keypoint_ctx_t *ctx,
 	for (row = offset; row < erow; row += 2) {
 		int col;
 		const int rowh = row / 2;
-		
 		for (col = offset; col < ecol; col += 2) {
 			int level_bound = 0, s;
 			const int colh = col / 2;
-
 			for (s = 0; s < ctx->param.level; s += 2) {
 				int o_r = NV_ROUND_INT(NV_MAT_V(outer_r, 0, s));
 				int o_r_offset = NV_ROUND_INT(o_r * NV_KEYPOINT_DESC_SCALE);
@@ -409,22 +407,12 @@ nv_keypoint_scale_response(const nv_keypoint_ctx_t *ctx,
 					break;
 				}
 			}
-			for (s = 0; s < level_bound - 3; s += 2) {
-				NV_MAT3D_V(grid_response, s + 1, rowh, colh) = nv_keypoint_scale_diff(
+			for (s = 1; s < level_bound; ++s) {
+				NV_MAT3D_V(grid_response, s, rowh, colh) = nv_keypoint_scale_diff(
 					img_integral, img_integral_tilted,
 					row, col,
-					NV_ROUND_INT(NV_MAT_V(outer_r, 0, s + 1)),
-					NV_ROUND_INT(NV_MAT_V(inner_r, 0, s + 1)));
-				NV_MAT3D_V(grid_response, s + 2, rowh, colh) = nv_keypoint_scale_diff(
-					img_integral, img_integral_tilted,
-					row, col,
-					NV_ROUND_INT(NV_MAT_V(outer_r, 0, s + 2)),
-					NV_ROUND_INT(NV_MAT_V(inner_r, 0, s + 2)));
-				NV_MAT3D_V(grid_response, s + 3, rowh, colh) = nv_keypoint_scale_diff(
-					img_integral, img_integral_tilted,
-					row, col,
-					NV_ROUND_INT(NV_MAT_V(outer_r, 0, s + 3)),
-					NV_ROUND_INT(NV_MAT_V(inner_r, 0, s + 3)));;
+					NV_ROUND_INT(NV_MAT_V(outer_r, 0, s)),
+					NV_ROUND_INT(NV_MAT_V(inner_r, 0, s)));
 			}
 		}
 	}
