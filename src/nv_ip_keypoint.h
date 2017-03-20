@@ -50,7 +50,8 @@ typedef enum {
 } nv_keypoint_descriptor_e;
 
 typedef enum {
-	NV_KEYPOINT_DETECTOR_STAR
+	NV_KEYPOINT_DETECTOR_STAR,
+	NV_KEYPOINT_DETECTOR_STAR_WITHOUT_SCALESPACE_SEARCH
 } nv_keypoint_detector_e;
 
 typedef struct {

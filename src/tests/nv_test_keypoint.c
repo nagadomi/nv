@@ -129,7 +129,12 @@ void nv_test_keypoint(void)
 	int n = 1;
 	float match;
 	nv_keypoint_param_t param1 = *nv_keypoint_param_gradient_histogram_default();
-	nv_keypoint_param_t param2 = *nv_keypoint_param_rectangle_feature_default();
+	nv_keypoint_param_t param2 = *nv_keypoint_param_gradient_histogram_default();
+	nv_keypoint_param_t param3 = *nv_keypoint_param_rectangle_feature_default();
+	nv_keypoint_param_t param4 = *nv_keypoint_param_rectangle_feature_default();
+
+	param2.detector = NV_KEYPOINT_DETECTOR_STAR_WITHOUT_SCALESPACE_SEARCH;
+	param4.detector = NV_KEYPOINT_DETECTOR_STAR_WITHOUT_SCALESPACE_SEARCH;
 	
 	for (i = 0; i < n; ++i) {
 		match = nv_test_keypoint_match(&param1, NV_TEST_IMG, NV_TEST_IMG_ROTATE);
@@ -137,12 +142,26 @@ void nv_test_keypoint(void)
 	}
 	match = nv_test_keypoint_match(&param1, NV_TEST_IMG, NV_TEST_NEGA);
 	NV_ASSERT(match < 0.5f);
-	
+
 	for (i = 0; i < n; ++i) {
 		match = nv_test_keypoint_match(&param2, NV_TEST_IMG, NV_TEST_IMG_ROTATE);
 		NV_ASSERT(match > 0.5f);
 	}
 	match = nv_test_keypoint_match(&param2, NV_TEST_IMG, NV_TEST_NEGA);
+	NV_ASSERT(match < 0.5f);
+	
+	for (i = 0; i < n; ++i) {
+		match = nv_test_keypoint_match(&param3, NV_TEST_IMG, NV_TEST_IMG_ROTATE);
+		NV_ASSERT(match > 0.5f);
+	}
+	match = nv_test_keypoint_match(&param3, NV_TEST_IMG, NV_TEST_NEGA);
+	NV_ASSERT(match < 0.5f);
+
+	for (i = 0; i < n; ++i) {
+		match = nv_test_keypoint_match(&param4, NV_TEST_IMG, NV_TEST_IMG_ROTATE);
+		NV_ASSERT(match > 0.5f);
+	}
+	match = nv_test_keypoint_match(&param4, NV_TEST_IMG, NV_TEST_NEGA);
 	NV_ASSERT(match < 0.5f);
 
 	fflush(stdout);

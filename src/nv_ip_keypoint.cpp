@@ -361,6 +361,75 @@ nv_keypoint_scale_search(const nv_keypoint_ctx_t *ctx,
 	nv_matrix_free(&scale_response);
 }
 
+static void
+nv_keypoint_scale_response(const nv_keypoint_ctx_t *ctx,
+						   nv_matrix_t *  grid_response, 
+						   const nv_matrix_t *  img_integral,
+						   const nv_matrix_t *  img_integral_tilted
+	)
+{
+	int row;
+	int offset = NV_ROUND_INT(NV_MAT_V(ctx->outer_r, 0, 0) * NV_KEYPOINT_DESC_SCALE);
+	const int img_rows = img_integral->rows - 1;
+	const int img_cols = img_integral->cols - 1;
+	int erow = img_rows - offset;
+	int ecol = img_cols - offset;
+	const int threads = nv_omp_procs();
+	const nv_matrix_t *outer_r = ctx->outer_r;
+	const nv_matrix_t *inner_r = ctx->inner_r;
+	
+	if (offset % 2 != 0) {
+		offset += 1;
+	}
+	erow = img_rows - offset;
+	ecol = img_cols - offset;
+	
+	/* スケール空間でStarDetectorのレスポンスを得る(極値の検出はしない) */
+#ifdef _OPENMP
+#pragma omp parallel for schedule(dynamic, 1) num_threads(threads)
+#endif
+	for (row = offset; row < erow; row += 2) {
+		int col;
+		const int rowh = row / 2;
+		
+		for (col = offset; col < ecol; col += 2) {
+			int level_bound = 0, s;
+			const int colh = col / 2;
+
+			for (s = 0; s < ctx->param.level; s += 2) {
+				int o_r = NV_ROUND_INT(NV_MAT_V(outer_r, 0, s));
+				int o_r_offset = NV_ROUND_INT(o_r * NV_KEYPOINT_DESC_SCALE);
+				if (row - o_r_offset >= 0
+					&& col - o_r_offset >= 0
+					&& row + o_r_offset < img_rows
+					&& col + o_r_offset < img_cols)
+				{
+					level_bound = s;
+				} else {
+					break;
+				}
+			}
+			for (s = 0; s < level_bound - 3; s += 2) {
+				NV_MAT3D_V(grid_response, s + 1, rowh, colh) = nv_keypoint_scale_diff(
+					img_integral, img_integral_tilted,
+					row, col,
+					NV_ROUND_INT(NV_MAT_V(outer_r, 0, s + 1)),
+					NV_ROUND_INT(NV_MAT_V(inner_r, 0, s + 1)));
+				NV_MAT3D_V(grid_response, s + 2, rowh, colh) = nv_keypoint_scale_diff(
+					img_integral, img_integral_tilted,
+					row, col,
+					NV_ROUND_INT(NV_MAT_V(outer_r, 0, s + 2)),
+					NV_ROUND_INT(NV_MAT_V(inner_r, 0, s + 2)));
+				NV_MAT3D_V(grid_response, s + 3, rowh, colh) = nv_keypoint_scale_diff(
+					img_integral, img_integral_tilted,
+					row, col,
+					NV_ROUND_INT(NV_MAT_V(outer_r, 0, s + 3)),
+					NV_ROUND_INT(NV_MAT_V(inner_r, 0, s + 3)));;
+			}
+		}
+	}
+}
+
 static int
 nv_keypoint_desc_cmp(const void *p1, const void *p2)
 {
@@ -1082,11 +1151,23 @@ nv_keypoint_detect(const nv_keypoint_ctx_t *ctx,
 	
 	nv_matrix_zero(grid_response);
 
-	/* 画素ごとに特徴点（候補）のスケールを探索する. */
-	nv_keypoint_scale_search(
-		ctx, grid_response,
-		integral, integral_tilted);
-	
+	switch (ctx->param.detector) {
+	case NV_KEYPOINT_DETECTOR_STAR:
+		/* スケール空間の探索を行う */
+		nv_keypoint_scale_search(
+			ctx, grid_response,
+			integral, integral_tilted);
+		break;
+	case NV_KEYPOINT_DETECTOR_STAR_WITHOUT_SCALESPACE_SEARCH:
+		/* スケール空間の探索は行わず全て検出する */
+		nv_keypoint_scale_response(
+			ctx, grid_response,
+			integral, integral_tilted);
+		break;
+	default:
+		NV_ASSERT(NULL == "unknown detector");
+		break;
+	}
 	/* 特徴点を選択する.  */
 	nv_keypoint_select(ctx,
 					   keypoints_tmp, nkeypoint, grid_response,
@@ -1171,7 +1252,6 @@ nv_keypoint_cpu(const nv_keypoint_ctx_t *ctx,
 	
 	nv_integral(integral, img, channel);
 	nv_integral_tilted(integral_tilted, img, channel);
-
 	nv_keypoint_make_scale_space(ctx,
 								 memo,
 								 integral,
